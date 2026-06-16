@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DocumentTemplate } from "@/components/document-template";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, Printer } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Download } from "lucide-react";
+import { exportElementToPdf } from "@/lib/export-pdf";
 
 export const Route = createFileRoute("/verify/$documentNumber")({
   head: () => ({ meta: [{ title: "نتيجة التحقق" }] }),
