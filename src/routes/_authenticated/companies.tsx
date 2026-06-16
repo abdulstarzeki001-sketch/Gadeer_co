@@ -8,17 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Upload, Search, Trash2, Pencil } from "lucide-react";
+import { Plus, Search, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import companiesJson from "@/data/companies.json";
 
 export const Route = createFileRoute("/_authenticated/companies")({
   head: () => ({ meta: [{ title: "الشركات - الكمارك" }] }),
   component: CompaniesPage,
 });
-
-type RawCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
-const SOURCE = companiesJson as RawCompany[];
 
 function CompaniesPage() {
   const qc = useQueryClient();
@@ -65,35 +61,6 @@ function CompaniesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const importMut = useMutation({
-    mutationFn: async () => {
-      const existing = new Set(companies.map((c) => c.company_name.trim()));
-      const fresh = SOURCE
-        .filter((r) => r.CompanyNameProject && !existing.has(r.CompanyNameProject.trim()))
-        .map((r) => ({
-          company_name: r.CompanyNameProject.trim(),
-          governorate: r.GovernorateName || "",
-          brand: r.Brand || "",
-          license_number: String(r.Number || ""),
-          specialization: "",
-        }));
-      if (fresh.length === 0) return { inserted: 0 };
-      const chunkSize = 500;
-      let inserted = 0;
-      for (let i = 0; i < fresh.length; i += chunkSize) {
-        const chunk = fresh.slice(i, i + chunkSize);
-        const { error } = await supabase.from("companies").insert(chunk);
-        if (error) throw error;
-        inserted += chunk.length;
-      }
-      return { inserted };
-    },
-    onSuccess: ({ inserted }) => {
-      qc.invalidateQueries({ queryKey: ["companies"] });
-      toast.success(`تم استيراد ${inserted} شركة`);
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   const filtered = companies.filter((c) =>
     !search || c.company_name.includes(search) || (c.brand ?? "").includes(search) || (c.governorate ?? "").includes(search)
@@ -118,13 +85,10 @@ function CompaniesPage() {
     <div className="p-6 space-y-4 max-w-7xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">الشركات</h1>
-          <p className="text-sm text-muted-foreground">{companies.length} شركة مسجلة — قاعدة المصدر: {SOURCE.length}</p>
+          <h1 className="text-2xl font-bold">الشركات (العملاء)</h1>
+          <p className="text-sm text-muted-foreground">{companies.length} شركة — تُضاف يدوياً أو تلقائياً عند إنشاء وثيقة</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => importMut.mutate()} disabled={importMut.isPending}>
-            <Upload className="h-4 w-4 ml-1" />استيراد من JSON
-          </Button>
           <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); } }}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 ml-1" />شركة جديدة</Button>
