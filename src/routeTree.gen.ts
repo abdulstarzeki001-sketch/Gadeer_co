@@ -17,7 +17,6 @@ import { Route as VerifyDocumentNumberRouteImport } from './routes/verify.$docum
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
 import { Route as AuthenticatedDocumentsIndexRouteImport } from './routes/_authenticated/documents.index'
-import { Route as ApiPublicSeedCompaniesRouteImport } from './routes/api/public/seed-companies'
 import { Route as AuthenticatedDocumentsPreviewRouteImport } from './routes/_authenticated/documents.preview'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents.new'
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
@@ -63,11 +62,6 @@ const AuthenticatedDocumentsIndexRoute =
     path: '/documents/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicSeedCompaniesRoute = ApiPublicSeedCompaniesRouteImport.update({
-  id: '/api/public/seed-companies',
-  path: '/api/public/seed-companies',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedDocumentsPreviewRoute =
   AuthenticatedDocumentsPreviewRouteImport.update({
     id: '/documents/preview',
@@ -104,7 +98,6 @@ export interface FileRoutesByFullPath {
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
-  '/api/public/seed-companies': typeof ApiPublicSeedCompaniesRoute
   '/documents/': typeof AuthenticatedDocumentsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -118,7 +111,6 @@ export interface FileRoutesByTo {
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
-  '/api/public/seed-companies': typeof ApiPublicSeedCompaniesRoute
   '/documents': typeof AuthenticatedDocumentsIndexRoute
 }
 export interface FileRoutesById {
@@ -134,7 +126,6 @@ export interface FileRoutesById {
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/_authenticated/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
-  '/api/public/seed-companies': typeof ApiPublicSeedCompaniesRoute
   '/_authenticated/documents/': typeof AuthenticatedDocumentsIndexRoute
 }
 export interface FileRouteTypes {
@@ -150,7 +141,6 @@ export interface FileRouteTypes {
     | '/documents/$id'
     | '/documents/new'
     | '/documents/preview'
-    | '/api/public/seed-companies'
     | '/documents/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -164,7 +154,6 @@ export interface FileRouteTypes {
     | '/documents/$id'
     | '/documents/new'
     | '/documents/preview'
-    | '/api/public/seed-companies'
     | '/documents'
   id:
     | '__root__'
@@ -179,7 +168,6 @@ export interface FileRouteTypes {
     | '/_authenticated/documents/$id'
     | '/_authenticated/documents/new'
     | '/_authenticated/documents/preview'
-    | '/api/public/seed-companies'
     | '/_authenticated/documents/'
   fileRoutesById: FileRoutesById
 }
@@ -187,7 +175,6 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   VerifyRoute: typeof VerifyRouteWithChildren
-  ApiPublicSeedCompaniesRoute: typeof ApiPublicSeedCompaniesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -247,13 +234,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/documents/'
       preLoaderRoute: typeof AuthenticatedDocumentsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/public/seed-companies': {
-      id: '/api/public/seed-companies'
-      path: '/api/public/seed-companies'
-      fullPath: '/api/public/seed-companies'
-      preLoaderRoute: typeof ApiPublicSeedCompaniesRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/documents/preview': {
       id: '/_authenticated/documents/preview'
@@ -339,7 +319,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   VerifyRoute: VerifyRouteWithChildren,
-  ApiPublicSeedCompaniesRoute: ApiPublicSeedCompaniesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
