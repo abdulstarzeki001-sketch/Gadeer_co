@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Building2, Truck, MapPin, Shield, DollarSign, Send } from "lucide-react";
+import { Building2, Truck, Shield, DollarSign, Send } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/documents/new")({
   component: CreateDocument,
 });
 
-const CHECKPOINTS = ["سيطرة دارمان", "منفذ الشلامجة", "نقطة أم قصر", "منفذ زرباطية", "منفذ المنذرية", "منفذ طريبيل", "منفذ عرعر", "منفذ ربيعة", "منفذ إبراهيم الخليل", "منفذ سفوان", "منفذ الوليد", "منفذ مندلي"];
+const CHECKPOINTS = ["سيطرة دارمان", "سيطرة السد"];
 const GOVERNORATES = ["بغداد", "البصرة", "نينوى", "أربيل", "السليمانية", "كركوك", "النجف", "كربلاء", "ذي قار", "بابل", "ديالى", "الأنبار", "واسط", "صلاح الدين", "ميسان", "المثنى", "القادسية", "دهوك"];
 
 function CreateDocument() {
@@ -41,8 +41,6 @@ function CreateDocument() {
     granting_license_approval: "", license_approval_number: "", license_approval_date: "", license_text_specialization: "",
     brand: "", notes: "", document_value: "",
   });
-  const [items, setItems] = useState([{ item_name: "", unit: "طن", production_capacity: "" }]);
-
   const onCompanyChange = (id: string) => {
     const c = companies.find((x) => x.id === id);
     if (!c) return;
@@ -60,11 +58,9 @@ function CreateDocument() {
 
   const createMut = useMutation({
     mutationFn: async () => {
-      const validItems = items.filter((i) => i.item_name && i.production_capacity);
       if (!form.company_id || !form.driver_name || !form.vehicle_number || !form.checkpoint_name_control || !form.weight_quantity) {
         throw new Error("الرجاء ملء الحقول المطلوبة *");
       }
-      if (validItems.length === 0) throw new Error("أضف مادة واحدة على الأقل");
 
       const insertPayload = {
         company_id: form.company_id,
@@ -96,8 +92,6 @@ function CreateDocument() {
       const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
       const qr = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
       await supabase.from("documents").update({ qr_code_data: qr }).eq("id", doc.id);
-
-      await supabase.from("document_items").insert(validItems.map((i) => ({ ...i, document_id: doc.id })));
 
       const val = parseFloat(form.document_value);
       if (val > 0) {
@@ -138,9 +132,9 @@ function CreateDocument() {
                 <SelectContent>{companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div className="space-y-2"><Label>المحافظة</Label>
+            <div className="space-y-2"><Label>مكاتب النقل</Label>
               <Select value={form.governorate_name} onValueChange={(v) => setForm({ ...form, governorate_name: v })}>
-                <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="اختيار ناقل" /></SelectTrigger>
                 <SelectContent>{GOVERNORATES.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
               </Select>
             </div>
@@ -187,16 +181,6 @@ function CreateDocument() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-5 w-5 text-primary" />الموقع الجغرافي</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2"><Label>خط الطول (X)</Label><Input value={form.x_coordinate} onChange={(e) => setForm({ ...form, x_coordinate: e.target.value })} dir="ltr" /></div>
-            <div className="space-y-2"><Label>خط العرض (Y)</Label><Input value={form.y_coordinate} onChange={(e) => setForm({ ...form, y_coordinate: e.target.value })} dir="ltr" /></div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-5 w-5 text-primary" />الإجازة / الموافقة</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -207,46 +191,6 @@ function CreateDocument() {
           </div>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">المواد المرخّصة</CardTitle>
-            <Button type="button" variant="secondary" size="sm" onClick={() => setItems([...items, { item_name: "", unit: "طن", production_capacity: "" }])}>
-              <Plus className="h-4 w-4 ml-1" />إضافة مادة
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {items.map((it, i) => (
-            <div key={i} className="p-4 rounded-md bg-muted/40 space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-medium">المادة {i + 1}</span>
-                {items.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="space-y-1"><Label className="text-xs">اسم المادة *</Label><Input value={it.item_name} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], item_name: e.target.value }; setItems(a); }} placeholder="اسم المادة" /></div>
-                <div className="space-y-1"><Label className="text-xs">الوحدة</Label>
-                  <Select value={it.unit} onValueChange={(v) => { const a = [...items]; a[i] = { ...a[i], unit: v }; setItems(a); }}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{["طن", "كغم", "قطعة", "لتر", "متر", "صندوق", "كيس", "برميل"].map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1"><Label className="text-xs">الطاقة الإنتاجية / الكمية *</Label><Input value={it.production_capacity} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], production_capacity: e.target.value }; setItems(a); }} type="number" min="0" placeholder="الكمية" dir="ltr" /></div>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <div className="space-y-2">
-        <Label>ملاحظات</Label>
-        <Textarea placeholder="ملاحظات إضافية (اختياري)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="resize-none" />
-      </div>
 
       <Button type="submit" size="lg" className="w-full" disabled={createMut.isPending}>
         <Send className="h-4 w-4 ml-2" />
