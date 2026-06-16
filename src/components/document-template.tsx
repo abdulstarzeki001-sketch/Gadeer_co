@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/iraq-customs-logo.png.asset.json";
+import logoAsset from "@/assets/logo_new.png.asset.json";
 
 interface DocumentItem {
   id: string;
