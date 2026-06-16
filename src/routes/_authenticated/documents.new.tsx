@@ -25,7 +25,10 @@ function CreateDocument() {
   const { data: companies = [] } = useQuery({
     queryKey: ["companies-select"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("companies").select("id, company_name, governorate, license_number, specialization, brand").order("company_name");
+      const { data, error } = await supabase
+        .from("companies")
+        .select("id, company_name, governorate, license_number, specialization, brand, granting_license_approval, license_approval_date, cargo_details, type_industry_production")
+        .order("company_name");
       if (error) throw error;
       return data;
     },
@@ -49,10 +52,13 @@ function CreateDocument() {
       company_id: id,
       company_name: c.company_name,
       company_name_project: c.company_name,
-      governorate_name: c.governorate,
-      license_approval_number: c.license_number,
-      license_text_specialization: c.specialization,
+      governorate_name: c.governorate ?? "",
+      license_approval_number: c.license_number ?? "",
+      license_text_specialization: c.specialization ?? "",
       brand: c.brand ?? "",
+      granting_license_approval: c.granting_license_approval ?? "",
+      license_approval_date: c.license_approval_date ?? "",
+      cargo_typedetails: c.cargo_details ?? c.type_industry_production ?? "",
     }));
   };
 
