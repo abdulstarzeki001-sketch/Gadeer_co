@@ -17,6 +17,7 @@ import { Route as VerifyDocumentNumberRouteImport } from './routes/verify.$docum
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
+import { Route as AuthenticatedDocumentsPreviewRouteImport } from './routes/_authenticated/documents.preview'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents.new'
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
 import { Route as AuthenticatedAccountingCompanyIdRouteImport } from './routes/_authenticated/accounting.$companyId'
@@ -60,6 +61,12 @@ const AuthenticatedAccountingRoute = AuthenticatedAccountingRouteImport.update({
   path: '/accounting',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDocumentsPreviewRoute =
+  AuthenticatedDocumentsPreviewRouteImport.update({
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => AuthenticatedDocumentsRoute,
+  } as any)
 const AuthenticatedDocumentsNewRoute =
   AuthenticatedDocumentsNewRouteImport.update({
     id: '/new',
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
+  '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
+  '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/_authenticated/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
+  '/_authenticated/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
+    | '/documents/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
+    | '/documents/preview'
   id:
     | '__root__'
     | '/_authenticated'
@@ -155,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authenticated/accounting/$companyId'
     | '/_authenticated/documents/$id'
     | '/_authenticated/documents/new'
+    | '/_authenticated/documents/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/documents/preview': {
+      id: '/_authenticated/documents/preview'
+      path: '/preview'
+      fullPath: '/documents/preview'
+      preLoaderRoute: typeof AuthenticatedDocumentsPreviewRouteImport
+      parentRoute: typeof AuthenticatedDocumentsRoute
+    }
     '/_authenticated/documents/new': {
       id: '/_authenticated/documents/new'
       path: '/new'
@@ -263,12 +283,14 @@ const AuthenticatedAccountingRouteWithChildren =
 interface AuthenticatedDocumentsRouteChildren {
   AuthenticatedDocumentsIdRoute: typeof AuthenticatedDocumentsIdRoute
   AuthenticatedDocumentsNewRoute: typeof AuthenticatedDocumentsNewRoute
+  AuthenticatedDocumentsPreviewRoute: typeof AuthenticatedDocumentsPreviewRoute
 }
 
 const AuthenticatedDocumentsRouteChildren: AuthenticatedDocumentsRouteChildren =
   {
     AuthenticatedDocumentsIdRoute: AuthenticatedDocumentsIdRoute,
     AuthenticatedDocumentsNewRoute: AuthenticatedDocumentsNewRoute,
+    AuthenticatedDocumentsPreviewRoute: AuthenticatedDocumentsPreviewRoute,
   }
 
 const AuthenticatedDocumentsRouteWithChildren =
