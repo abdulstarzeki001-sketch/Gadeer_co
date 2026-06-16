@@ -61,35 +61,6 @@ function CompaniesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const importMut = useMutation({
-    mutationFn: async () => {
-      const existing = new Set(companies.map((c) => c.company_name.trim()));
-      const fresh = SOURCE
-        .filter((r) => r.CompanyNameProject && !existing.has(r.CompanyNameProject.trim()))
-        .map((r) => ({
-          company_name: r.CompanyNameProject.trim(),
-          governorate: r.GovernorateName || "",
-          brand: r.Brand || "",
-          license_number: String(r.Number || ""),
-          specialization: "",
-        }));
-      if (fresh.length === 0) return { inserted: 0 };
-      const chunkSize = 500;
-      let inserted = 0;
-      for (let i = 0; i < fresh.length; i += chunkSize) {
-        const chunk = fresh.slice(i, i + chunkSize);
-        const { error } = await supabase.from("companies").insert(chunk);
-        if (error) throw error;
-        inserted += chunk.length;
-      }
-      return { inserted };
-    },
-    onSuccess: ({ inserted }) => {
-      qc.invalidateQueries({ queryKey: ["companies"] });
-      toast.success(`تم استيراد ${inserted} شركة`);
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   const filtered = companies.filter((c) =>
     !search || c.company_name.includes(search) || (c.brand ?? "").includes(search) || (c.governorate ?? "").includes(search)
