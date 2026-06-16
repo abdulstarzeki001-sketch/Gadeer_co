@@ -172,12 +172,3 @@ function MetaLine({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
-
-function MetaLine({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "35mm 1fr", gap: "2mm" }}>
-      <span className="meta-label">{label}</span>
-      <span className="meta-value" style={{ direction: "ltr", textAlign: "left" }}>{value}</span>
-    </div>
-  );
-}
