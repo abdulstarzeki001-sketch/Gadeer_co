@@ -37,158 +37,173 @@ interface DocumentData {
 
 export function DocumentTemplate({ doc }: { doc: DocumentData }) {
   const issued = new Date(doc.created_at);
+  const dateStr = issued.toLocaleDateString("ar-IQ");
+  const timeStr = issued.toLocaleTimeString("ar-IQ", { hour: "2-digit", minute: "2-digit" });
+
+  const border = "1px solid #d6d6d6";
+  const cellPad = "1.2mm 2mm";
+  const rowH = "6.5mm";
 
   return (
-    <div className="doc-page bg-white text-black mx-auto shadow-lg print:shadow-none" dir="rtl"
-      style={{ width: "210mm", minHeight: "297mm", padding: "12mm", fontFamily: "Cairo, sans-serif" }}>
+    <div
+      className="qr-document-root"
+      dir="rtl"
+      style={{
+        width: "210mm",
+        minHeight: "297mm",
+        padding: "12mm 14mm 10mm 14mm",
+        margin: "0 auto",
+        background: "white",
+        color: "#111",
+        fontFamily: "'Cairo', sans-serif",
+        boxSizing: "border-box",
+        position: "relative",
+      }}
+    >
       {/* Header */}
-      <div className="border-b-4 border-double pb-3" style={{ borderColor: "#1e3a5f" }}>
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-center flex-1">
-            <div className="text-[11px]">جمهورية العراق</div>
-            <div className="text-lg font-bold" style={{ color: "#1e3a5f" }}>الهيئة العامة للكمارك</div>
-            <div className="text-[11px]">منصة المنتج المحلي</div>
-          </div>
-          <div className="h-16 w-16 rounded-full flex items-center justify-center" style={{ background: "#1e3a5f" }}>
-            <ShieldCheck className="h-9 w-9 text-amber-400" />
-          </div>
-          <div className="text-center flex-1 text-[11px]">
-            <div>Republic of Iraq</div>
-            <div className="font-bold">General Authority of Customs</div>
-            <div>Local Product Platform</div>
-          </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "10pt", marginBottom: "8mm" }}>
+        <div style={{ textAlign: "right", lineHeight: 1.7, flex: 1 }}>
+          <div>رقم الوثيقة</div>
+          <div>تاريخ إنشاء الوثيقة</div>
+          <div>التوقيت</div>
+        </div>
+        <div style={{ width: "22mm", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <Logo size="22mm" />
+        </div>
+        <div style={{ textAlign: "left", lineHeight: 1.7, flex: 1, direction: "ltr", fontFamily: "'Cairo', sans-serif" }}>
+          <div style={{ fontWeight: 700 }}>{doc.document_number}</div>
+          <div>{dateStr}</div>
+          <div>{timeStr}</div>
         </div>
       </div>
 
       {/* Title */}
-      <div className="text-center my-4">
-        <h1 className="text-xl font-bold inline-block px-6 py-1 rounded" style={{ background: "#fef3c7", color: "#1e3a5f", border: "1px solid #d4a017" }}>
-          وثيقة شحن منتج محلي
-        </h1>
+      <h1 style={{ fontSize: "18pt", fontWeight: 700, textAlign: "right", margin: 0, marginBottom: "4mm" }}>
+        منصة المنتج المحلي
+      </h1>
+
+      {/* Subject row */}
+      <div style={{
+        height: "8mm", background: "#efefef", fontSize: "11pt", fontWeight: 700,
+        display: "flex", alignItems: "center", padding: "0 2mm", border,
+      }}>
+        الموضوع: {doc.subject || "وثيقة شحن منتج محلي"}
       </div>
 
-      {/* Doc meta row */}
-      <table className="w-full text-sm mb-4" style={{ borderCollapse: "collapse" }}>
-        <tbody>
-          <tr>
-            <Cell label="رقم الوثيقة" value={<span className="font-mono font-bold">{doc.document_number}</span>} />
-            <Cell label="تاريخ الإصدار" value={issued.toLocaleDateString("ar-IQ")} />
-            <Cell label="الموضوع" value={doc.subject || "-"} />
+      {/* Company section */}
+      <SectionHeader>معلومات الشركة</SectionHeader>
+      <InfoTable rowH={rowH} cellPad={cellPad} border={border} rows={[
+        ["اسم الشركة / المشروع", doc.company_name_project || doc.company_name],
+        ["المحافظة", doc.governorate_name || "-"],
+        ["العلامة التجارية", doc.brand || "-"],
+        ["رقم الإجازة", doc.license_approval_number || "-"],
+        ["الجهة المانحة", doc.granting_license_approval || "-"],
+        ["تاريخ الإجازة", doc.license_approval_date || "-"],
+        ["منطوق الإجازة / الاختصاص", doc.license_text_specialization || "-"],
+      ]} />
+
+      {/* Vehicle section */}
+      <SectionHeader>السائق والمركبة</SectionHeader>
+      <InfoTable rowH={rowH} cellPad={cellPad} border={border} rows={[
+        ["اسم السائق", doc.driver_name],
+        ["رقم العجلة", doc.vehicle_number],
+        ["محافظة التسجيل", doc.registration_governorate || "-"],
+        ["سيطرة الدخول", doc.checkpoint_name_control],
+        ["الوجهة النهائية", doc.destination_governorate || "-"],
+        ["الوزن / الكمية", doc.weight_quantity],
+        ["نوع / تفاصيل الحمولة", doc.cargo_typedetails || "-"],
+      ]} />
+
+      {/* Items */}
+      <SectionHeader>المواد المرخّصة</SectionHeader>
+      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "10pt" }}>
+        <thead>
+          <tr style={{ background: "#efefef" }}>
+            <th style={{ border, padding: cellPad, height: rowH, width: "8%" }}>ت</th>
+            <th style={{ border, padding: cellPad, height: rowH, textAlign: "right" }}>اسم المادة</th>
+            <th style={{ border, padding: cellPad, height: rowH, width: "20%" }}>الوحدة</th>
+            <th style={{ border, padding: cellPad, height: rowH, width: "22%" }}>الكمية</th>
           </tr>
+        </thead>
+        <tbody>
+          {(doc.items ?? []).map((it, i) => (
+            <tr key={it.id}>
+              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{i + 1}</td>
+              <td style={{ border, padding: cellPad, height: rowH, textAlign: "right" }}>{it.item_name}</td>
+              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{it.unit}</td>
+              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{it.production_capacity}</td>
+            </tr>
+          ))}
+          {(!doc.items || doc.items.length === 0) && (
+            <tr><td colSpan={4} style={{ border, padding: cellPad, textAlign: "center", color: "#888" }}>لا توجد مواد</td></tr>
+          )}
         </tbody>
       </table>
 
-      {/* Company */}
-      <Section title="معلومات الشركة">
-        <Row label="اسم الشركة / المشروع" value={doc.company_name_project || doc.company_name} colSpan={2} />
-        <Row label="المحافظة" value={doc.governorate_name || "-"} />
-        <Row label="العلامة التجارية" value={doc.brand || "-"} colSpan={2} />
-        <Row label="رقم الإجازة" value={doc.license_approval_number || "-"} />
-        <Row label="الجهة المانحة" value={doc.granting_license_approval || "-"} />
-        <Row label="تاريخ الإجازة" value={doc.license_approval_date || "-"} />
-        <Row label="منطوق الإجازة / الاختصاص" value={doc.license_text_specialization || "-"} colSpan={3} />
-      </Section>
-
-      {/* Vehicle */}
-      <Section title="السائق والمركبة">
-        <Row label="اسم السائق" value={doc.driver_name} />
-        <Row label="رقم العجلة" value={doc.vehicle_number} />
-        <Row label="محافظة التسجيل" value={doc.registration_governorate || "-"} />
-        <Row label="سيطرة الدخول" value={doc.checkpoint_name_control} />
-        <Row label="الوجهة النهائية" value={doc.destination_governorate || "-"} />
-        <Row label="الوزن / الكمية" value={doc.weight_quantity} />
-        <Row label="نوع / تفاصيل الحمولة" value={doc.cargo_typedetails || "-"} colSpan={3} />
-      </Section>
-
-      {/* Items table */}
-      <div className="mt-4">
-        <h3 className="text-sm font-bold mb-1 px-2 py-1" style={{ background: "#1e3a5f", color: "white" }}>المواد المرخّصة</h3>
-        <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#fef3c7" }}>
-              <th className="border p-1.5 w-10">ت</th>
-              <th className="border p-1.5">اسم المادة</th>
-              <th className="border p-1.5 w-20">الوحدة</th>
-              <th className="border p-1.5 w-28">الكمية</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(doc.items ?? []).map((it, i) => (
-              <tr key={it.id}>
-                <td className="border p-1.5 text-center">{i + 1}</td>
-                <td className="border p-1.5">{it.item_name}</td>
-                <td className="border p-1.5 text-center">{it.unit}</td>
-                <td className="border p-1.5 text-center font-mono" dir="ltr">{it.production_capacity}</td>
-              </tr>
-            ))}
-            {(!doc.items || doc.items.length === 0) && (
-              <tr><td colSpan={4} className="border p-3 text-center text-gray-500">لا توجد مواد</td></tr>
-            )}
-          </tbody>
-        </table>
+      {/* QR */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "4mm", marginBottom: "4mm" }}>
+        {doc.qr_code_data ? (
+          <img src={doc.qr_code_data} alt="QR" style={{ width: "34mm", height: "34mm" }} />
+        ) : (
+          <div style={{ width: "34mm", height: "34mm", border, display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "9pt" }}>QR</div>
+        )}
       </div>
 
-      {/* Coordinates */}
-      {(doc.x_coordinate || doc.y_coordinate) && (
-        <div className="mt-3 text-sm">
-          <span className="font-bold">الإحداثيات:</span>{" "}
-          <span dir="ltr" className="font-mono">X: {doc.x_coordinate || "-"} | Y: {doc.y_coordinate || "-"}</span>
-        </div>
-      )}
-
-      {/* Notes + QR */}
-      <div className="grid grid-cols-3 gap-3 mt-4">
-        <div className="col-span-2">
-          <div className="text-sm font-bold mb-1">ملاحظات</div>
-          <div className="border p-2 min-h-[80px] text-sm">{doc.notes || "—"}</div>
-        </div>
-        <div className="border p-2 text-center">
-          {doc.qr_code_data ? (
-            <img src={doc.qr_code_data} alt="QR" className="mx-auto" style={{ width: 120, height: 120 }} />
-          ) : (
-            <div className="h-[120px] flex items-center justify-center text-gray-400 text-xs">QR</div>
-          )}
-          <div className="text-[10px] mt-1 text-gray-600">امسح للتحقق</div>
-        </div>
+      {/* Notes */}
+      <div style={{ fontSize: "9pt", textAlign: "center", lineHeight: 1.5, padding: "0 4mm" }}>
+        {doc.notes || "هذه الوثيقة صادرة إلكترونياً عبر منصة المنتج المحلي. يرجى التحقق من صحتها بمسح رمز QR أعلاه."}
       </div>
 
-      {/* Signature */}
-      <div className="grid grid-cols-3 gap-6 mt-10 text-sm text-center">
-        <div><div className="border-t border-gray-800 pt-1">مسؤول الإصدار</div></div>
-        <div><div className="border-t border-gray-800 pt-1">مدير الشركة</div></div>
-        <div><div className="border-t border-gray-800 pt-1">مدير السيطرة</div></div>
-      </div>
-
-      <div className="text-[10px] text-center text-gray-500 mt-6 border-t pt-2">
-        هذه الوثيقة صادرة إلكترونياً من منصة المنتج المحلي - الهيئة العامة للكمارك. للتحقق امسح رمز QR أو زر /verify
+      {/* Footer */}
+      <div style={{
+        position: "absolute", left: "14mm", right: "14mm", bottom: "10mm",
+        borderTop: "1px solid #999", paddingTop: "2mm",
+        textAlign: "center", fontSize: "8.5pt",
+      }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "1mm" }}>
+          <Logo size="9mm" />
+        </div>
+        <div>الهيئة العامة للكمارك — منصة المنتج المحلي · للتحقق: /verify/{doc.document_number}</div>
       </div>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-3">
-      <h3 className="text-sm font-bold mb-1 px-2 py-1" style={{ background: "#1e3a5f", color: "white" }}>{title}</h3>
-      <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}><tbody>{children}</tbody></table>
+    <div style={{
+      background: "#a40000", color: "#fff", fontSize: "11pt", fontWeight: 700,
+      height: "7mm", display: "flex", alignItems: "center", padding: "0 2mm",
+      marginTop: "3mm",
+    }}>{children}</div>
+  );
+}
+
+function InfoTable({
+  rows, rowH, cellPad, border,
+}: { rows: [string, React.ReactNode][]; rowH: string; cellPad: string; border: string }) {
+  return (
+    <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "10pt" }}>
+      <tbody>
+        {rows.map(([label, value], i) => (
+          <tr key={i}>
+            <td style={{ border, padding: cellPad, height: rowH, width: "35%", textAlign: "right", fontWeight: 600, background: "#fafafa" }}>{label}</td>
+            <td style={{ border, padding: cellPad, height: rowH, width: "65%", textAlign: "right" }}>{value}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function Logo({ size }: { size: string }) {
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: "50%",
+      background: "#1e3a5f", color: "#f5c843",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <ShieldCheck style={{ width: "60%", height: "60%" }} />
     </div>
-  );
-}
-
-function Row({ label, value, colSpan = 1 }: { label: string; value: React.ReactNode; colSpan?: number }) {
-  return (
-    <tr>
-      <td className="border p-1.5 font-bold bg-gray-50 w-[180px]">{label}</td>
-      <td className="border p-1.5" colSpan={colSpan === 1 ? undefined : colSpan * 2 - 1}>{value}</td>
-    </tr>
-  );
-}
-
-function Cell({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <>
-      <td className="border p-1.5 font-bold bg-gray-50">{label}</td>
-      <td className="border p-1.5">{value}</td>
-    </>
   );
 }
