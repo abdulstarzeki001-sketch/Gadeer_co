@@ -82,9 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
       { name: "description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
       { property: "og:title", content: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
-      { property: "og:description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها" },
+      { property: "og:description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
+      { name: "twitter:description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/caab6747-7df1-4139-a8a4-11017c5c4cd0/id-preview-c1f17de8--2250d21d-4d82-4c08-ab9b-ebff3185882c.lovable.app-1781624255039.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/caab6747-7df1-4139-a8a4-11017c5c4cd0/id-preview-c1f17de8--2250d21d-4d82-4c08-ab9b-ebff3185882c.lovable.app-1781624255039.png" },
     ],
     links: [
       {
