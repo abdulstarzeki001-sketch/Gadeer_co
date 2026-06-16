@@ -9,14 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as VerifyDocumentNumberRouteImport } from './routes/verify.$documentNumber'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents.new'
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -30,6 +37,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const VerifyDocumentNumberRoute = VerifyDocumentNumberRouteImport.update({
+  id: '/$documentNumber',
+  path: '/$documentNumber',
+  getParentRoute: () => VerifyRoute,
 } as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
   id: '/documents',
@@ -57,15 +69,19 @@ const AuthenticatedDocumentsIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/documents': typeof AuthenticatedDocumentsRouteWithChildren
+  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/documents': typeof AuthenticatedDocumentsRouteWithChildren
+  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/': typeof AuthenticatedIndexRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
@@ -74,8 +90,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/verify': typeof VerifyRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRouteWithChildren
+  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
@@ -85,15 +103,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/verify'
     | '/companies'
     | '/documents'
+    | '/verify/$documentNumber'
     | '/documents/$id'
     | '/documents/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/verify'
     | '/companies'
     | '/documents'
+    | '/verify/$documentNumber'
     | '/'
     | '/documents/$id'
     | '/documents/new'
@@ -101,8 +123,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/verify'
     | '/_authenticated/companies'
     | '/_authenticated/documents'
+    | '/verify/$documentNumber'
     | '/_authenticated/'
     | '/_authenticated/documents/$id'
     | '/_authenticated/documents/new'
@@ -111,10 +135,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  VerifyRoute: typeof VerifyRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -135,6 +167,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/verify/$documentNumber': {
+      id: '/verify/$documentNumber'
+      path: '/$documentNumber'
+      fullPath: '/verify/$documentNumber'
+      preLoaderRoute: typeof VerifyDocumentNumberRouteImport
+      parentRoute: typeof VerifyRoute
     }
     '/_authenticated/documents': {
       id: '/_authenticated/documents'
@@ -198,10 +237,32 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface VerifyRouteChildren {
+  VerifyDocumentNumberRoute: typeof VerifyDocumentNumberRoute
+}
+
+const VerifyRouteChildren: VerifyRouteChildren = {
+  VerifyDocumentNumberRoute: VerifyDocumentNumberRoute,
+}
+
+const VerifyRouteWithChildren =
+  VerifyRoute._addFileChildren(VerifyRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  VerifyRoute: VerifyRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
