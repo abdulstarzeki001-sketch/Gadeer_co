@@ -42,8 +42,6 @@ function VerifyResult() {
     );
   }
 
-  return (
-    <div className="bg-muted/30 min-h-screen py-6" dir="rtl">
   const ref = useRef<HTMLDivElement>(null);
   const handleDownload = async () => {
     const el = ref.current?.querySelector(".qr-document-root") as HTMLElement | null;
