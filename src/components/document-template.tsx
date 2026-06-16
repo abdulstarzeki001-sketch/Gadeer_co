@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import logoAsset from "@/assets/iraq-customs-logo.png.asset.json";
 
 interface DocumentItem {
   id: string;
@@ -35,14 +35,57 @@ interface DocumentData {
   items?: DocumentItem[];
 }
 
-export function DocumentTemplate({ doc }: { doc: DocumentData }) {
-  const issued = new Date(doc.created_at);
-  const dateStr = issued.toLocaleDateString("ar-IQ");
-  const timeStr = issued.toLocaleTimeString("ar-IQ", { hour: "2-digit", minute: "2-digit" });
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}/${m}/${day}`;
+}
 
+function formatTime(iso: string) {
+  const d = new Date(iso);
+  let hour = d.getHours();
+  const minute = String(d.getMinutes()).padStart(2, "0");
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${minute} ${ampm}`;
+}
+
+export function DocumentTemplate({ doc }: { doc: DocumentData }) {
   const border = "1px solid #d6d6d6";
-  const cellPad = "1.2mm 2mm";
-  const rowH = "6.5mm";
+  const labelCell: React.CSSProperties = {
+    border, height: "6.5mm", padding: "1mm 2mm", width: "35%",
+    fontWeight: 700, color: "#555", textAlign: "right", verticalAlign: "middle",
+  };
+  const valueCell: React.CSSProperties = {
+    border, height: "6.5mm", padding: "1mm 2mm", width: "65%",
+    textAlign: "center", fontWeight: 600, color: "#222", verticalAlign: "middle",
+  };
+  const headerTh: React.CSSProperties = {
+    background: "#a40000", color: "#fff", height: "7mm",
+    fontSize: "11pt", fontWeight: 800, textAlign: "center",
+    border, padding: "1mm 2mm",
+  };
+
+  const rows: [string, React.ReactNode][] = [
+    ["اسم سيطرة الدخول", doc.checkpoint_name_control || "-"],
+    ["اسم السائق", doc.driver_name || "-"],
+    ["رقم العجلة", doc.vehicle_number || "-"],
+    ["محافظة تسجيل العجلة", doc.registration_governorate || "-"],
+    ["نوع / تفاصيل الحمولة", doc.cargo_typedetails || "-"],
+    ["الوزن / الكمية", doc.weight_quantity || "-"],
+    ["الوجهة النهائية / المحافظة", doc.destination_governorate || "-"],
+    ["اسم المحافظة", doc.governorate_name || "-"],
+    ["اسم الشركة / المشروع", doc.company_name_project || doc.company_name],
+    ["الجهة المانحة للإجازة / الموافقة", doc.granting_license_approval || "-"],
+    ["رقم الإجازة / الموافقة", doc.license_approval_number || "-"],
+    ["تاريخ الإجازة / الموافقة", doc.license_approval_date || "-"],
+    ["منطوق الإجازة / الاختصاص", doc.license_text_specialization || "-"],
+    ["العلامة التجارية", doc.brand || "-"],
+  ];
+
+  const items = doc.items ?? [];
 
   return (
     <div
@@ -53,157 +96,137 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
         minHeight: "297mm",
         padding: "12mm 14mm 10mm 14mm",
         margin: "0 auto",
-        background: "white",
-        color: "#111",
-        fontFamily: "'Cairo', sans-serif",
+        background: "#fff",
+        color: "#222",
+        fontFamily: "'Cairo', Arial, sans-serif",
         boxSizing: "border-box",
         position: "relative",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "10pt", marginBottom: "8mm" }}>
-        <div style={{ textAlign: "right", lineHeight: 1.7, flex: 1 }}>
-          <div>رقم الوثيقة</div>
-          <div>تاريخ إنشاء الوثيقة</div>
-          <div>التوقيت</div>
+      <header style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 32mm 1fr",
+        alignItems: "start",
+        minHeight: "38mm",
+        fontSize: "10pt",
+        fontWeight: 700,
+        lineHeight: 1.65,
+      }}>
+        <div style={{ textAlign: "right", paddingTop: "6mm" }}>
+          <div>جمهورية العراق</div>
+          <div>وزارة المالية</div>
+          <div>الهيئة العامة للكمارك</div>
         </div>
-        <div style={{ width: "22mm", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <Logo size="22mm" />
+        <div style={{ textAlign: "center", paddingTop: "1mm" }}>
+          <div style={{
+            width: "26mm", height: "26mm", borderRadius: "50%",
+            border: "2px solid #d8d8d8", margin: "0 auto",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "#fff", overflow: "hidden",
+          }}>
+            <img src={logoAsset.url} alt="Iraq Customs" style={{ width: "23mm", height: "23mm", objectFit: "contain" }} />
+          </div>
         </div>
-        <div style={{ textAlign: "left", lineHeight: 1.7, flex: 1, direction: "ltr", fontFamily: "'Cairo', sans-serif" }}>
-          <div style={{ fontWeight: 700 }}>{doc.document_number}</div>
-          <div>{dateStr}</div>
-          <div>{timeStr}</div>
+        <div style={{ textAlign: "right", paddingTop: "6mm" }}>
+          <MetaLine label="رقم الوثيقة" value={doc.document_number} />
+          <MetaLine label="تاريخ إنشاء الوثيقة" value={formatDate(doc.created_at)} />
+          <MetaLine label="التوقيت" value={formatTime(doc.created_at)} />
         </div>
-      </div>
+      </header>
+
+      <hr style={{ border: "none", borderTop: "1px solid #d8d8d8", margin: "0 0 6mm 0" }} />
 
       {/* Title */}
-      <h1 style={{ fontSize: "18pt", fontWeight: 700, textAlign: "right", margin: 0, marginBottom: "4mm" }}>
+      <h2 style={{ textAlign: "center", fontSize: "18pt", fontWeight: 800, lineHeight: 1.2, margin: "0 0 4mm 0" }}>
         منصة المنتج المحلي
-      </h1>
+      </h2>
 
-      {/* Subject row */}
+      {/* Subject */}
       <div style={{
-        height: "8mm", background: "#efefef", fontSize: "11pt", fontWeight: 700,
-        display: "flex", alignItems: "center", padding: "0 2mm", border,
+        height: "8mm", background: "#f3f3f3", border: "1px solid #d6d6d6",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: "8px", fontSize: "11pt", fontWeight: 700, marginBottom: "2mm",
+        boxSizing: "border-box",
       }}>
-        الموضوع: {doc.subject || "وثيقة شحن منتج محلي"}
+        <strong>الموضوع /</strong>
+        <span>{doc.subject || "الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة"}</span>
       </div>
 
-      {/* Company section */}
-      <SectionHeader>معلومات الشركة</SectionHeader>
-      <InfoTable rowH={rowH} cellPad={cellPad} border={border} rows={[
-        ["اسم الشركة / المشروع", doc.company_name_project || doc.company_name],
-        ["المحافظة", doc.governorate_name || "-"],
-        ["العلامة التجارية", doc.brand || "-"],
-        ["رقم الإجازة", doc.license_approval_number || "-"],
-        ["الجهة المانحة", doc.granting_license_approval || "-"],
-        ["تاريخ الإجازة", doc.license_approval_date || "-"],
-        ["منطوق الإجازة / الاختصاص", doc.license_text_specialization || "-"],
-      ]} />
-
-      {/* Vehicle section */}
-      <SectionHeader>السائق والمركبة</SectionHeader>
-      <InfoTable rowH={rowH} cellPad={cellPad} border={border} rows={[
-        ["اسم السائق", doc.driver_name],
-        ["رقم العجلة", doc.vehicle_number],
-        ["محافظة التسجيل", doc.registration_governorate || "-"],
-        ["سيطرة الدخول", doc.checkpoint_name_control],
-        ["الوجهة النهائية", doc.destination_governorate || "-"],
-        ["الوزن / الكمية", doc.weight_quantity],
-        ["نوع / تفاصيل الحمولة", doc.cargo_typedetails || "-"],
-      ]} />
-
-      {/* Items */}
-      <SectionHeader>المواد المرخّصة</SectionHeader>
-      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "10pt" }}>
+      {/* Info table */}
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: "10pt", lineHeight: 1.25 }}>
         <thead>
-          <tr style={{ background: "#efefef" }}>
-            <th style={{ border, padding: cellPad, height: rowH, width: "8%" }}>ت</th>
-            <th style={{ border, padding: cellPad, height: rowH, textAlign: "right" }}>اسم المادة</th>
-            <th style={{ border, padding: cellPad, height: rowH, width: "20%" }}>الوحدة</th>
-            <th style={{ border, padding: cellPad, height: rowH, width: "22%" }}>الكمية</th>
-          </tr>
+          <tr><th colSpan={2} style={headerTh}>المعلومات الشخصية</th></tr>
         </thead>
         <tbody>
-          {(doc.items ?? []).map((it, i) => (
-            <tr key={it.id}>
-              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{i + 1}</td>
-              <td style={{ border, padding: cellPad, height: rowH, textAlign: "right" }}>{it.item_name}</td>
-              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{it.unit}</td>
-              <td style={{ border, padding: cellPad, height: rowH, textAlign: "center" }}>{it.production_capacity}</td>
+          {rows.map(([label, value], i) => (
+            <tr key={i}>
+              <td style={labelCell}>{label}</td>
+              <td style={valueCell}>{value}</td>
             </tr>
           ))}
-          {(!doc.items || doc.items.length === 0) && (
-            <tr><td colSpan={4} style={{ border, padding: cellPad, textAlign: "center", color: "#888" }}>لا توجد مواد</td></tr>
+          <tr><th colSpan={2} style={headerTh}>المواد / المنتجات المرخّصة</th></tr>
+          {items.length === 0 ? (
+            <tr>
+              <td style={labelCell}>-</td>
+              <td style={valueCell}>-</td>
+            </tr>
+          ) : (
+            items.map((it) => (
+              <tr key={it.id}>
+                <td style={labelCell}>{it.item_name}</td>
+                <td style={valueCell}>{it.production_capacity} {it.unit}</td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>
 
       {/* QR */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "4mm", marginBottom: "4mm" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "4mm", marginBottom: "4mm" }}>
         {doc.qr_code_data ? (
-          <img src={doc.qr_code_data} alt="QR" style={{ width: "34mm", height: "34mm" }} />
+          <img src={doc.qr_code_data} alt="QR" style={{ width: "34mm", height: "34mm", objectFit: "contain" }} />
         ) : (
           <div style={{ width: "34mm", height: "34mm", border, display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "9pt" }}>QR</div>
         )}
       </div>
 
       {/* Notes */}
-      <div style={{ fontSize: "9pt", textAlign: "center", lineHeight: 1.5, padding: "0 4mm" }}>
-        {doc.notes || "هذه الوثيقة صادرة إلكترونياً عبر منصة المنتج المحلي. يرجى التحقق من صحتها بمسح رمز QR أعلاه."}
+      <div style={{ textAlign: "center", fontSize: "9pt", lineHeight: 1.5 }}>
+        <p style={{ margin: 0 }}>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
+        <p style={{ margin: 0 }}>يمكنك حفظ صورة الوثيقة في الهاتف لاستخدامها عند الحاجة.</p>
+        <p style={{ margin: 0 }}>لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
+        <b style={{ color: "#1d66d1" }}>https://ur.gov.iq</b>
       </div>
 
       {/* Footer */}
-      <div style={{
-        position: "absolute", left: "14mm", right: "14mm", bottom: "10mm",
-        borderTop: "1px solid #999", paddingTop: "2mm",
-        textAlign: "center", fontSize: "8.5pt",
+      <footer style={{
+        position: "absolute", bottom: "7mm", left: "14mm", right: "14mm",
+        borderTop: "1px solid #d9d9d9", paddingTop: "2mm",
+        display: "grid", gridTemplateColumns: "1fr 1.5fr 1fr",
+        alignItems: "end", fontSize: "8.5pt", lineHeight: 1.35,
       }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "1mm" }}>
-          <Logo size="9mm" />
+        <div />
+        <div style={{ textAlign: "center", fontWeight: 700 }}>
+          <div>مكتب رئيس الوزراء / المركز الوطني للتحول الرقمي</div>
+          <div>بغداد – كرادة مريم</div>
+          <div>المركز الوطني للتحول الرقمي @2025</div>
         </div>
-        <div>الهيئة العامة للكمارك — منصة المنتج المحلي · للتحقق: /verify/{doc.document_number}</div>
-      </div>
+        <div style={{ textAlign: "left", direction: "ltr" }}>
+          <div>Prime Minister's Office</div>
+          <div>National Center for Digital Transformation</div>
+          <div>Tel: 5599</div>
+        </div>
+      </footer>
     </div>
   );
 }
 
-function SectionHeader({ children }: { children: React.ReactNode }) {
+function MetaLine({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{
-      background: "#a40000", color: "#fff", fontSize: "11pt", fontWeight: 700,
-      height: "7mm", display: "flex", alignItems: "center", padding: "0 2mm",
-      marginTop: "3mm",
-    }}>{children}</div>
-  );
-}
-
-function InfoTable({
-  rows, rowH, cellPad, border,
-}: { rows: [string, React.ReactNode][]; rowH: string; cellPad: string; border: string }) {
-  return (
-    <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "10pt" }}>
-      <tbody>
-        {rows.map(([label, value], i) => (
-          <tr key={i}>
-            <td style={{ border, padding: cellPad, height: rowH, width: "35%", textAlign: "right", fontWeight: 600, background: "#fafafa" }}>{label}</td>
-            <td style={{ border, padding: cellPad, height: rowH, width: "65%", textAlign: "right" }}>{value}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function Logo({ size }: { size: string }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: "50%",
-      background: "#1e3a5f", color: "#f5c843",
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }}>
-      <ShieldCheck style={{ width: "60%", height: "60%" }} />
+    <div style={{ display: "grid", gridTemplateColumns: "35mm 1fr", gap: "2mm" }}>
+      <span style={{ fontWeight: 800 }}>{label}</span>
+      <span style={{ direction: "ltr", textAlign: "left", fontWeight: 700 }}>{value}</span>
     </div>
   );
 }
