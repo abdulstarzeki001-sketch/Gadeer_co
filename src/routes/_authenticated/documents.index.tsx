@@ -28,7 +28,7 @@ function DocumentsList() {
     !search ||
     d.document_number.includes(search) ||
     d.company_name.includes(search) ||
-    d.driver_name.includes(search) ||
+    (d.driver_name ?? "").includes(search) ||
     (d.vehicle_number ?? "").includes(search)
   );
 

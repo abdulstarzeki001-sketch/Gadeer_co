@@ -12,13 +12,13 @@ interface DocumentData {
   company_name: string;
   company_name_project?: string | null;
   subject?: string | null;
-  driver_name: string;
-  vehicle_number: string;
+  driver_name?: string | null;
+  vehicle_number?: string | null;
   licence_number?: string | null;
-  checkpoint_name_control: string;
+  checkpoint_name_control?: string | null;
   registration_governorate?: string | null;
   cargo_typedetails?: string | null;
-  weight_quantity: string;
+  weight_quantity?: string | null;
   destination_governorate?: string | null;
   governorate_name?: string | null;
   x_coordinate?: string | null;
