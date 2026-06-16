@@ -143,11 +143,8 @@ function CreateDocument() {
                 <SelectContent>{companies.map((c) => <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <div className="space-y-2"><Label>مكاتب النقل</Label>
-              <Select value={form.governorate_name} onValueChange={(v) => setForm({ ...form, governorate_name: v })}>
-                <SelectTrigger><SelectValue placeholder="اختيار ناقل" /></SelectTrigger>
-                <SelectContent>{GOVERNORATES.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="space-y-2"><Label>المنتج المحلي</Label>
+              <Input value={form.governorate_name} onChange={(e) => setForm({ ...form, governorate_name: e.target.value })} placeholder="اسم المنتج المحلي" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
