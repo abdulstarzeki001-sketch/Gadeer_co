@@ -117,7 +117,7 @@
 
 .doc-title{
   direction:rtl;
-  text-align:center;
+  text-align:right;
   font-size:18pt;
   font-weight:800;
   line-height:1.2;
@@ -131,10 +131,11 @@
   border:1px solid #d6d6d6;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
   gap:8px;
   direction:rtl;
-  text-align:center;
+  text-align:right;
+  padding-right:3mm;
   font-size:11pt;
   font-weight:700;
   margin-bottom:2mm;
@@ -146,6 +147,8 @@
   font-size:11pt;
   font-weight:700;
   color:#222;
+  direction:rtl;
+  text-align:right;
 }
 
 /* Table */
@@ -154,8 +157,18 @@
   border-collapse:collapse;
   table-layout:fixed;
   direction:rtl;
-  font-size:10pt;
   line-height:1.25;
+}
+
+.info-table,
+.info-table tbody,
+.info-table tr,
+.info-table td,
+.info-table th{
+  direction:rtl !important;
+  text-align:right !important;
+  font-size:10pt !important;
+  font-family:"Cairo",sans-serif !important;
 }
 
 .info-table th,
@@ -167,29 +180,26 @@
   vertical-align:middle;
 }
 
+.info-table td{
+  font-weight:600;
+  color:#222;
+}
+
 .info-table th{
   background:#a40000;
   color:#fff;
   height:7mm;
-  font-size:11pt;
-  font-weight:800;
-  text-align:center;
+  font-weight:700;
 }
 
 .info-table td:first-child{
   width:35%;
-  direction:rtl;
-  text-align:right;
-  font-size:10pt;
   font-weight:700;
   color:#555;
 }
 
 .info-table td:nth-child(2){
   width:65%;
-  direction:rtl;
-  text-align:center;
-  font-size:10pt;
   font-weight:600;
   color:#222;
 }
