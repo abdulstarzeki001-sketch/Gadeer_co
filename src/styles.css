@@ -194,8 +194,8 @@
 
 .info-table td:first-child{
   width:35%;
-  font-weight:700;
-  color:#555;
+  font-weight:600;
+  color:#222;
 }
 
 .info-table td:nth-child(2){
