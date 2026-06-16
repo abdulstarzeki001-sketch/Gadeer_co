@@ -26,7 +26,7 @@ export type Database = {
           granting_license_approval: string | null
           id: string
           license_approval_date: string | null
-          license_number: string
+          license_number: string | null
           phone: string | null
           specialization: string
           type_industry_production: string | null
@@ -42,7 +42,7 @@ export type Database = {
           granting_license_approval?: string | null
           id?: string
           license_approval_date?: string | null
-          license_number?: string
+          license_number?: string | null
           phone?: string | null
           specialization?: string
           type_industry_production?: string | null
@@ -58,7 +58,7 @@ export type Database = {
           granting_license_approval?: string | null
           id?: string
           license_approval_date?: string | null
-          license_number?: string
+          license_number?: string | null
           phone?: string | null
           specialization?: string
           type_industry_production?: string | null
