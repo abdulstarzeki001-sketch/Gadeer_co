@@ -1,16 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Building2, Truck, Shield, DollarSign, Send, Eye, ChevronsUpDown, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
@@ -20,38 +19,32 @@ export const Route = createFileRoute("/_authenticated/documents/new")({
   component: CreateDocument,
 });
 
-const CHECKPOINTS = ["سيطرة دارمان", "سيطرة السد"];
-const GOVERNORATES = ["بغداد", "البصرة", "نينوى", "أربيل", "السليمانية", "كركوك", "النجف", "كربلاء", "ذي قار", "بابل", "ديالى", "الأنبار", "واسط", "صلاح الدين", "ميسان", "المثنى", "القادسية", "دهوك"];
-
 type RefCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
 const REFERENCE = (companiesJson as RefCompany[]).filter((r) => r.CompanyNameProject);
-
-async function findOrCreateCompany(payload: { company_name: string; governorate: string; brand: string }) {
-  const name = payload.company_name.trim();
-  const { data: existing, error: selErr } = await supabase
-    .from("companies").select("id").eq("company_name", name).maybeSingle();
-  if (selErr) throw selErr;
-  if (existing) return existing.id as string;
-  const { data: inserted, error: insErr } = await supabase
-    .from("companies").insert({ company_name: name, governorate: payload.governorate, brand: payload.brand }).select("id").single();
-  if (insErr) throw insErr;
-  return inserted.id as string;
-}
 
 function CreateDocument() {
   const navigate = useNavigate();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [refIndex, setRefIndex] = useState<number | null>(null);
 
+  // الشركات المضافة يدوياً (شركات النقل - العملاء)
+  const { data: clients = [] } = useQuery({
+    queryKey: ["client-companies"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("companies").select("id, company_name").order("company_name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [form, setForm] = useState({
-    company_name: "", company_name_project: "", subject: "",
-    driver_name: "", vehicle_number: "", licence_number: "",
-    checkpoint_name_control: "", registration_governorate: "",
-    cargo_typedetails: "", weight_quantity: "",
-    destination_governorate: "", governorate_name: "",
-    x_coordinate: "", y_coordinate: "",
-    granting_license_approval: "", license_approval_number: "", license_approval_date: "", license_text_specialization: "",
-    brand: "", notes: "", document_value: "",
+    company_id: "",            // شركة النقل (يدوية)
+    document_value: "",
+    brand: "",
+    // معبأة تلقائياً من المرجع — مخفية في النموذج
+    company_name_project: "",  // اسم الشركة المنتجة (من المرجع)
+    governorate_name: "",      // المنتج المحلي
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -62,7 +55,6 @@ function CreateDocument() {
     setPickerOpen(false);
     setForm((f) => ({
       ...f,
-      company_name: r.CompanyNameProject,
       company_name_project: r.CompanyNameProject,
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
@@ -71,38 +63,18 @@ function CreateDocument() {
 
   const createMut = useMutation({
     mutationFn: async () => {
-      if (!form.company_name || !form.driver_name || !form.vehicle_number || !form.checkpoint_name_control || !form.weight_quantity) {
-        throw new Error("الرجاء ملء الحقول المطلوبة *");
-      }
+      if (!form.company_id) throw new Error("اختر شركة النقل");
+      if (!selectedRef) throw new Error("اختر شركة مرجعية لتعبئة هيكل الوثيقة");
 
-      const company_id = await findOrCreateCompany({
-        company_name: form.company_name,
-        governorate: form.governorate_name,
-        brand: form.brand,
-      });
+      const client = clients.find((c) => c.id === form.company_id);
+      if (!client) throw new Error("شركة النقل غير موجودة");
 
       const insertPayload = {
-        company_id,
-        company_name: form.company_name,
+        company_id: form.company_id,
+        company_name: client.company_name,
         company_name_project: form.company_name_project || null,
-        subject: form.subject || null,
-        driver_name: form.driver_name,
-        vehicle_number: form.vehicle_number,
-        licence_number: form.license_approval_number || form.licence_number || null,
-        checkpoint_name_control: form.checkpoint_name_control,
-        registration_governorate: form.registration_governorate || null,
-        cargo_typedetails: form.cargo_typedetails || null,
-        weight_quantity: form.weight_quantity,
-        destination_governorate: form.destination_governorate || null,
-        governorate_name: form.governorate_name || null,
-        x_coordinate: form.x_coordinate || null,
-        y_coordinate: form.y_coordinate || null,
-        granting_license_approval: form.granting_license_approval || null,
-        license_approval_number: form.license_approval_number || null,
-        license_approval_date: form.license_approval_date || null,
-        license_text_specialization: form.license_text_specialization || null,
         brand: form.brand || null,
-        notes: form.notes || null,
+        governorate_name: form.governorate_name || null,
         document_value: parseFloat(form.document_value) || 0,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
@@ -115,13 +87,12 @@ function CreateDocument() {
       const val = parseFloat(form.document_value);
       if (val > 0) {
         await supabase.from("transactions").insert({
-          company_id,
+          company_id: form.company_id,
           document_id: doc.id,
           document_number: doc.document_number,
-          driver_name: form.driver_name,
           type: "charge",
           amount: val,
-          description: `وثيقة شحن - ${form.driver_name} - ${form.vehicle_number}`,
+          description: `وثيقة شحن - ${client.company_name}`,
         });
       }
       return doc;
@@ -134,14 +105,18 @@ function CreateDocument() {
   });
 
   const openPreview = () => {
-    sessionStorage.setItem("document-preview", JSON.stringify(form));
+    const client = clients.find((c) => c.id === form.company_id);
+    sessionStorage.setItem("document-preview", JSON.stringify({
+      ...form,
+      company_name: client?.company_name ?? "",
+    }));
     window.open("/documents/preview", "_blank");
   };
 
   const refCount = useMemo(() => REFERENCE.length, []);
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-5xl mx-auto">
+    <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold">إنشاء وثيقة جديدة</h1>
         <p className="text-sm text-muted-foreground">منصة المنتج المحلي - وثيقة شحن</p>
@@ -150,102 +125,67 @@ function CreateDocument() {
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" />معلومات الشركة</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>اختر شركة مرجعية (لتعبئة تلقائية) — {refCount} شركة</Label>
-              <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" role="combobox" className="w-full justify-between font-normal">
-                    <span className="truncate">{selectedRef ? selectedRef.CompanyNameProject : "ابحث عن شركة..."}</span>
-                    <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
-                  <Command shouldFilter={true}>
-                    <CommandInput placeholder="ابحث بالاسم أو العلامة..." />
-                    <CommandList>
-                      <CommandEmpty>لا توجد نتائج</CommandEmpty>
-                      <CommandGroup>
-                        {REFERENCE.slice(0, 500).map((r, i) => (
-                          <CommandItem key={i} value={`${r.CompanyNameProject} ${r.Brand} ${r.GovernorateName}`} onSelect={() => pickReference(i)}>
-                            <Check className={`ml-2 h-4 w-4 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
-                            <div className="flex flex-col">
-                              <span className="text-sm">{r.CompanyNameProject}</span>
-                              <span className="text-xs text-muted-foreground truncate max-w-[400px]">{r.GovernorateName} — {r.Brand}</span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <p className="text-xs text-muted-foreground">أو اكتب اسم الشركة يدوياً أدناه</p>
-            </div>
-            <div className="space-y-2"><Label>اسم الشركة *</Label>
-              <Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} placeholder="اسم الشركة" />
-            </div>
+          <div className="space-y-2">
+            <Label>اختر شركة مرجعية (لتعبئة هيكل الوثيقة) — {refCount} شركة *</Label>
+            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button type="button" variant="outline" role="combobox" className="w-full justify-between font-normal">
+                  <span className="truncate">{selectedRef ? selectedRef.CompanyNameProject : "ابحث عن شركة..."}</span>
+                  <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
+                <Command shouldFilter={true}>
+                  <CommandInput placeholder="ابحث بالاسم أو العلامة..." />
+                  <CommandList>
+                    <CommandEmpty>لا توجد نتائج</CommandEmpty>
+                    <CommandGroup>
+                      {REFERENCE.slice(0, 500).map((r, i) => (
+                        <CommandItem key={i} value={`${r.CompanyNameProject} ${r.Brand} ${r.GovernorateName}`} onSelect={() => pickReference(i)}>
+                          <Check className={`ml-2 h-4 w-4 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
+                          <div className="flex flex-col">
+                            <span className="text-sm">{r.CompanyNameProject}</span>
+                            <span className="text-xs text-muted-foreground truncate max-w-[400px]">{r.GovernorateName} — {r.Brand}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {selectedRef && (
+              <div className="text-xs text-muted-foreground rounded-md border p-2 space-y-0.5 bg-muted/30">
+                <div>المحافظة: {selectedRef.GovernorateName}</div>
+                <div className="truncate">العلامة: {selectedRef.Brand}</div>
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2"><Label>المنتج المحلي</Label>
-              <Input value={form.governorate_name} onChange={(e) => setForm({ ...form, governorate_name: e.target.value })} placeholder="اسم المنتج المحلي" />
-            </div>
-            <div className="space-y-2"><Label>الموضوع</Label><Input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></div>
+
+          <div className="space-y-2">
+            <Label>شركة النقل (المضافة يدوياً) *</Label>
+            <Select value={form.company_id} onValueChange={(v) => setForm({ ...form, company_id: v })}>
+              <SelectTrigger><SelectValue placeholder={clients.length === 0 ? "أضف شركة نقل من صفحة الشركات أولاً" : "اختر شركة النقل"} /></SelectTrigger>
+              <SelectContent>
+                {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
               <Input type="number" min="0" step="0.01" value={form.document_value} onChange={(e) => setForm({ ...form, document_value: e.target.value })} dir="ltr" />
             </div>
-            <div className="space-y-2"><Label>العلامة التجارية</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Truck className="h-5 w-5 text-primary" />السائق والمركبة</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2"><Label>اسم السائق *</Label><Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} /></div>
-            <div className="space-y-2"><Label>رقم العجلة *</Label><Input value={form.vehicle_number} onChange={(e) => setForm({ ...form, vehicle_number: e.target.value })} /></div>
-            <div className="space-y-2"><Label>محافظة تسجيل العجلة</Label>
-              <Select value={form.registration_governorate} onValueChange={(v) => setForm({ ...form, registration_governorate: v })}>
-                <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
-                <SelectContent>{GOVERNORATES.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="space-y-2"><Label>العلامة التجارية</Label>
+              <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
             </div>
-            <div className="space-y-2"><Label>سيطرة الدخول *</Label>
-              <Select value={form.checkpoint_name_control} onValueChange={(v) => setForm({ ...form, checkpoint_name_control: v })}>
-                <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
-                <SelectContent>{CHECKPOINTS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2"><Label>نوع/تفاصيل الحمولة</Label><Textarea value={form.cargo_typedetails} onChange={(e) => setForm({ ...form, cargo_typedetails: e.target.value })} className="resize-none" /></div>
-            <div className="space-y-2"><Label>الوزن/الكمية *</Label><Input value={form.weight_quantity} onChange={(e) => setForm({ ...form, weight_quantity: e.target.value })} /></div>
-            <div className="space-y-2"><Label>الوجهة النهائية</Label>
-              <Select value={form.destination_governorate} onValueChange={(v) => setForm({ ...form, destination_governorate: v })}>
-                <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
-                <SelectContent>{GOVERNORATES.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-5 w-5 text-primary" />الإجازة / الموافقة</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2"><Label>الجهة المانحة</Label><Input value={form.granting_license_approval} onChange={(e) => setForm({ ...form, granting_license_approval: e.target.value })} /></div>
-            <div className="space-y-2"><Label>رقم الإجازة</Label><Input value={form.license_approval_number} onChange={(e) => setForm({ ...form, license_approval_number: e.target.value })} /></div>
-            <div className="space-y-2"><Label>تاريخ الإجازة</Label><Input type="date" value={form.license_approval_date} onChange={(e) => setForm({ ...form, license_approval_date: e.target.value })} dir="ltr" /></div>
-            <div className="space-y-2"><Label>منطوق الإجازة</Label><Input value={form.license_text_specialization} onChange={(e) => setForm({ ...form, license_text_specialization: e.target.value })} /></div>
           </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Button type="button" variant="outline" size="lg" onClick={openPreview}>
+        <Button type="button" variant="outline" size="lg" onClick={openPreview} disabled={!selectedRef || !form.company_id}>
           <Eye className="h-4 w-4 ml-2" />
           معاينة الوثيقة
         </Button>
