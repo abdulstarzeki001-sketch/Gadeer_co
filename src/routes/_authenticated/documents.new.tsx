@@ -217,30 +217,41 @@ function CreateDocument() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {items.map((it, i) => (
-            <div key={i} className="p-3 rounded-md bg-muted/40 grid grid-cols-1 md:grid-cols-[1fr_120px_140px_auto] gap-2 items-end">
-              <div><Label className="text-xs">اسم المادة *</Label><Input value={it.item_name} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], item_name: e.target.value }; setItems(a); }} /></div>
-              <div><Label className="text-xs">الوحدة</Label>
-                <Select value={it.unit} onValueChange={(v) => { const a = [...items]; a[i] = { ...a[i], unit: v }; setItems(a); }}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{["طن", "كغم", "قطعة", "لتر", "متر", "م³"].map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-                </Select>
+            <div key={i} className="p-4 rounded-md bg-muted/40 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium">المادة {i + 1}</span>
+                {items.length > 1 && (
+                  <Button type="button" variant="ghost" size="icon" onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                )}
               </div>
-              <div><Label className="text-xs">الكمية *</Label><Input value={it.production_capacity} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], production_capacity: e.target.value }; setItems(a); }} dir="ltr" /></div>
-              {items.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => setItems(items.filter((_, idx) => idx !== i))}><Trash2 className="h-4 w-4 text-destructive" /></Button>}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="space-y-1"><Label className="text-xs">اسم المادة *</Label><Input value={it.item_name} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], item_name: e.target.value }; setItems(a); }} placeholder="اسم المادة" /></div>
+                <div className="space-y-1"><Label className="text-xs">الوحدة</Label>
+                  <Select value={it.unit} onValueChange={(v) => { const a = [...items]; a[i] = { ...a[i], unit: v }; setItems(a); }}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{["طن", "كغم", "قطعة", "لتر", "متر", "صندوق", "كيس", "برميل"].map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1"><Label className="text-xs">الطاقة الإنتاجية / الكمية *</Label><Input value={it.production_capacity} onChange={(e) => { const a = [...items]; a[i] = { ...a[i], production_capacity: e.target.value }; setItems(a); }} type="number" min="0" placeholder="الكمية" dir="ltr" /></div>
+              </div>
             </div>
           ))}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="pt-6"><Textarea placeholder="ملاحظات إضافية..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></CardContent>
-      </Card>
-
-      <div className="flex justify-end">
-        <Button type="submit" disabled={createMut.isPending} size="lg"><Send className="h-4 w-4 ml-1" />إصدار الوثيقة</Button>
+      <div className="space-y-2">
+        <Label>ملاحظات</Label>
+        <Textarea placeholder="ملاحظات إضافية (اختياري)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="resize-none" />
       </div>
+
+      <Button type="submit" size="lg" className="w-full" disabled={createMut.isPending}>
+        <Send className="h-4 w-4 ml-2" />
+        {createMut.isPending ? "جاري الإنشاء..." : "إنشاء الوثيقة و رمز QR"}
+      </Button>
     </form>
   );
 }
