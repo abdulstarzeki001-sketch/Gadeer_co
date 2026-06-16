@@ -104,7 +104,7 @@ export type Database = {
         Row: {
           brand: string | null
           cargo_typedetails: string | null
-          checkpoint_name_control: string
+          checkpoint_name_control: string | null
           company_id: string
           company_name: string
           company_name_project: string | null
@@ -113,7 +113,7 @@ export type Database = {
           destination_governorate: string | null
           document_number: string
           document_value: number
-          driver_name: string
+          driver_name: string | null
           governorate_name: string | null
           granting_license_approval: string | null
           id: string
@@ -126,15 +126,15 @@ export type Database = {
           registration_governorate: string | null
           status: string
           subject: string | null
-          vehicle_number: string
-          weight_quantity: string
+          vehicle_number: string | null
+          weight_quantity: string | null
           x_coordinate: string | null
           y_coordinate: string | null
         }
         Insert: {
           brand?: string | null
           cargo_typedetails?: string | null
-          checkpoint_name_control: string
+          checkpoint_name_control?: string | null
           company_id: string
           company_name: string
           company_name_project?: string | null
@@ -143,7 +143,7 @@ export type Database = {
           destination_governorate?: string | null
           document_number?: string
           document_value?: number
-          driver_name: string
+          driver_name?: string | null
           governorate_name?: string | null
           granting_license_approval?: string | null
           id?: string
@@ -156,15 +156,15 @@ export type Database = {
           registration_governorate?: string | null
           status?: string
           subject?: string | null
-          vehicle_number: string
-          weight_quantity: string
+          vehicle_number?: string | null
+          weight_quantity?: string | null
           x_coordinate?: string | null
           y_coordinate?: string | null
         }
         Update: {
           brand?: string | null
           cargo_typedetails?: string | null
-          checkpoint_name_control?: string
+          checkpoint_name_control?: string | null
           company_id?: string
           company_name?: string
           company_name_project?: string | null
@@ -173,7 +173,7 @@ export type Database = {
           destination_governorate?: string | null
           document_number?: string
           document_value?: number
-          driver_name?: string
+          driver_name?: string | null
           governorate_name?: string | null
           granting_license_approval?: string | null
           id?: string
@@ -186,8 +186,8 @@ export type Database = {
           registration_governorate?: string | null
           status?: string
           subject?: string | null
-          vehicle_number?: string
-          weight_quantity?: string
+          vehicle_number?: string | null
+          weight_quantity?: string | null
           x_coordinate?: string | null
           y_coordinate?: string | null
         }
