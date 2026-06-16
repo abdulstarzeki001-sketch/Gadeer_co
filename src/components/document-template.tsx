@@ -109,9 +109,10 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
         gridTemplateColumns: "1fr 32mm 1fr",
         alignItems: "start",
         minHeight: "38mm",
-        fontSize: "10pt",
+        fontSize: "14pt",
         fontWeight: 700,
         lineHeight: 1.65,
+        color: "#222",
       }}>
         <div style={{ textAlign: "right", paddingTop: "6mm" }}>
           <div>جمهورية العراق</div>
