@@ -85,13 +85,10 @@ function CompaniesPage() {
     <div className="p-6 space-y-4 max-w-7xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">الشركات</h1>
-          <p className="text-sm text-muted-foreground">{companies.length} شركة مسجلة — قاعدة المصدر: {SOURCE.length}</p>
+          <h1 className="text-2xl font-bold">الشركات (العملاء)</h1>
+          <p className="text-sm text-muted-foreground">{companies.length} شركة — تُضاف يدوياً أو تلقائياً عند إنشاء وثيقة</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => importMut.mutate()} disabled={importMut.isPending}>
-            <Upload className="h-4 w-4 ml-1" />استيراد من JSON
-          </Button>
           <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); } }}>
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 ml-1" />شركة جديدة</Button>
