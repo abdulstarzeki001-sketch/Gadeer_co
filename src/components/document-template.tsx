@@ -53,21 +53,6 @@ function formatTime(iso: string) {
 }
 
 export function DocumentTemplate({ doc }: { doc: DocumentData }) {
-  const border = "1px solid #d6d6d6";
-  const labelCell: React.CSSProperties = {
-    border, height: "6.5mm", padding: "1mm 2mm", width: "35%",
-    fontWeight: 700, color: "#555", textAlign: "right", verticalAlign: "middle",
-  };
-  const valueCell: React.CSSProperties = {
-    border, height: "6.5mm", padding: "1mm 2mm", width: "65%",
-    textAlign: "center", fontWeight: 600, color: "#222", verticalAlign: "middle",
-  };
-  const headerTh: React.CSSProperties = {
-    background: "#a40000", color: "#fff", height: "7mm",
-    fontSize: "11pt", fontWeight: 800, textAlign: "center",
-    border, padding: "1mm 2mm",
-  };
-
   const rows: [string, React.ReactNode][] = [
     ["اسم سيطرة الدخول", doc.checkpoint_name_control || "-"],
     ["اسم السائق", doc.driver_name || "-"],
@@ -88,95 +73,65 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
   const items = doc.items ?? [];
 
   return (
-    <div
-      className="qr-document-root"
-      dir="rtl"
-      style={{
-        width: "210mm",
-        minHeight: "297mm",
-        padding: "12mm 14mm 10mm 14mm",
-        margin: "0 auto",
-        background: "#fff",
-        color: "#222",
-        fontFamily: "'Cairo', Arial, sans-serif",
-        boxSizing: "border-box",
-        position: "relative",
-      }}
-    >
+    <div className="qr-document-root a4-page">
       {/* Header */}
-      <header style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 32mm 1fr",
-        alignItems: "start",
-        minHeight: "38mm",
-        fontSize: "14pt",
-        fontWeight: 700,
-        lineHeight: 1.65,
-        color: "#222",
-      }}>
-        <div style={{ textAlign: "right", paddingTop: "6mm" }}>
+      <header className="header-clean">
+        <div className="header-right">
           <div>جمهورية العراق</div>
           <div>وزارة المالية</div>
           <div>الهيئة العامة للكمارك</div>
         </div>
-        <div style={{ textAlign: "center", paddingTop: "1mm" }}>
+        <div className="header-center">
           <div style={{
             width: "26mm", height: "26mm", borderRadius: "50%",
             border: "2px solid #d8d8d8", margin: "0 auto",
             display: "flex", alignItems: "center", justifyContent: "center",
             background: "#fff", overflow: "hidden",
           }}>
-            <img src={logoAsset.url} alt="Iraq Customs" style={{ width: "23mm", height: "23mm", objectFit: "contain" }} />
+            <img src={logoAsset.url} alt="Iraq Customs" className="center-logo" style={{ width: "23mm", height: "23mm" }} />
           </div>
         </div>
-        <div style={{ textAlign: "right", paddingTop: "6mm" }}>
+        <div className="header-left">
           <MetaLine label="رقم الوثيقة" value={doc.document_number} />
           <MetaLine label="تاريخ إنشاء الوثيقة" value={formatDate(doc.created_at)} />
           <MetaLine label="التوقيت" value={formatTime(doc.created_at)} />
         </div>
       </header>
 
-      <hr style={{ border: "none", borderTop: "1px solid #d8d8d8", margin: "0 0 6mm 0" }} />
+      <hr className="divider" />
 
       {/* Title */}
-      <h2 style={{ textAlign: "center", fontSize: "18pt", fontWeight: 800, lineHeight: 1.2, margin: "0 0 4mm 0" }}>
-        منصة المنتج المحلي
-      </h2>
+      <h2 className="doc-title">منصة المنتج المحلي</h2>
 
       {/* Subject */}
-      <div style={{
-        height: "8mm", background: "#f3f3f3", border: "1px solid #d6d6d6",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        gap: "8px", fontSize: "11pt", fontWeight: 700, marginBottom: "2mm",
-        boxSizing: "border-box",
-      }}>
+      <div className="subject-row">
         <strong>الموضوع /</strong>
         <span>{doc.subject || "الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة"}</span>
       </div>
 
       {/* Info table */}
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: "10pt", lineHeight: 1.25 }}>
+      <table className="info-table">
         <thead>
-          <tr><th colSpan={2} style={headerTh}>المعلومات الشخصية</th></tr>
+          <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
         </thead>
         <tbody>
           {rows.map(([label, value], i) => (
             <tr key={i}>
-              <td style={labelCell}>{label}</td>
-              <td style={valueCell}>{value}</td>
+              <td>{label}</td>
+              <td>{value}</td>
             </tr>
           ))}
-          <tr><th colSpan={2} style={headerTh}>المواد / المنتجات المرخّصة</th></tr>
+          <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
           {items.length === 0 ? (
             <tr>
-              <td style={labelCell}>-</td>
-              <td style={valueCell}>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
           ) : (
             items.map((it) => (
               <tr key={it.id}>
-                <td style={labelCell}>{it.item_name}</td>
-                <td style={valueCell}>{it.production_capacity} {it.unit}</td>
+                <td>{it.item_name}</td>
+                <td>{it.production_capacity} {it.unit}</td>
               </tr>
             ))
           )}
@@ -184,36 +139,31 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
       </table>
 
       {/* QR */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "4mm", marginBottom: "4mm" }}>
+      <div className="qr-wrap">
         {doc.qr_code_data ? (
-          <img src={doc.qr_code_data} alt="QR" style={{ width: "34mm", height: "34mm", objectFit: "contain" }} />
+          <img src={doc.qr_code_data} alt="QR" className="barcode-img" />
         ) : (
-          <div style={{ width: "34mm", height: "34mm", border, display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "9pt" }}>QR</div>
+          <div style={{ width: "34mm", height: "34mm", border: "1px solid #d6d6d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "9pt" }}>QR</div>
         )}
       </div>
 
       {/* Notes */}
-      <div style={{ textAlign: "center", fontSize: "9pt", lineHeight: 1.5 }}>
-        <p style={{ margin: 0 }}>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
-        <p style={{ margin: 0 }}>يمكنك حفظ صورة الوثيقة في الهاتف لاستخدامها عند الحاجة.</p>
-        <p style={{ margin: 0 }}>لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
+      <div className="notes">
+        <p>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
+        <p>يمكنك حفظ صورة الوثيقة في الهاتف لاستخدامها عند الحاجة.</p>
+        <p>لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
         <b style={{ color: "#1d66d1" }}>https://ur.gov.iq</b>
       </div>
 
       {/* Footer */}
-      <footer style={{
-        position: "absolute", bottom: "7mm", left: "14mm", right: "14mm",
-        borderTop: "1px solid #d9d9d9", paddingTop: "2mm",
-        display: "grid", gridTemplateColumns: "1fr 1.5fr 1fr",
-        alignItems: "end", fontSize: "8.5pt", lineHeight: 1.35,
-      }}>
-        <div />
-        <div style={{ textAlign: "center", fontWeight: 700 }}>
+      <footer className="doc-footer">
+        <div className="footer-left" />
+        <div className="footer-center">
           <div>مكتب رئيس الوزراء / المركز الوطني للتحول الرقمي</div>
           <div>بغداد – كرادة مريم</div>
           <div>المركز الوطني للتحول الرقمي @2025</div>
         </div>
-        <div style={{ textAlign: "left", direction: "ltr" }}>
+        <div className="footer-right">
           <div>Prime Minister's Office</div>
           <div>National Center for Digital Transformation</div>
           <div>Tel: 5599</div>

@@ -4,6 +4,177 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Document A4 classes */
+.a4-page{
+  width:210mm;
+  min-height:297mm;
+  padding:12mm 14mm 10mm 14mm;
+  background:#fff;
+  box-sizing:border-box;
+  position:relative;
+  direction:rtl;
+  font-family:"Cairo",Arial,sans-serif;
+  color:#222;
+}
+
+.header-clean{
+  display:grid;
+  grid-template-columns:1fr 32mm 1fr;
+  min-height:38mm;
+  font-size:14pt;
+  font-weight:700;
+  line-height:1.65;
+}
+
+.header-right{
+  text-align:right;
+  padding-top:6mm;
+}
+
+.header-center{
+  text-align:center;
+  padding-top:1mm;
+}
+
+.header-left{
+  text-align:right;
+  padding-top:6mm;
+}
+
+.center-logo{
+  width:22mm;
+  height:22mm;
+  object-fit:contain;
+}
+
+.divider{
+  border:none;
+  border-top:1px solid #d8d8d8;
+  margin:0 0 6mm 0;
+}
+
+.doc-title{
+  text-align:center;
+  font-size:18pt;
+  font-weight:800;
+  margin:0 0 4mm 0;
+}
+
+.subject-row{
+  height:8mm;
+  background:#f3f3f3;
+  border:1px solid #d6d6d6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:11pt;
+  font-weight:700;
+  margin-bottom:2mm;
+}
+
+.info-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:10pt;
+  line-height:1.25;
+}
+
+.info-table th,
+.info-table td{
+  border:1px solid #d6d6d6;
+  height:6.5mm;
+  padding:1mm 2mm;
+  box-sizing:border-box;
+  vertical-align:middle;
+}
+
+.info-table th{
+  background:#a40000;
+  color:#fff;
+  height:7mm;
+  font-size:11pt;
+  font-weight:800;
+  text-align:center;
+}
+
+.info-table td:first-child{
+  width:35%;
+  font-weight:700;
+  color:#555;
+  text-align:right;
+}
+
+.info-table td:nth-child(2){
+  width:65%;
+  font-weight:600;
+  color:#222;
+  text-align:center;
+}
+
+.qr-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:4mm;
+  margin-bottom:4mm;
+}
+
+.barcode-img,
+.barcode-img svg,
+.barcode-img img{
+  width:34mm !important;
+  height:34mm !important;
+}
+
+.notes{
+  text-align:center;
+  font-size:9pt;
+  line-height:1.5;
+}
+
+.notes p{
+  margin:0;
+}
+
+.notes a{
+  color:#1d66d1;
+  text-decoration:none;
+}
+
+.doc-footer{
+  position:absolute;
+  bottom:7mm;
+  left:14mm;
+  right:14mm;
+  border-top:1px solid #d9d9d9;
+  padding-top:2mm;
+  display:grid;
+  grid-template-columns:1fr 1.5fr 1fr;
+  align-items:end;
+  font-size:8.5pt;
+  font-weight:700;
+  line-height:1.35;
+}
+
+.footer-left{
+  text-align:right;
+}
+
+.footer-center{
+  text-align:center;
+}
+
+.footer-right{
+  text-align:left;
+  direction:ltr;
+}
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
 /*
  * Design system definition.
  *
