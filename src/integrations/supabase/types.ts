@@ -22,13 +22,13 @@ export type Database = {
           company_name: string
           created_at: string
           email: string | null
-          governorate: string
+          governorate: string | null
           granting_license_approval: string | null
           id: string
           license_approval_date: string | null
           license_number: string | null
           phone: string | null
-          specialization: string
+          specialization: string | null
           type_industry_production: string | null
         }
         Insert: {
@@ -38,13 +38,13 @@ export type Database = {
           company_name: string
           created_at?: string
           email?: string | null
-          governorate?: string
+          governorate?: string | null
           granting_license_approval?: string | null
           id?: string
           license_approval_date?: string | null
           license_number?: string | null
           phone?: string | null
-          specialization?: string
+          specialization?: string | null
           type_industry_production?: string | null
         }
         Update: {
@@ -54,13 +54,13 @@ export type Database = {
           company_name?: string
           created_at?: string
           email?: string | null
-          governorate?: string
+          governorate?: string | null
           granting_license_approval?: string | null
           id?: string
           license_approval_date?: string | null
           license_number?: string | null
           phone?: string | null
-          specialization?: string
+          specialization?: string | null
           type_industry_production?: string | null
         }
         Relationships: []
