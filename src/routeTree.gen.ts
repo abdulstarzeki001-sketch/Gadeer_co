@@ -19,6 +19,7 @@ import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents.new'
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
+import { Route as AuthenticatedAccountingCompanyIdRouteImport } from './routes/_authenticated/accounting.$companyId'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -71,26 +72,34 @@ const AuthenticatedDocumentsIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedDocumentsRoute,
   } as any)
+const AuthenticatedAccountingCompanyIdRoute =
+  AuthenticatedAccountingCompanyIdRouteImport.update({
+    id: '/$companyId',
+    path: '/$companyId',
+    getParentRoute: () => AuthenticatedAccountingRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/verify': typeof VerifyRouteWithChildren
-  '/accounting': typeof AuthenticatedAccountingRoute
+  '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/documents': typeof AuthenticatedDocumentsRouteWithChildren
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
+  '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/verify': typeof VerifyRouteWithChildren
-  '/accounting': typeof AuthenticatedAccountingRoute
+  '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/documents': typeof AuthenticatedDocumentsRouteWithChildren
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/': typeof AuthenticatedIndexRoute
+  '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
 }
@@ -99,11 +108,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/verify': typeof VerifyRouteWithChildren
-  '/_authenticated/accounting': typeof AuthenticatedAccountingRoute
+  '/_authenticated/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRouteWithChildren
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
 }
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/companies'
     | '/documents'
     | '/verify/$documentNumber'
+    | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
   fileRoutesByTo: FileRoutesByTo
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/verify/$documentNumber'
     | '/'
+    | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
   id:
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documents'
     | '/verify/$documentNumber'
     | '/_authenticated/'
+    | '/_authenticated/accounting/$companyId'
     | '/_authenticated/documents/$id'
     | '/_authenticated/documents/new'
   fileRoutesById: FileRoutesById
@@ -222,8 +235,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocumentsIdRouteImport
       parentRoute: typeof AuthenticatedDocumentsRoute
     }
+    '/_authenticated/accounting/$companyId': {
+      id: '/_authenticated/accounting/$companyId'
+      path: '/$companyId'
+      fullPath: '/accounting/$companyId'
+      preLoaderRoute: typeof AuthenticatedAccountingCompanyIdRouteImport
+      parentRoute: typeof AuthenticatedAccountingRoute
+    }
   }
 }
+
+interface AuthenticatedAccountingRouteChildren {
+  AuthenticatedAccountingCompanyIdRoute: typeof AuthenticatedAccountingCompanyIdRoute
+}
+
+const AuthenticatedAccountingRouteChildren: AuthenticatedAccountingRouteChildren =
+  {
+    AuthenticatedAccountingCompanyIdRoute:
+      AuthenticatedAccountingCompanyIdRoute,
+  }
+
+const AuthenticatedAccountingRouteWithChildren =
+  AuthenticatedAccountingRoute._addFileChildren(
+    AuthenticatedAccountingRouteChildren,
+  )
 
 interface AuthenticatedDocumentsRouteChildren {
   AuthenticatedDocumentsIdRoute: typeof AuthenticatedDocumentsIdRoute
@@ -242,14 +277,14 @@ const AuthenticatedDocumentsRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAccountingRoute: typeof AuthenticatedAccountingRoute
+  AuthenticatedAccountingRoute: typeof AuthenticatedAccountingRouteWithChildren
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAccountingRoute: AuthenticatedAccountingRoute,
+  AuthenticatedAccountingRoute: AuthenticatedAccountingRouteWithChildren,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
