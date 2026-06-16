@@ -195,16 +195,17 @@
 }
 
 .info-table td:first-child{
-  width:35%;
+  width:60%;
   font-weight:600;
   color:#222;
 }
 
 .info-table td:nth-child(2){
-  width:65%;
+  width:40%;
   font-weight:600;
   color:#222;
 }
+
 
 .info-header{
   background:#a40000 !important;
