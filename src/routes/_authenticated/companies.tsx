@@ -8,17 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Upload, Search, Trash2, Pencil } from "lucide-react";
+import { Plus, Search, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import companiesJson from "@/data/companies.json";
 
 export const Route = createFileRoute("/_authenticated/companies")({
   head: () => ({ meta: [{ title: "الشركات - الكمارك" }] }),
   component: CompaniesPage,
 });
-
-type RawCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
-const SOURCE = companiesJson as RawCompany[];
 
 function CompaniesPage() {
   const qc = useQueryClient();
