@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Printer, ArrowRight } from "lucide-react";
+import { Download, ArrowRight } from "lucide-react";
 import { DocumentTemplate } from "@/components/document-template";
+import { exportElementToPdf } from "@/lib/export-pdf";
 
 export const Route = createFileRoute("/_authenticated/documents/$id")({
   head: () => ({ meta: [{ title: "وثيقة - الكمارك" }] }),
@@ -12,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/documents/$id")({
 
 function DocumentView() {
   const { id } = Route.useParams();
+  const ref = useRef<HTMLDivElement>(null);
   const { data } = useQuery({
     queryKey: ["document", id],
     queryFn: async () => {
@@ -24,13 +27,19 @@ function DocumentView() {
 
   if (!data) return <div className="p-8 text-center text-muted-foreground">جاري التحميل...</div>;
 
+  const handleDownload = async () => {
+    const el = ref.current?.querySelector(".qr-document-root") as HTMLElement | null;
+    if (!el) return;
+    await exportElementToPdf(el, `document-${data.document_number}.pdf`);
+  };
+
   return (
     <div className="bg-muted/30 min-h-screen py-6">
       <div className="max-w-[210mm] mx-auto px-4 mb-3 flex items-center justify-between no-print">
         <Button variant="ghost" asChild><Link to="/documents"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
-        <Button onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
+        <Button onClick={handleDownload}><Download className="h-4 w-4 ml-1" />تنزيل PDF</Button>
       </div>
-      <div className="shadow-lg print:shadow-none mx-auto" style={{ width: "210mm" }}>
+      <div ref={ref} className="shadow-lg print:shadow-none mx-auto" style={{ width: "210mm" }}>
         <DocumentTemplate doc={data} />
       </div>
     </div>
