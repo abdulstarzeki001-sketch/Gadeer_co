@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DocumentTemplate } from "@/components/document-template";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, Printer } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Download } from "lucide-react";
+import { exportElementToPdf } from "@/lib/export-pdf";
 
 export const Route = createFileRoute("/verify/$documentNumber")({
   head: () => ({ meta: [{ title: "نتيجة التحقق" }] }),
@@ -40,6 +42,13 @@ function VerifyResult() {
     );
   }
 
+  const ref = useRef<HTMLDivElement>(null);
+  const handleDownload = async () => {
+    const el = ref.current?.querySelector(".qr-document-root") as HTMLElement | null;
+    if (!el) return;
+    await exportElementToPdf(el, `document-${documentNumber}.pdf`);
+  };
+
   return (
     <div className="bg-muted/30 min-h-screen py-6" dir="rtl">
       <div className="max-w-[210mm] mx-auto px-4 mb-3 no-print">
@@ -52,11 +61,13 @@ function VerifyResult() {
                 <div className="text-xs text-muted-foreground">صادرة من الهيئة العامة للكمارك</div>
               </div>
             </div>
-            <Button onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
+            <Button onClick={handleDownload}><Download className="h-4 w-4 ml-1" />تنزيل PDF</Button>
           </CardContent>
         </Card>
       </div>
-      <DocumentTemplate doc={data} />
+      <div ref={ref}>
+        <DocumentTemplate doc={data} />
+      </div>
     </div>
   );
 }
