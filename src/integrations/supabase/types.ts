@@ -18,38 +18,50 @@ export type Database = {
         Row: {
           address: string | null
           brand: string | null
+          cargo_details: string | null
           company_name: string
           created_at: string
           email: string | null
-          governorate: string
+          governorate: string | null
+          granting_license_approval: string | null
           id: string
-          license_number: string
+          license_approval_date: string | null
+          license_number: string | null
           phone: string | null
-          specialization: string
+          specialization: string | null
+          type_industry_production: string | null
         }
         Insert: {
           address?: string | null
           brand?: string | null
+          cargo_details?: string | null
           company_name: string
           created_at?: string
           email?: string | null
-          governorate?: string
+          governorate?: string | null
+          granting_license_approval?: string | null
           id?: string
-          license_number?: string
+          license_approval_date?: string | null
+          license_number?: string | null
           phone?: string | null
-          specialization?: string
+          specialization?: string | null
+          type_industry_production?: string | null
         }
         Update: {
           address?: string | null
           brand?: string | null
+          cargo_details?: string | null
           company_name?: string
           created_at?: string
           email?: string | null
-          governorate?: string
+          governorate?: string | null
+          granting_license_approval?: string | null
           id?: string
-          license_number?: string
+          license_approval_date?: string | null
+          license_number?: string | null
           phone?: string | null
-          specialization?: string
+          specialization?: string | null
+          type_industry_production?: string | null
         }
         Relationships: []
       }

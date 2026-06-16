@@ -1,0 +1,1 @@
+ALTER TABLE public.companies ALTER COLUMN license_number DROP NOT NULL;

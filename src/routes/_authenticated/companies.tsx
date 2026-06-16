@@ -96,16 +96,16 @@ function CompaniesPage() {
   });
 
   const filtered = companies.filter((c) =>
-    !search || c.company_name.includes(search) || (c.brand ?? "").includes(search) || c.governorate.includes(search)
+    !search || c.company_name.includes(search) || (c.brand ?? "").includes(search) || (c.governorate ?? "").includes(search)
   );
 
   const startEdit = (c: typeof companies[number]) => {
     setEditId(c.id);
     setForm({
       company_name: c.company_name,
-      license_number: c.license_number,
-      specialization: c.specialization,
-      governorate: c.governorate,
+      license_number: c.license_number ?? "",
+      specialization: c.specialization ?? "",
+      governorate: c.governorate ?? "",
       brand: c.brand ?? "",
       phone: c.phone ?? "",
       email: c.email ?? "",
