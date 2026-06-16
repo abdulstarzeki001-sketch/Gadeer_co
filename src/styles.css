@@ -149,7 +149,7 @@
 @media print {
   @page {
     size: A4;
-    margin: 1.5cm;
+    margin: 0;
   }
   body {
     background: white !important;
@@ -159,6 +159,15 @@
   }
   .print-only {
     display: block !important;
+  }
+  html, body { margin: 0 !important; padding: 0 !important; }
+  body * { visibility: hidden !important; }
+  .qr-document-root, .qr-document-root * { visibility: visible !important; }
+  .qr-document-root {
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
   }
 }
 .print-only { display: none; }
