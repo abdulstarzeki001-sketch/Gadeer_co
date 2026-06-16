@@ -82,13 +82,8 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
           <div>الهيئة العامة للكمارك</div>
         </div>
         <div className="header-center">
-          <div style={{
-            width: "26mm", height: "26mm", borderRadius: "50%",
-            border: "2px solid #d8d8d8", margin: "0 auto",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            background: "#fff", overflow: "hidden",
-          }}>
-            <img src={logoAsset.url} alt="Iraq Customs" className="center-logo" style={{ width: "23mm", height: "23mm" }} />
+          <div className="logo-ring">
+            <img src={logoAsset.url} alt="Iraq Customs" className="center-logo" />
           </div>
         </div>
         <div className="header-left">
@@ -100,62 +95,58 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
 
       <hr className="divider" />
 
-      {/* Title */}
-      <h2 className="doc-title">منصة المنتج المحلي</h2>
+      <div className="content">
+        <h2 className="doc-title">منصة المنتج المحلي</h2>
 
-      {/* Subject */}
-      <div className="subject-row">
-        <strong>الموضوع /</strong>
-        <span>{doc.subject || "الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة"}</span>
-      </div>
+        <div className="subject-row">
+          <strong>الموضوع /</strong>
+          <span className="subject-field">الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة</span>
+        </div>
 
-      {/* Info table */}
-      <table className="info-table">
-        <thead>
-          <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
-        </thead>
-        <tbody>
-          {rows.map(([label, value], i) => (
-            <tr key={i}>
-              <td>{label}</td>
-              <td>{value}</td>
-            </tr>
-          ))}
-          <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
-          {items.length === 0 ? (
-            <tr>
-              <td>-</td>
-              <td>-</td>
-            </tr>
-          ) : (
-            items.map((it) => (
-              <tr key={it.id}>
-                <td>{it.item_name}</td>
-                <td>{it.production_capacity} {it.unit}</td>
+        <table className="info-table">
+          <thead>
+            <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
+          </thead>
+          <tbody>
+            {rows.map(([label, value], i) => (
+              <tr key={i}>
+                <td>{label}</td>
+                <td>{value}</td>
               </tr>
-            ))
+            ))}
+            <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
+            {items.length === 0 ? (
+              <tr>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            ) : (
+              items.map((it) => (
+                <tr key={it.id}>
+                  <td>{it.item_name}</td>
+                  <td>{it.production_capacity} {it.unit}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+
+        <div className="qr-wrap">
+          {doc.qr_code_data ? (
+            <img src={doc.qr_code_data} alt="QR" className="barcode-img" />
+          ) : (
+            <div className="barcode-img" style={{ border: "1px solid #d6d6d6", color: "#999", fontSize: "9pt" }}>QR</div>
           )}
-        </tbody>
-      </table>
+        </div>
 
-      {/* QR */}
-      <div className="qr-wrap">
-        {doc.qr_code_data ? (
-          <img src={doc.qr_code_data} alt="QR" className="barcode-img" />
-        ) : (
-          <div style={{ width: "34mm", height: "34mm", border: "1px solid #d6d6d6", display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "9pt" }}>QR</div>
-        )}
+        <div className="notes">
+          <p>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
+          <p>يمكنك حفظ صورة الوثيقة في الهاتف لاستخدامها عند الحاجة.</p>
+          <p>لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
+          <b>https://ur.gov.iq</b>
+        </div>
       </div>
 
-      {/* Notes */}
-      <div className="notes">
-        <p>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
-        <p>يمكنك حفظ صورة الوثيقة في الهاتف لاستخدامها عند الحاجة.</p>
-        <p>لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
-        <b style={{ color: "#1d66d1" }}>https://ur.gov.iq</b>
-      </div>
-
-      {/* Footer */}
       <footer className="doc-footer">
         <div className="footer-left" />
         <div className="footer-center">
@@ -169,6 +160,15 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
           <div>Tel: 5599</div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function MetaLine({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="meta-line">
+      <span className="meta-label">{label}</span>
+      <span className="meta-value">{value}</span>
     </div>
   );
 }
