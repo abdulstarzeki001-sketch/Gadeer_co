@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Document A4 classes */
+body,
+.a4-page{
+  font-family:"Cairo",sans-serif;
+  font-size:10pt;
+}
+
 .a4-page{
   width:210mm;
   min-height:297mm;
@@ -13,7 +19,6 @@
   box-sizing:border-box;
   position:relative;
   direction:rtl;
-  font-family:"Cairo",Arial,sans-serif;
   color:#222;
 }
 
@@ -21,7 +26,11 @@
   display:grid;
   grid-template-columns:1fr 32mm 1fr;
   min-height:38mm;
-  font-size:14pt;
+}
+
+.header-right,
+.header-left{
+  font-size:10pt;
   font-weight:700;
   line-height:1.65;
 }
@@ -39,6 +48,16 @@
 .header-left{
   text-align:right;
   padding-top:6mm;
+}
+
+.meta-label{
+  font-size:9.5pt;
+  font-weight:700;
+}
+
+.meta-value{
+  font-size:9.5pt;
+  font-weight:700;
 }
 
 .center-logo{
@@ -77,7 +96,6 @@
   width:100%;
   border-collapse:collapse;
   table-layout:fixed;
-  font-size:10pt;
   line-height:1.25;
 }
 
@@ -101,6 +119,7 @@
 
 .info-table td:first-child{
   width:35%;
+  font-size:10pt;
   font-weight:700;
   color:#555;
   text-align:right;
@@ -108,6 +127,7 @@
 
 .info-table td:nth-child(2){
   width:65%;
+  font-size:10pt;
   font-weight:600;
   color:#222;
   text-align:center;
@@ -121,7 +141,11 @@
   margin-bottom:4mm;
 }
 
-.barcode-img,
+.barcode-img{
+  width:34mm;
+  height:34mm;
+}
+
 .barcode-img svg,
 .barcode-img img{
   width:34mm !important;
@@ -138,7 +162,10 @@
   margin:0;
 }
 
-.notes a{
+.notes a,
+.notes b{
+  font-size:9pt;
+  font-weight:700;
   color:#1d66d1;
   text-decoration:none;
 }
@@ -153,8 +180,6 @@
   display:grid;
   grid-template-columns:1fr 1.5fr 1fr;
   align-items:end;
-  font-size:8.5pt;
-  font-weight:700;
   line-height:1.35;
 }
 
@@ -164,11 +189,15 @@
 
 .footer-center{
   text-align:center;
+  font-size:8.5pt;
+  font-weight:700;
 }
 
 .footer-right{
   text-align:left;
   direction:ltr;
+  font-size:8pt;
+  font-weight:600;
 }
 @source "../src";
 @import "tw-animate-css";

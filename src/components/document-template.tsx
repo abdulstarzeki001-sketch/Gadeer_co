@@ -176,8 +176,8 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
 function MetaLine({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "35mm 1fr", gap: "2mm" }}>
-      <span style={{ fontWeight: 800 }}>{label}</span>
-      <span style={{ direction: "ltr", textAlign: "left", fontWeight: 700 }}>{value}</span>
+      <span className="meta-label">{label}</span>
+      <span className="meta-value" style={{ direction: "ltr", textAlign: "left" }}>{value}</span>
     </div>
   );
 }
