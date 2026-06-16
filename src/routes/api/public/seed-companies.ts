@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/seed-companies")({
         let inserted = 0;
         for (let i = 0; i < rows.length; i += chunkSize) {
           const chunk = rows.slice(i, i + chunkSize);
-          const { error } = await supabaseAdmin.from("companies").insert(chunk);
+          const { error } = await (supabaseAdmin.from("companies") as any).insert(chunk);
           if (error) return new Response(`error at ${i}: ${error.message}`, { status: 500 });
           inserted += chunk.length;
         }
