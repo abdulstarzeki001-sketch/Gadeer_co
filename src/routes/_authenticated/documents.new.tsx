@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building2, Truck, Shield, DollarSign, Send } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
+import { Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DocumentTemplate } from "@/components/document-template";
 
 export const Route = createFileRoute("/_authenticated/documents/new")({
   head: () => ({ meta: [{ title: "إنشاء وثيقة - الكمارك" }] }),
@@ -22,6 +25,8 @@ const GOVERNORATES = ["بغداد", "البصرة", "نينوى", "أربيل", 
 
 function CreateDocument() {
   const navigate = useNavigate();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewQr, setPreviewQr] = useState<string>("");
   const { data: companies = [] } = useQuery({
     queryKey: ["companies-select"],
     queryFn: async () => {
@@ -114,6 +119,12 @@ function CreateDocument() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const openPreview = async () => {
+    const qr = await QRCode.toDataURL(`${window.location.origin}/verify/PREVIEW`, { width: 300, margin: 1 });
+    setPreviewQr(qr);
+    setPreviewOpen(true);
+  };
+
   return (
     <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-5xl mx-auto">
       <div>
@@ -192,10 +203,55 @@ function CreateDocument() {
         </CardContent>
       </Card>
 
-      <Button type="submit" size="lg" className="w-full" disabled={createMut.isPending}>
-        <Send className="h-4 w-4 ml-2" />
-        {createMut.isPending ? "جاري الإنشاء..." : "إنشاء الوثيقة و رمز QR"}
-      </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Button type="button" variant="outline" size="lg" onClick={openPreview}>
+          <Eye className="h-4 w-4 ml-2" />
+          معاينة الوثيقة
+        </Button>
+        <Button type="submit" size="lg" disabled={createMut.isPending}>
+          <Send className="h-4 w-4 ml-2" />
+          {createMut.isPending ? "جاري الإنشاء..." : "إنشاء الوثيقة و رمز QR"}
+        </Button>
+      </div>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-[230mm] max-h-[95vh] overflow-y-auto p-4">
+          <DialogHeader>
+            <DialogTitle>معاينة الوثيقة قبل الإصدار</DialogTitle>
+          </DialogHeader>
+          <div className="bg-white shadow-lg mx-auto" style={{ width: "210mm" }}>
+            <DocumentTemplate
+              doc={{
+                document_number: "PREVIEW",
+                company_name: form.company_name || "—",
+                company_name_project: form.company_name_project,
+                subject: form.subject,
+                driver_name: form.driver_name || "—",
+                vehicle_number: form.vehicle_number || "—",
+                licence_number: form.license_approval_number || form.licence_number,
+                checkpoint_name_control: form.checkpoint_name_control || "—",
+                registration_governorate: form.registration_governorate,
+                cargo_typedetails: form.cargo_typedetails,
+                weight_quantity: form.weight_quantity || "—",
+                destination_governorate: form.destination_governorate,
+                governorate_name: form.governorate_name,
+                x_coordinate: form.x_coordinate,
+                y_coordinate: form.y_coordinate,
+                granting_license_approval: form.granting_license_approval,
+                license_approval_number: form.license_approval_number,
+                license_approval_date: form.license_approval_date,
+                license_text_specialization: form.license_text_specialization,
+                brand: form.brand,
+                notes: form.notes,
+                qr_code_data: previewQr,
+                document_value: form.document_value,
+                created_at: new Date().toISOString(),
+                items: [],
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }
