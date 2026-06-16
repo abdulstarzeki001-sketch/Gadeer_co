@@ -30,7 +30,9 @@ function DocumentView() {
         <Button variant="ghost" asChild><Link to="/documents"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
         <Button onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
       </div>
-      <DocumentTemplate doc={data} />
+      <div className="shadow-lg print:shadow-none mx-auto" style={{ width: "210mm" }}>
+        <DocumentTemplate doc={data} />
+      </div>
     </div>
   );
 }
