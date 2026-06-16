@@ -9,7 +9,7 @@ export const Route = createFileRoute("/api/public/seed-companies")({
         if (token !== "seed-once-2026") return new Response("forbidden", { status: 403 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         await supabaseAdmin.from("companies").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-        const rows = seedData as Array<Record<string, unknown>>;
+        const rows = seedData as Array<{ company_name: string; [k: string]: unknown }>;
         const chunkSize = 200;
         let inserted = 0;
         for (let i = 0; i < rows.length; i += chunkSize) {
