@@ -69,6 +69,10 @@ function CreateDocument() {
       const client = clients.find((c) => c.id === form.company_id);
       if (!client) throw new Error("شركة النقل غير موجودة");
 
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("الجلسة غير صالحة");
+
       const insertPayload = {
         company_id: form.company_id,
         company_name: client.company_name,
@@ -76,6 +80,7 @@ function CreateDocument() {
         brand: form.brand || null,
         governorate_name: form.governorate_name || null,
         document_value: parseFloat(form.document_value) || 0,
+        created_by: uid,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
@@ -93,6 +98,7 @@ function CreateDocument() {
           type: "charge",
           amount: val,
           description: `وثيقة شحن - ${client.company_name}`,
+          created_by: uid,
         });
       }
       return doc;
