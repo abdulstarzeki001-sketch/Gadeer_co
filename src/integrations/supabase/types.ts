@@ -289,6 +289,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_document: { Args: { doc_number: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
