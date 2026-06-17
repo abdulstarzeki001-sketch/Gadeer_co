@@ -39,8 +39,11 @@ function CompanyStatement() {
     mutationFn: async () => {
       const v = parseFloat(amount);
       if (!v || v <= 0) throw new Error("أدخل مبلغاً صحيحاً");
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("الجلسة غير صالحة");
       const { error } = await supabase.from("transactions").insert({
-        company_id: companyId, type: "payment", amount: v, description: desc || "تسديد",
+        company_id: companyId, type: "payment", amount: v, description: desc || "تسديد", created_by: uid,
       });
       if (error) throw error;
     },
