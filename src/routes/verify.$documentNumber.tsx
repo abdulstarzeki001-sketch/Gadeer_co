@@ -20,10 +20,9 @@ function VerifyResult() {
   const { data, isLoading } = useQuery({
     queryKey: ["verify", documentNumber],
     queryFn: async () => {
-      const { data: doc } = await supabase.from("documents").select("*").eq("document_number", documentNumber).maybeSingle();
-      if (!doc) return null;
-      const { data: items } = await supabase.from("document_items").select("*").eq("document_id", doc.id);
-      return { ...doc, items: items ?? [] };
+      const { data, error } = await supabase.rpc("verify_document", { doc_number: documentNumber });
+      if (error) throw error;
+      return data as any;
     },
   });
 
