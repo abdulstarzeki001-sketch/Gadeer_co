@@ -38,13 +38,22 @@ function CreateDocument() {
     },
   });
 
+  const { data: traders = [] } = useQuery({
+    queryKey: ["traders"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("traders").select("id, name").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [form, setForm] = useState({
-    company_id: "",            // شركة النقل (يدوية)
+    company_id: "",
+    trader_id: "",
     document_value: "",
     brand: "",
-    // معبأة تلقائياً من المرجع — مخفية في النموذج
-    company_name_project: "",  // اسم الشركة المنتجة (من المرجع)
-    governorate_name: "",      // المنتج المحلي
+    company_name_project: "",
+    governorate_name: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -80,6 +89,7 @@ function CreateDocument() {
         brand: form.brand || null,
         governorate_name: form.governorate_name || null,
         document_value: parseFloat(form.document_value) || 0,
+        trader_id: form.trader_id || null,
         created_by: uid,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
@@ -93,6 +103,7 @@ function CreateDocument() {
       if (val > 0) {
         await supabase.from("transactions").insert({
           company_id: form.company_id,
+          trader_id: form.trader_id || null,
           document_id: doc.id,
           document_number: doc.document_number,
           type: "charge",
@@ -174,6 +185,17 @@ function CreateDocument() {
               <SelectTrigger><SelectValue placeholder={clients.length === 0 ? "أضف شركة نقل من صفحة الشركات أولاً" : "اختر شركة النقل"} /></SelectTrigger>
               <SelectContent>
                 {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.company_name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>التاجر (اختياري - لربط الوثيقة بحساب تاجر)</Label>
+            <Select value={form.trader_id || "__none"} onValueChange={(v) => setForm({ ...form, trader_id: v === "__none" ? "" : v })}>
+              <SelectTrigger><SelectValue placeholder={traders.length === 0 ? "أضف تاجراً من صفحة التجار" : "اختر التاجر"} /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">— بدون تاجر —</SelectItem>
+                {traders.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>

@@ -11,16 +11,18 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Building2, FileText, Plus, Wallet, ShieldCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, Building2, FileText, Plus, Wallet, ShieldCheck, LogOut, Users, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 const items = [
   { title: "اللوحة الرئيسية", url: "/" as const, icon: LayoutDashboard },
   { title: "الشركات", url: "/companies" as const, icon: Building2 },
+  { title: "التجار", url: "/traders" as const, icon: Users },
   { title: "الوثائق", url: "/documents" as const, icon: FileText },
   { title: "إنشاء وثيقة", url: "/documents/new" as const, icon: Plus },
   { title: "المحاسبة", url: "/accounting" as const, icon: Wallet },
+  { title: "التقارير", url: "/reports" as const, icon: BarChart3 },
   { title: "التحقق من وثيقة", url: "/verify" as const, icon: ShieldCheck },
 ];
 
