@@ -14,9 +14,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as VerifyDocumentNumberRouteImport } from './routes/verify.$documentNumber'
+import { Route as AuthenticatedTradersRouteImport } from './routes/_authenticated/traders'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
+import { Route as AuthenticatedTradersIndexRouteImport } from './routes/_authenticated/traders.index'
 import { Route as AuthenticatedDocumentsIndexRouteImport } from './routes/_authenticated/documents.index'
+import { Route as AuthenticatedTradersTraderIdRouteImport } from './routes/_authenticated/traders.$traderId'
 import { Route as AuthenticatedDocumentsPreviewRouteImport } from './routes/_authenticated/documents.preview'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents.new'
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
@@ -46,6 +50,16 @@ const VerifyDocumentNumberRoute = VerifyDocumentNumberRouteImport.update({
   path: '/$documentNumber',
   getParentRoute: () => VerifyRoute,
 } as any)
+const AuthenticatedTradersRoute = AuthenticatedTradersRouteImport.update({
+  id: '/traders',
+  path: '/traders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
@@ -56,11 +70,23 @@ const AuthenticatedAccountingRoute = AuthenticatedAccountingRouteImport.update({
   path: '/accounting',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTradersIndexRoute =
+  AuthenticatedTradersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedTradersRoute,
+  } as any)
 const AuthenticatedDocumentsIndexRoute =
   AuthenticatedDocumentsIndexRouteImport.update({
     id: '/documents/',
     path: '/documents/',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTradersTraderIdRoute =
+  AuthenticatedTradersTraderIdRouteImport.update({
+    id: '/$traderId',
+    path: '/$traderId',
+    getParentRoute: () => AuthenticatedTradersRoute,
   } as any)
 const AuthenticatedDocumentsPreviewRoute =
   AuthenticatedDocumentsPreviewRouteImport.update({
@@ -93,25 +119,32 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/traders': typeof AuthenticatedTradersRouteWithChildren
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
+  '/traders/$traderId': typeof AuthenticatedTradersTraderIdRoute
   '/documents/': typeof AuthenticatedDocumentsIndexRoute
+  '/traders/': typeof AuthenticatedTradersIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/': typeof AuthenticatedIndexRoute
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
+  '/traders/$traderId': typeof AuthenticatedTradersTraderIdRoute
   '/documents': typeof AuthenticatedDocumentsIndexRoute
+  '/traders': typeof AuthenticatedTradersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,13 +153,17 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRouteWithChildren
   '/_authenticated/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/traders': typeof AuthenticatedTradersRouteWithChildren
   '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/_authenticated/documents/preview': typeof AuthenticatedDocumentsPreviewRoute
+  '/_authenticated/traders/$traderId': typeof AuthenticatedTradersTraderIdRoute
   '/_authenticated/documents/': typeof AuthenticatedDocumentsIndexRoute
+  '/_authenticated/traders/': typeof AuthenticatedTradersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -136,25 +173,32 @@ export interface FileRouteTypes {
     | '/verify'
     | '/accounting'
     | '/companies'
+    | '/reports'
+    | '/traders'
     | '/verify/$documentNumber'
     | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
     | '/documents/preview'
+    | '/traders/$traderId'
     | '/documents/'
+    | '/traders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
     | '/verify'
     | '/accounting'
     | '/companies'
+    | '/reports'
     | '/verify/$documentNumber'
     | '/'
     | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
     | '/documents/preview'
+    | '/traders/$traderId'
     | '/documents'
+    | '/traders'
   id:
     | '__root__'
     | '/_authenticated'
@@ -162,13 +206,17 @@ export interface FileRouteTypes {
     | '/verify'
     | '/_authenticated/accounting'
     | '/_authenticated/companies'
+    | '/_authenticated/reports'
+    | '/_authenticated/traders'
     | '/verify/$documentNumber'
     | '/_authenticated/'
     | '/_authenticated/accounting/$companyId'
     | '/_authenticated/documents/$id'
     | '/_authenticated/documents/new'
     | '/_authenticated/documents/preview'
+    | '/_authenticated/traders/$traderId'
     | '/_authenticated/documents/'
+    | '/_authenticated/traders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +262,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyDocumentNumberRouteImport
       parentRoute: typeof VerifyRoute
     }
+    '/_authenticated/traders': {
+      id: '/_authenticated/traders'
+      path: '/traders'
+      fullPath: '/traders'
+      preLoaderRoute: typeof AuthenticatedTradersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/companies': {
       id: '/_authenticated/companies'
       path: '/companies'
@@ -228,12 +290,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/traders/': {
+      id: '/_authenticated/traders/'
+      path: '/'
+      fullPath: '/traders/'
+      preLoaderRoute: typeof AuthenticatedTradersIndexRouteImport
+      parentRoute: typeof AuthenticatedTradersRoute
+    }
     '/_authenticated/documents/': {
       id: '/_authenticated/documents/'
       path: '/documents'
       fullPath: '/documents/'
       preLoaderRoute: typeof AuthenticatedDocumentsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/traders/$traderId': {
+      id: '/_authenticated/traders/$traderId'
+      path: '/$traderId'
+      fullPath: '/traders/$traderId'
+      preLoaderRoute: typeof AuthenticatedTradersTraderIdRouteImport
+      parentRoute: typeof AuthenticatedTradersRoute
     }
     '/_authenticated/documents/preview': {
       id: '/_authenticated/documents/preview'
@@ -281,9 +357,24 @@ const AuthenticatedAccountingRouteWithChildren =
     AuthenticatedAccountingRouteChildren,
   )
 
+interface AuthenticatedTradersRouteChildren {
+  AuthenticatedTradersTraderIdRoute: typeof AuthenticatedTradersTraderIdRoute
+  AuthenticatedTradersIndexRoute: typeof AuthenticatedTradersIndexRoute
+}
+
+const AuthenticatedTradersRouteChildren: AuthenticatedTradersRouteChildren = {
+  AuthenticatedTradersTraderIdRoute: AuthenticatedTradersTraderIdRoute,
+  AuthenticatedTradersIndexRoute: AuthenticatedTradersIndexRoute,
+}
+
+const AuthenticatedTradersRouteWithChildren =
+  AuthenticatedTradersRoute._addFileChildren(AuthenticatedTradersRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountingRoute: typeof AuthenticatedAccountingRouteWithChildren
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedTradersRoute: typeof AuthenticatedTradersRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedDocumentsIdRoute: typeof AuthenticatedDocumentsIdRoute
   AuthenticatedDocumentsNewRoute: typeof AuthenticatedDocumentsNewRoute
@@ -294,6 +385,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountingRoute: AuthenticatedAccountingRouteWithChildren,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedTradersRoute: AuthenticatedTradersRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedDocumentsIdRoute: AuthenticatedDocumentsIdRoute,
   AuthenticatedDocumentsNewRoute: AuthenticatedDocumentsNewRoute,
