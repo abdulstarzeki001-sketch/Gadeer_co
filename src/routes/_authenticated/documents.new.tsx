@@ -89,6 +89,7 @@ function CreateDocument() {
         brand: form.brand || null,
         governorate_name: form.governorate_name || null,
         document_value: parseFloat(form.document_value) || 0,
+        trader_id: form.trader_id || null,
         created_by: uid,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
@@ -102,6 +103,7 @@ function CreateDocument() {
       if (val > 0) {
         await supabase.from("transactions").insert({
           company_id: form.company_id,
+          trader_id: form.trader_id || null,
           document_id: doc.id,
           document_number: doc.document_number,
           type: "charge",
