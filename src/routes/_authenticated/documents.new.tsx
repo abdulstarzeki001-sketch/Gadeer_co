@@ -38,13 +38,22 @@ function CreateDocument() {
     },
   });
 
+  const { data: traders = [] } = useQuery({
+    queryKey: ["traders"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("traders").select("id, name").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [form, setForm] = useState({
-    company_id: "",            // شركة النقل (يدوية)
+    company_id: "",
+    trader_id: "",
     document_value: "",
     brand: "",
-    // معبأة تلقائياً من المرجع — مخفية في النموذج
-    company_name_project: "",  // اسم الشركة المنتجة (من المرجع)
-    governorate_name: "",      // المنتج المحلي
+    company_name_project: "",
+    governorate_name: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
