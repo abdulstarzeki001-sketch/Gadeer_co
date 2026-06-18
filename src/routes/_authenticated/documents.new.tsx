@@ -189,6 +189,17 @@ function CreateDocument() {
             </Select>
           </div>
 
+          <div className="space-y-2">
+            <Label>التاجر (اختياري - لربط الوثيقة بحساب تاجر)</Label>
+            <Select value={form.trader_id || "__none"} onValueChange={(v) => setForm({ ...form, trader_id: v === "__none" ? "" : v })}>
+              <SelectTrigger><SelectValue placeholder={traders.length === 0 ? "أضف تاجراً من صفحة التجار" : "اختر التاجر"} /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">— بدون تاجر —</SelectItem>
+                {traders.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
