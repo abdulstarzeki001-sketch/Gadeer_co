@@ -126,6 +126,7 @@ export type Database = {
           registration_governorate: string | null
           status: string
           subject: string | null
+          trader_id: string | null
           vehicle_number: string | null
           weight_quantity: string | null
           x_coordinate: string | null
@@ -156,6 +157,7 @@ export type Database = {
           registration_governorate?: string | null
           status?: string
           subject?: string | null
+          trader_id?: string | null
           vehicle_number?: string | null
           weight_quantity?: string | null
           x_coordinate?: string | null
@@ -186,6 +188,7 @@ export type Database = {
           registration_governorate?: string | null
           status?: string
           subject?: string | null
+          trader_id?: string | null
           vehicle_number?: string | null
           weight_quantity?: string | null
           x_coordinate?: string | null
@@ -199,7 +202,47 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "documents_trader_id_fkey"
+            columns: ["trader_id"]
+            isOneToOne: false
+            referencedRelation: "traders"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      traders: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
@@ -212,6 +255,7 @@ export type Database = {
           document_number: string | null
           driver_name: string | null
           id: string
+          trader_id: string | null
           type: string
         }
         Insert: {
@@ -224,6 +268,7 @@ export type Database = {
           document_number?: string | null
           driver_name?: string | null
           id?: string
+          trader_id?: string | null
           type?: string
         }
         Update: {
@@ -236,6 +281,7 @@ export type Database = {
           document_number?: string | null
           driver_name?: string | null
           id?: string
+          trader_id?: string | null
           type?: string
         }
         Relationships: [
@@ -251,6 +297,13 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_trader_id_fkey"
+            columns: ["trader_id"]
+            isOneToOne: false
+            referencedRelation: "traders"
             referencedColumns: ["id"]
           },
         ]
