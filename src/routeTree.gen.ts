@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyRouteImport } from './routes/verify'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
@@ -30,11 +29,6 @@ import { Route as AuthenticatedAccountingCompanyIdRouteImport } from './routes/_
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -122,7 +116,6 @@ const AuthenticatedAccountingCompanyIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
@@ -139,7 +132,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
@@ -158,7 +150,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/verify': typeof VerifyRouteWithChildren
   '/_authenticated/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
@@ -179,7 +170,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/sitemap.xml'
     | '/verify'
     | '/accounting'
     | '/companies'
@@ -196,7 +186,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
-    | '/sitemap.xml'
     | '/verify'
     | '/accounting'
     | '/companies'
@@ -214,7 +203,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
-    | '/sitemap.xml'
     | '/verify'
     | '/_authenticated/accounting'
     | '/_authenticated/companies'
@@ -234,7 +222,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerifyRoute: typeof VerifyRouteWithChildren
 }
 
@@ -245,13 +232,6 @@ declare module '@tanstack/react-router' {
       path: '/verify'
       fullPath: '/verify'
       preLoaderRoute: typeof VerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -431,7 +411,6 @@ const VerifyRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerifyRoute: VerifyRouteWithChildren,
 }
 export const routeTree = rootRouteImport
