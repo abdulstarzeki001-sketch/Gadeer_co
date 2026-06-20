@@ -262,8 +262,8 @@
 .doc-footer{
   position:absolute;
   bottom:7mm;
-  left:13mm;
-  right:13mm;
+  left:10mm;
+  right:10mm;
   border-top:1px solid #d9d9d9;
   padding-top:2mm;
   display:grid;
