@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://json-doc-maker.lovable.app/sitemap.xml
