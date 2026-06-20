@@ -158,7 +158,7 @@
   border-collapse:collapse;
   table-layout:fixed;
   direction:rtl;
-  line-height:1.25;
+  line-height:1.1;
 }
 
 .info-table,
@@ -175,8 +175,8 @@
 .info-table th,
 .info-table td{
   border:1px solid #d6d6d6;
-  height:6.5mm;
-  padding:1mm 2mm;
+  height:5.5mm;
+  padding:0.7mm 1.5mm;
   box-sizing:border-box;
   vertical-align:middle;
 }
@@ -189,7 +189,7 @@
 .info-table th{
   background:#a40000;
   color:#fff;
-  height:7mm;
+  height:6mm;
   font-weight:700;
   text-align:center !important;
 }
