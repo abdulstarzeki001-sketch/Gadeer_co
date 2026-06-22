@@ -163,23 +163,54 @@ function CreateDocument() {
                 <DialogHeader className="p-3 border-b shrink-0">
                   <DialogTitle className="text-sm">اختر شركة مرجعية</DialogTitle>
                 </DialogHeader>
-                <Command shouldFilter={true} className="flex-1 min-h-0">
-                  <CommandInput placeholder="ابحث بالاسم أو العلامة..." />
-                  <CommandList className="flex-1 max-h-none">
-                    <CommandEmpty>لا توجد نتائج</CommandEmpty>
-                    <CommandGroup>
-                      {REFERENCE.slice(0, 500).map((r, i) => (
-                        <CommandItem key={i} value={`${r.CompanyNameProject} ${r.Brand} ${r.GovernorateName}`} onSelect={() => pickReference(i)}>
-                          <Check className={`ml-2 h-4 w-4 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
-                          <div className="flex flex-col min-w-0">
+                <div className="p-2 border-b shrink-0 space-y-2">
+                  <div className="relative">
+                    <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      autoFocus
+                      value={refQuery}
+                      onChange={(e) => setRefQuery(e.target.value)}
+                      placeholder="ابحث بالاسم أو العلامة أو المحافظة..."
+                      className="pr-8 pl-8"
+                    />
+                    {refQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setRefQuery("")}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        aria-label="تصفير البحث"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground px-1">
+                    {filteredRefs.length} نتيجة{filteredRefs.length > 500 ? " — يعرض أول 500" : ""}
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  {filteredRefs.length === 0 ? (
+                    <div className="p-6 text-center text-sm text-muted-foreground">لا توجد نتائج</div>
+                  ) : (
+                    filteredRefs.slice(0, 500).map((r) => {
+                      const i = REFERENCE.indexOf(r);
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => pickReference(i)}
+                          className="w-full flex items-start gap-2 text-right p-2 hover:bg-accent border-b last:border-b-0"
+                        >
+                          <Check className={`h-4 w-4 mt-0.5 shrink-0 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
+                          <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-sm truncate">{r.CompanyNameProject}</span>
                             <span className="text-xs text-muted-foreground truncate">{r.GovernorateName} — {r.Brand}</span>
                           </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
               </DialogContent>
             </Dialog>
             {selectedRef && (
