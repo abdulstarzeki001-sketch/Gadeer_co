@@ -257,6 +257,10 @@
   margin:0;
 }
 
+.notes .notes-muted{
+  color:#9aa3ad;
+}
+
 .notes a,
 .notes b{
   color:#1d66d1;
