@@ -1,4 +1,5 @@
 import logoAsset from "@/assets/logo_new.png.asset.json";
+import emblemAsset from "@/assets/iraq-emblem.png.asset.json";
 
 interface DocumentItem {
   id: string;
@@ -94,6 +95,10 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
       </header>
 
       <hr className="divider" />
+
+      <div className="under-divider-right">
+        <img src={emblemAsset.url} alt="شعار جمهورية العراق" className="iraq-emblem" />
+      </div>
 
       <div className="content">
         <h2 className="doc-title">منصة المنتج المحلي</h2>
