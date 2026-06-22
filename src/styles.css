@@ -110,13 +110,13 @@
   margin:0 0 6mm 0;
 }
 
-.under-divider-right{
+.under-footer-right{
   display:flex;
   justify-content:flex-end;
-  margin:-4mm 0 4mm 0;
+  margin:2mm 0 0 0;
 }
 .iraq-emblem{
-  width:22mm;
+  width:12mm;
   height:auto;
   object-fit:contain;
 }
