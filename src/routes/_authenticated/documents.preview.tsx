@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { DocumentTemplate } from "@/components/document-template";
 import { Button } from "@/components/ui/button";
 import { Printer, Download } from "lucide-react";
-import { exportElementToPdf } from "@/lib/export-pdf";
+import { PdfPreviewDialog } from "@/components/pdf-preview-dialog";
 
 export const Route = createFileRoute("/_authenticated/documents/preview")({
   head: () => ({ meta: [{ title: "معاينة الوثيقة" }] }),
@@ -14,17 +14,7 @@ export const Route = createFileRoute("/_authenticated/documents/preview")({
 function PreviewPage() {
   const [doc, setDoc] = useState<any>(null);
   const docRef = useRef<HTMLDivElement>(null);
-  const [exporting, setExporting] = useState(false);
-
-  const handleExportPdf = async () => {
-    if (!docRef.current) return;
-    setExporting(true);
-    try {
-      await exportElementToPdf(docRef.current, `document-PREVIEW.pdf`);
-    } finally {
-      setExporting(false);
-    }
-  };
+  const [pdfOpen, setPdfOpen] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("document-preview");
@@ -66,9 +56,9 @@ function PreviewPage() {
   return (
     <div className="bg-muted min-h-screen py-6">
       <div className="max-w-[230mm] mx-auto mb-4 px-4 flex justify-end gap-2 print:hidden">
-        <Button onClick={handleExportPdf} disabled={exporting} variant="outline">
+        <Button onClick={() => setPdfOpen(true)} variant="outline">
           <Download className="h-4 w-4 ml-2" />
-          {exporting ? "جاري التنزيل..." : "تنزيل PDF"}
+          معاينة وتنزيل PDF
         </Button>
         <Button onClick={() => window.print()}>
           <Printer className="h-4 w-4 ml-2" />
@@ -78,6 +68,12 @@ function PreviewPage() {
       <div ref={docRef} className="bg-white shadow-lg mx-auto" style={{ width: "210mm" }}>
         <DocumentTemplate doc={doc} />
       </div>
+      <PdfPreviewDialog
+        open={pdfOpen}
+        onOpenChange={setPdfOpen}
+        getElement={() => docRef.current}
+        fileName="document-PREVIEW.pdf"
+      />
     </div>
   );
 }
