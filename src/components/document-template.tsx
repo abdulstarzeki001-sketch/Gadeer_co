@@ -165,6 +165,9 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
           <div>Tel: 5599</div>
         </div>
       </footer>
+      <div className="under-footer-right">
+        <img src={emblemAsset.url} alt="شعار جمهورية العراق" className="iraq-emblem" />
+      </div>
     </div>
   );
 }
