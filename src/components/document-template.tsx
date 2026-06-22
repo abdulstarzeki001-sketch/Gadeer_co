@@ -105,8 +105,8 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
 
         <table className="info-table">
           <colgroup>
-            <col style={{ width: "65%" }} />
             <col style={{ width: "35%" }} />
+            <col style={{ width: "65%" }} />
           </colgroup>
           <thead>
             <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
