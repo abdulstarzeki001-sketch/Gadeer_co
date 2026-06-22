@@ -107,9 +107,9 @@ function CompaniesPage() {
           <p className="text-sm text-muted-foreground">{companies.length} شركة — تُضاف يدوياً أو تلقائياً عند إنشاء وثيقة</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); } }}>
+          <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); setForm({ company_name: "", address: "" }); setErrors({}); } }}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 ml-1" />شركة جديدة</Button>
+              <Button onClick={() => { setEditId(null); setForm({ company_name: "", address: "" }); setErrors({}); }}><Plus className="h-4 w-4 ml-1" />شركة جديدة</Button>
             </DialogTrigger>
             <DialogContent dir="rtl" className="max-w-2xl">
               <DialogHeader><DialogTitle>{editId ? "تعديل شركة" : "إضافة شركة"}</DialogTitle></DialogHeader>
