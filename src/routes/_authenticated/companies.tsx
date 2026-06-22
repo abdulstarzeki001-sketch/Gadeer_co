@@ -21,7 +21,7 @@ function CompaniesPage() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ company_name: "", license_number: "", specialization: "", governorate: "", brand: "", phone: "", email: "", address: "" });
+  const [form, setForm] = useState({ company_name: "", address: "" });
 
   const { data: companies = [] } = useQuery({
     queryKey: ["companies"],
@@ -47,7 +47,7 @@ function CompaniesPage() {
       toast.success(editId ? "تم التعديل" : "تمت إضافة الشركة");
       setOpen(false);
       setEditId(null);
-      setForm({ company_name: "", license_number: "", specialization: "", governorate: "", brand: "", phone: "", email: "", address: "" });
+      setForm({ company_name: "", address: "" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -63,19 +63,13 @@ function CompaniesPage() {
 
 
   const filtered = companies.filter((c) =>
-    !search || c.company_name.includes(search) || (c.brand ?? "").includes(search) || (c.governorate ?? "").includes(search)
+    !search || c.company_name.includes(search) || (c.address ?? "").includes(search)
   );
 
   const startEdit = (c: typeof companies[number]) => {
     setEditId(c.id);
     setForm({
       company_name: c.company_name,
-      license_number: c.license_number ?? "",
-      specialization: c.specialization ?? "",
-      governorate: c.governorate ?? "",
-      brand: c.brand ?? "",
-      phone: c.phone ?? "",
-      email: c.email ?? "",
       address: c.address ?? "",
     });
     setOpen(true);
@@ -95,15 +89,9 @@ function CompaniesPage() {
             </DialogTrigger>
             <DialogContent dir="rtl" className="max-w-2xl">
               <DialogHeader><DialogTitle>{editId ? "تعديل شركة" : "إضافة شركة"}</DialogTitle></DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="md:col-span-2"><Label>اسم الشركة *</Label><Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} /></div>
-                <div><Label>المحافظة</Label><Input value={form.governorate} onChange={(e) => setForm({ ...form, governorate: e.target.value })} /></div>
-                <div><Label>رقم الإجازة</Label><Input value={form.license_number} onChange={(e) => setForm({ ...form, license_number: e.target.value })} /></div>
-                <div className="md:col-span-2"><Label>الاختصاص</Label><Input value={form.specialization} onChange={(e) => setForm({ ...form, specialization: e.target.value })} /></div>
-                <div className="md:col-span-2"><Label>العلامة التجارية</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
-                <div><Label>الهاتف</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-                <div><Label>البريد</Label><Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-                <div className="md:col-span-2"><Label>العنوان</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+              <div className="grid grid-cols-1 gap-3">
+                <div><Label>اسم الشركة *</Label><Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} /></div>
+                <div><Label>العنوان</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
               </div>
               <DialogFooter>
                 <Button onClick={() => saveMut.mutate(form)} disabled={!form.company_name || saveMut.isPending}>حفظ</Button>
@@ -125,9 +113,7 @@ function CompaniesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>اسم الشركة</TableHead>
-                <TableHead>المحافظة</TableHead>
-                <TableHead>العلامة</TableHead>
-                <TableHead>الاختصاص</TableHead>
+                <TableHead>العنوان</TableHead>
                 <TableHead className="w-28">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
@@ -135,9 +121,7 @@ function CompaniesPage() {
               {filtered.slice(0, 200).map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="font-medium">{c.company_name}</TableCell>
-                  <TableCell>{c.governorate}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{c.brand}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{c.specialization}</TableCell>
+                  <TableCell className="max-w-[300px] truncate">{c.address}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" onClick={() => startEdit(c)}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => { if (confirm("حذف الشركة؟")) deleteMut.mutate(c.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -145,7 +129,7 @@ function CompaniesPage() {
                 </TableRow>
               ))}
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">لا نتائج</TableCell></TableRow>
+                <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-8">لا نتائج</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
