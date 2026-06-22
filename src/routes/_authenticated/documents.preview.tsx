@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { DocumentTemplate } from "@/components/document-template";
 import { Button } from "@/components/ui/button";
 import { Printer, Download } from "lucide-react";
 import { exportElementToPdf } from "@/lib/export-pdf";
-import { useRef, useState as useStateReact } from "react";
 
 export const Route = createFileRoute("/_authenticated/documents/preview")({
   head: () => ({ meta: [{ title: "معاينة الوثيقة" }] }),
@@ -15,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/documents/preview")({
 function PreviewPage() {
   const [doc, setDoc] = useState<any>(null);
   const docRef = useRef<HTMLDivElement>(null);
-  const [exporting, setExporting] = useStateReact(false);
+  const [exporting, setExporting] = useState(false);
 
   const handleExportPdf = async () => {
     if (!docRef.current) return;
