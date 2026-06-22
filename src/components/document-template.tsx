@@ -153,7 +153,9 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
       </div>
 
       <footer className="doc-footer">
-        <div className="footer-left" />
+        <div className="footer-left">
+          <img src={emblemAsset.url} alt="شعار جمهورية العراق" className="iraq-emblem" />
+        </div>
         <div className="footer-center">
           <div>مكتب رئيس الوزراء / المركز الوطني للتحول الرقمي</div>
           <div>بغداد – كرادة مريم</div>
@@ -165,9 +167,6 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
           <div>Tel: 5599</div>
         </div>
       </footer>
-      <div className="under-footer-right">
-        <img src={emblemAsset.url} alt="شعار جمهورية العراق" className="iraq-emblem" />
-      </div>
     </div>
   );
 }
