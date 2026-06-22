@@ -10,6 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const companySchema = z.object({
+  company_name: z.string().trim().nonempty({ message: "اسم الشركة مطلوب" }).max(150, { message: "اسم الشركة طويل جداً" }),
+  address: z.string().trim().nonempty({ message: "العنوان مطلوب" }).max(300, { message: "العنوان طويل جداً" }),
+});
 
 export const Route = createFileRoute("/_authenticated/companies")({
   head: () => ({ meta: [{ title: "الشركات - الكمارك" }] }),
@@ -22,6 +28,23 @@ function CompaniesPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ company_name: "", address: "" });
+  const [errors, setErrors] = useState<{ company_name?: string; address?: string }>({});
+
+  const handleSave = () => {
+    const result = companySchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: { company_name?: string; address?: string } = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as "company_name" | "address";
+        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error(Object.values(fieldErrors)[0] ?? "تحقق من الحقول");
+      return;
+    }
+    setErrors({});
+    saveMut.mutate(result.data);
+  };
 
   const { data: companies = [] } = useQuery({
     queryKey: ["companies"],
@@ -48,6 +71,7 @@ function CompaniesPage() {
       setOpen(false);
       setEditId(null);
       setForm({ company_name: "", address: "" });
+      setErrors({});
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -90,11 +114,19 @@ function CompaniesPage() {
             <DialogContent dir="rtl" className="max-w-2xl">
               <DialogHeader><DialogTitle>{editId ? "تعديل شركة" : "إضافة شركة"}</DialogTitle></DialogHeader>
               <div className="grid grid-cols-1 gap-3">
-                <div><Label>اسم الشركة *</Label><Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} /></div>
-                <div><Label>العنوان</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+                <div>
+                  <Label>اسم الشركة *</Label>
+                  <Input maxLength={150} value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} aria-invalid={!!errors.company_name} />
+                  {errors.company_name && <p className="text-xs text-destructive mt-1">{errors.company_name}</p>}
+                </div>
+                <div>
+                  <Label>العنوان *</Label>
+                  <Input maxLength={300} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} aria-invalid={!!errors.address} />
+                  {errors.address && <p className="text-xs text-destructive mt-1">{errors.address}</p>}
+                </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => saveMut.mutate(form)} disabled={!form.company_name || saveMut.isPending}>حفظ</Button>
+                <Button onClick={handleSave} disabled={saveMut.isPending}>حفظ</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
