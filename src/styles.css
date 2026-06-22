@@ -111,7 +111,7 @@
 }
 
 .iraq-emblem{
-  width:12mm;
+  width:9mm;
   height:auto;
   object-fit:contain;
   display:block;
@@ -275,10 +275,10 @@
   padding-top:2mm;
   display:grid;
   grid-template-columns:1fr 1.5fr 1fr;
-  align-items:end;
-  font-size:8.5pt;
+  align-items:start;
+  font-size:7.5pt;
   font-weight:700;
-  line-height:1.35;
+  line-height:1.3;
 }
 
 .footer-left{
@@ -286,21 +286,21 @@
   text-align:right;
   display:flex;
   justify-content:flex-start;
-  align-items:flex-end;
-  padding-top:1mm;
+  align-items:flex-start;
+  padding-top:0;
 }
 
 .footer-center{
   direction:rtl;
   text-align:center;
-  font-size:8.5pt;
+  font-size:7.5pt;
   font-weight:700;
 }
 
 .footer-right{
   direction:ltr;
   text-align:left;
-  font-size:8pt;
+  font-size:7pt;
   font-weight:600;
 }
 @source "../src";
