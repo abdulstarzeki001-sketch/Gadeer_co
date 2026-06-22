@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check } from "lucide-react";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
@@ -26,6 +25,17 @@ function CreateDocument() {
   const navigate = useNavigate();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [refIndex, setRefIndex] = useState<number | null>(null);
+  const [refQuery, setRefQuery] = useState("");
+
+  const filteredRefs = useMemo(() => {
+    const q = refQuery.trim().toLowerCase();
+    if (!q) return REFERENCE;
+    const tokens = q.split(/\s+/).filter(Boolean);
+    return REFERENCE.filter((r) => {
+      const hay = `${r.CompanyNameProject ?? ""} ${r.Brand ?? ""} ${r.GovernorateName ?? ""}`.toLowerCase();
+      return tokens.every((t) => hay.includes(t));
+    });
+  }, [refQuery]);
 
   // الشركات المضافة يدوياً (شركات النقل - العملاء)
   const { data: clients = [] } = useQuery({
