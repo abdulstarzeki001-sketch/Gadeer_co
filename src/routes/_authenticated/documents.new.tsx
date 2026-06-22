@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,10 @@ function CreateDocument() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [refIndex, setRefIndex] = useState<number | null>(null);
   const [refQuery, setRefQuery] = useState("");
+  const PAGE = 50;
+  const [visibleCount, setVisibleCount] = useState(PAGE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const filteredRefs = useMemo(() => {
     const q = refQuery.trim().toLowerCase();
@@ -36,6 +40,30 @@ function CreateDocument() {
       return tokens.every((t) => hay.includes(t));
     });
   }, [refQuery]);
+
+  // reset pagination on query change or reopen
+  useEffect(() => {
+    setVisibleCount(PAGE);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [refQuery, pickerOpen]);
+
+  // infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const root = scrollRef.current;
+    const target = sentinelRef.current;
+    if (!root || !target) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((c) => Math.min(c + PAGE, filteredRefs.length));
+        }
+      },
+      { root, rootMargin: "200px" }
+    );
+    obs.observe(target);
+    return () => obs.disconnect();
+  }, [pickerOpen, filteredRefs.length]);
 
   // الشركات المضافة يدوياً (شركات النقل - العملاء)
   const { data: clients = [] } = useQuery({
@@ -185,30 +213,37 @@ function CreateDocument() {
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground px-1">
-                    {filteredRefs.length} نتيجة{filteredRefs.length > 500 ? " — يعرض أول 500" : ""}
+                    {filteredRefs.length} نتيجة — يعرض {Math.min(visibleCount, filteredRefs.length)}
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto">
+                <div ref={scrollRef} className="flex-1 overflow-y-auto">
                   {filteredRefs.length === 0 ? (
                     <div className="p-6 text-center text-sm text-muted-foreground">لا توجد نتائج</div>
                   ) : (
-                    filteredRefs.slice(0, 500).map((r) => {
-                      const i = REFERENCE.indexOf(r);
-                      return (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => pickReference(i)}
-                          className="w-full flex items-start gap-2 text-right p-2 hover:bg-accent border-b last:border-b-0"
-                        >
-                          <Check className={`h-4 w-4 mt-0.5 shrink-0 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-sm truncate">{r.CompanyNameProject}</span>
-                            <span className="text-xs text-muted-foreground truncate">{r.GovernorateName} — {r.Brand}</span>
-                          </div>
-                        </button>
-                      );
-                    })
+                    <>
+                      {filteredRefs.slice(0, visibleCount).map((r) => {
+                        const i = REFERENCE.indexOf(r);
+                        return (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => pickReference(i)}
+                            className="w-full flex items-start gap-2 text-right p-2 hover:bg-accent border-b last:border-b-0"
+                          >
+                            <Check className={`h-4 w-4 mt-0.5 shrink-0 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="text-sm truncate">{r.CompanyNameProject}</span>
+                              <span className="text-xs text-muted-foreground truncate">{r.GovernorateName} — {r.Brand}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                      {visibleCount < filteredRefs.length && (
+                        <div ref={sentinelRef} className="p-3 text-center text-xs text-muted-foreground">
+                          جاري التحميل...
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </DialogContent>
