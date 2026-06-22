@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,10 @@ function CreateDocument() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [refIndex, setRefIndex] = useState<number | null>(null);
   const [refQuery, setRefQuery] = useState("");
+  const PAGE = 50;
+  const [visibleCount, setVisibleCount] = useState(PAGE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const filteredRefs = useMemo(() => {
     const q = refQuery.trim().toLowerCase();
@@ -36,6 +40,30 @@ function CreateDocument() {
       return tokens.every((t) => hay.includes(t));
     });
   }, [refQuery]);
+
+  // reset pagination on query change or reopen
+  useEffect(() => {
+    setVisibleCount(PAGE);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [refQuery, pickerOpen]);
+
+  // infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const root = scrollRef.current;
+    const target = sentinelRef.current;
+    if (!root || !target) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((c) => Math.min(c + PAGE, filteredRefs.length));
+        }
+      },
+      { root, rootMargin: "200px" }
+    );
+    obs.observe(target);
+    return () => obs.disconnect();
+  }, [pickerOpen, filteredRefs.length]);
 
   // الشركات المضافة يدوياً (شركات النقل - العملاء)
   const { data: clients = [] } = useQuery({
