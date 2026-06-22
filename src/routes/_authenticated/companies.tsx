@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Trash2, Pencil } from "lucide-react";
+import { Plus, Search, Trash2, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -29,6 +29,7 @@ function CompaniesPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ company_name: "", address: "" });
   const [errors, setErrors] = useState<{ company_name?: string; address?: string }>({});
+  const [previewId, setPreviewId] = useState<string | null>(null);
 
   const handleSave = () => {
     const result = companySchema.safeParse(form);
@@ -99,6 +100,8 @@ function CompaniesPage() {
     setOpen(true);
   };
 
+  const previewCompany = companies.find((c) => c.id === previewId) ?? null;
+
   return (
     <div className="p-6 space-y-4 max-w-7xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -151,10 +154,11 @@ function CompaniesPage() {
             </TableHeader>
             <TableBody>
               {filtered.slice(0, 200).map((c) => (
-                <TableRow key={c.id}>
+                <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setPreviewId(c.id)}>
                   <TableCell className="font-medium">{c.company_name}</TableCell>
                   <TableCell className="max-w-[300px] truncate">{c.address}</TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" onClick={() => setPreviewId(c.id)}><Eye className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => startEdit(c)}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => { if (confirm("حذف الشركة؟")) deleteMut.mutate(c.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </TableCell>
@@ -168,6 +172,32 @@ function CompaniesPage() {
           {filtered.length > 200 && <div className="text-xs text-muted-foreground p-3 border-t">عرض أول 200 — استخدم البحث لتضييق النتائج</div>}
         </CardContent>
       </Card>
+
+      <Dialog open={!!previewId} onOpenChange={(v) => { if (!v) setPreviewId(null); }}>
+        <DialogContent dir="rtl" className="max-w-lg">
+          <DialogHeader><DialogTitle>معاينة الشركة</DialogTitle></DialogHeader>
+          {previewCompany && (
+            <div className="space-y-3 text-sm">
+              <div>
+                <div className="text-xs text-muted-foreground">اسم الشركة</div>
+                <div className="font-medium text-base">{previewCompany.company_name}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">العنوان</div>
+                <div>{previewCompany.address || "—"}</div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            {previewCompany && (
+              <Button variant="outline" onClick={() => { startEdit(previewCompany); setPreviewId(null); }}>
+                <Pencil className="h-4 w-4 ml-1" />تعديل
+              </Button>
+            )}
+            <Button onClick={() => setPreviewId(null)}>إغلاق</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
