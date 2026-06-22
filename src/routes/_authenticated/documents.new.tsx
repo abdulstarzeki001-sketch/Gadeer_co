@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check } from "lucide-react";
@@ -144,33 +144,34 @@ function CreateDocument() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>اختر شركة مرجعية (لتعبئة هيكل الوثيقة) — {refCount} شركة *</Label>
-            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-              <PopoverTrigger asChild>
-                <Button type="button" variant="outline" role="combobox" className="w-full justify-between font-normal">
-                  <span className="truncate">{selectedRef ? selectedRef.CompanyNameProject : "ابحث عن شركة..."}</span>
-                  <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
-                <Command shouldFilter={true}>
+            <Button type="button" variant="outline" role="combobox" className="w-full justify-between font-normal" onClick={() => setPickerOpen(true)}>
+              <span className="truncate">{selectedRef ? selectedRef.CompanyNameProject : "ابحث عن شركة..."}</span>
+              <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
+            </Button>
+            <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+              <DialogContent dir="rtl" className="p-0 gap-0 w-[92vw] max-w-sm h-[80vh] max-h-[640px] flex flex-col overflow-hidden">
+                <DialogHeader className="p-3 border-b shrink-0">
+                  <DialogTitle className="text-sm">اختر شركة مرجعية</DialogTitle>
+                </DialogHeader>
+                <Command shouldFilter={true} className="flex-1 min-h-0">
                   <CommandInput placeholder="ابحث بالاسم أو العلامة..." />
-                  <CommandList>
+                  <CommandList className="flex-1 max-h-none">
                     <CommandEmpty>لا توجد نتائج</CommandEmpty>
                     <CommandGroup>
                       {REFERENCE.slice(0, 500).map((r, i) => (
                         <CommandItem key={i} value={`${r.CompanyNameProject} ${r.Brand} ${r.GovernorateName}`} onSelect={() => pickReference(i)}>
                           <Check className={`ml-2 h-4 w-4 ${refIndex === i ? "opacity-100" : "opacity-0"}`} />
-                          <div className="flex flex-col">
-                            <span className="text-sm">{r.CompanyNameProject}</span>
-                            <span className="text-xs text-muted-foreground truncate max-w-[400px]">{r.GovernorateName} — {r.Brand}</span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm truncate">{r.CompanyNameProject}</span>
+                            <span className="text-xs text-muted-foreground truncate">{r.GovernorateName} — {r.Brand}</span>
                           </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverContent>
-            </Popover>
+              </DialogContent>
+            </Dialog>
             {selectedRef && (
               <div className="text-xs text-muted-foreground rounded-md border p-2 space-y-0.5 bg-muted/30">
                 <div>المحافظة: {selectedRef.GovernorateName}</div>
