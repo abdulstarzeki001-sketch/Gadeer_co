@@ -23,7 +23,6 @@ const items = [
   { title: "إنشاء وثيقة", url: "/documents/new" as const, icon: Plus },
   { title: "المحاسبة", url: "/accounting" as const, icon: Wallet },
   { title: "التقارير", url: "/reports" as const, icon: BarChart3 },
-  { title: "التحقق من وثيقة", url: "/verify" as const, icon: ShieldCheck },
 ];
 
 export function AppSidebar() {
