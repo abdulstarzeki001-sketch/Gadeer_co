@@ -9,11 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as VerifyDocumentNumberRouteImport } from './routes/verify.$documentNumber'
 import { Route as AuthenticatedTradersRouteImport } from './routes/_authenticated/traders'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
@@ -26,11 +24,6 @@ import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedDocumentsIdRouteImport } from './routes/_authenticated/documents.$id'
 import { Route as AuthenticatedAccountingCompanyIdRouteImport } from './routes/_authenticated/accounting.$companyId'
 
-const VerifyRoute = VerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -44,11 +37,6 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const VerifyDocumentNumberRoute = VerifyDocumentNumberRouteImport.update({
-  id: '/$documentNumber',
-  path: '/$documentNumber',
-  getParentRoute: () => VerifyRoute,
 } as any)
 const AuthenticatedTradersRoute = AuthenticatedTradersRouteImport.update({
   id: '/traders',
@@ -116,12 +104,10 @@ const AuthenticatedAccountingCompanyIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
-  '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/traders': typeof AuthenticatedTradersRouteWithChildren
-  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
@@ -132,11 +118,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
-  '/verify': typeof VerifyRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRoute
   '/reports': typeof AuthenticatedReportsRoute
-  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/': typeof AuthenticatedIndexRoute
   '/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/documents/$id': typeof AuthenticatedDocumentsIdRoute
@@ -150,12 +134,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/verify': typeof VerifyRouteWithChildren
   '/_authenticated/accounting': typeof AuthenticatedAccountingRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/traders': typeof AuthenticatedTradersRouteWithChildren
-  '/verify/$documentNumber': typeof VerifyDocumentNumberRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/accounting/$companyId': typeof AuthenticatedAccountingCompanyIdRoute
   '/_authenticated/documents/$id': typeof AuthenticatedDocumentsIdRoute
@@ -170,12 +152,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/verify'
     | '/accounting'
     | '/companies'
     | '/reports'
     | '/traders'
-    | '/verify/$documentNumber'
     | '/accounting/$companyId'
     | '/documents/$id'
     | '/documents/new'
@@ -186,11 +166,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
-    | '/verify'
     | '/accounting'
     | '/companies'
     | '/reports'
-    | '/verify/$documentNumber'
     | '/'
     | '/accounting/$companyId'
     | '/documents/$id'
@@ -203,12 +181,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
-    | '/verify'
     | '/_authenticated/accounting'
     | '/_authenticated/companies'
     | '/_authenticated/reports'
     | '/_authenticated/traders'
-    | '/verify/$documentNumber'
     | '/_authenticated/'
     | '/_authenticated/accounting/$companyId'
     | '/_authenticated/documents/$id'
@@ -222,18 +198,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  VerifyRoute: typeof VerifyRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verify': {
-      id: '/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof VerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -254,13 +222,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/verify/$documentNumber': {
-      id: '/verify/$documentNumber'
-      path: '/$documentNumber'
-      fullPath: '/verify/$documentNumber'
-      preLoaderRoute: typeof VerifyDocumentNumberRouteImport
-      parentRoute: typeof VerifyRoute
     }
     '/_authenticated/traders': {
       id: '/_authenticated/traders'
@@ -397,21 +358,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface VerifyRouteChildren {
-  VerifyDocumentNumberRoute: typeof VerifyDocumentNumberRoute
-}
-
-const VerifyRouteChildren: VerifyRouteChildren = {
-  VerifyDocumentNumberRoute: VerifyDocumentNumberRoute,
-}
-
-const VerifyRouteWithChildren =
-  VerifyRoute._addFileChildren(VerifyRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  VerifyRoute: VerifyRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
