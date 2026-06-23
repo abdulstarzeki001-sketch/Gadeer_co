@@ -441,7 +441,27 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">الوزن / الكمية</Label>
-                    <Input value={form.weight_quantity} onChange={(e) => setForm({ ...form, weight_quantity: e.target.value })} />
+                    {(() => {
+                      const match = form.weight_quantity.match(/^(طن|عدد)\s*(.*)$/);
+                      const unit = match ? match[1] : "طن";
+                      const num = match ? match[2] : form.weight_quantity;
+                      return (
+                        <div className="flex gap-2">
+                          <Select value={unit} onValueChange={(v) => setForm({ ...form, weight_quantity: `${v} ${num}`.trim() })}>
+                            <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="طن">طن</SelectItem>
+                              <SelectItem value="عدد">عدد</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            className="flex-1"
+                            value={num}
+                            onChange={(e) => setForm({ ...form, weight_quantity: `${unit} ${e.target.value}`.trim() })}
+                          />
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">الوجهة النهائية / المحافظة</Label>
