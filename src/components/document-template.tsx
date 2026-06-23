@@ -136,13 +136,11 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
           </tbody>
         </table>
 
-        <div className="qr-wrap">
-          {doc.qr_code_data ? (
-            <img src={doc.qr_code_data} alt="QR" className="barcode-img" />
-          ) : (
-            <div className="barcode-img" style={{ border: "1px solid #d6d6d6", color: "#999", fontSize: "9pt" }}>QR</div>
-          )}
-        </div>
+        {doc.qr_code_data ? (
+          <div className="qr-wrap">
+            <img src={doc.qr_code_data} alt="صورة الوثيقة" className="barcode-img" />
+          </div>
+        ) : null}
 
         <div className="notes">
           <p>إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
