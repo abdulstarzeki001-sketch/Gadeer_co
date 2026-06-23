@@ -120,16 +120,28 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
               </tr>
             ))}
             <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
+            <tr>
+              <th>معلومات الشركة — الطاقة الإنتاجية السنوية</th>
+              <th>الكمية المُدخلة (طن)</th>
+            </tr>
             {items.length === 0 ? (
               <tr>
-                <td>-</td>
-                <td>-</td>
+                <td>
+                  {[doc.license_text_specialization, doc.cargo_typedetails]
+                    .filter(Boolean)
+                    .join(" — ") || "-"}
+                </td>
+                <td>{doc.weight_quantity || "-"}</td>
               </tr>
             ) : (
               items.map((it) => (
                 <tr key={it.id}>
-                  <td>{it.item_name}</td>
-                  <td>{it.production_capacity} {it.unit}</td>
+                  <td>
+                    {[it.item_name, it.production_capacity ? `${it.production_capacity} ${it.unit ?? ""}`.trim() : null]
+                      .filter(Boolean)
+                      .join(" — ")}
+                  </td>
+                  <td>{doc.weight_quantity || "-"}</td>
                 </tr>
               ))
             )}
