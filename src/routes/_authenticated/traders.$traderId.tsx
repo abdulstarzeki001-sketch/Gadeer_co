@@ -104,20 +104,20 @@ function TraderStatement() {
   };
 
   return (
-    <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
-      <div className="flex items-center justify-between print:hidden">
-        <Button variant="ghost" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setPreviewOpen(true)}>
-            <Eye className="h-4 w-4 ml-1" />معاينة PDF
+    <div className="p-3 sm:p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
+      <div className="flex items-center justify-between gap-2 print:hidden">
+        <Button variant="ghost" size="sm" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" /><span className="hidden sm:inline">رجوع</span></Link></Button>
+        <div className="flex gap-1.5 flex-wrap justify-end">
+          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+            <Eye className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">معاينة PDF</span>
           </Button>
-          <Button variant="outline" onClick={handleDownload} disabled={downloading}>
-            <Download className="h-4 w-4 ml-1" />
-            {downloading ? "جاري التحميل..." : "تنزيل PDF"}
+          <Button variant="outline" size="sm" onClick={handleDownload} disabled={downloading}>
+            <Download className="h-4 w-4 sm:ml-1" />
+            <span className="hidden sm:inline">{downloading ? "جاري التحميل..." : "تنزيل PDF"}</span>
           </Button>
-          <Button variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
+          <Button variant="outline" size="sm" onClick={() => window.print()}><Printer className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">طباعة</span></Button>
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild><Button><Plus className="h-4 w-4 ml-1" />تسديد</Button></DialogTrigger>
+            <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">تسديد</span></Button></DialogTrigger>
             <DialogContent dir="rtl">
               <DialogHeader><DialogTitle>تسجيل تسديد</DialogTitle></DialogHeader>
               <div className="space-y-3">
@@ -130,16 +130,16 @@ function TraderStatement() {
         </div>
       </div>
 
-      <div ref={statementRef} className="space-y-4 bg-background p-4 rounded">
+      <div ref={statementRef} className="space-y-4 bg-background p-2 sm:p-4 rounded">
       <Card>
-        <CardContent className="p-5 flex items-center justify-between gap-4">
-          <div>
+        <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <div className="text-xs text-muted-foreground">صافي الرصيد (المستحقات − المدفوعات)</div>
             <div className="text-xs text-muted-foreground mt-0.5">
               {balance > 0 ? "مستحق على التاجر" : balance < 0 ? "رصيد دائن للتاجر" : "متوازن"}
             </div>
           </div>
-          <div className={`text-4xl font-extrabold tabular-nums ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : "text-foreground"}`} dir="ltr">
+          <div className={`text-2xl sm:text-4xl font-extrabold tabular-nums shrink-0 ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : "text-foreground"}`} dir="ltr">
             {fmtMoney(balance)}
           </div>
         </CardContent>
@@ -154,25 +154,25 @@ function TraderStatement() {
             {data?.trader?.notes && <div className="text-xs italic">{data.trader.notes}</div>}
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-3 gap-4 text-center">
+        <CardContent className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
           <div>
             <div className="text-xs text-muted-foreground">إجمالي الشحنات</div>
-            <div className="text-xl font-bold text-orange-600 tabular-nums" dir="ltr">{fmtMoney(totalCharges)}</div>
+            <div className="text-sm sm:text-xl font-bold text-orange-600 tabular-nums break-all" dir="ltr">{fmtMoney(totalCharges)}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">إجمالي القبوضات</div>
-            <div className="text-xl font-bold text-green-600 tabular-nums" dir="ltr">{fmtMoney(totalPayments)}</div>
+            <div className="text-sm sm:text-xl font-bold text-green-600 tabular-nums break-all" dir="ltr">{fmtMoney(totalPayments)}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">الرصيد الحالي</div>
-            <div className={`text-2xl font-bold tabular-nums ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : ""}`} dir="ltr">{fmtMoney(balance)}</div>
+            <div className={`text-base sm:text-2xl font-bold tabular-nums break-all ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : ""}`} dir="ltr">{fmtMoney(balance)}</div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4" />وثائق التاجر</CardTitle></CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader><TableRow>
               <TableHead>رقم الوثيقة</TableHead><TableHead>التاريخ</TableHead><TableHead>شركة النقل</TableHead><TableHead>القيمة</TableHead><TableHead>الحالة</TableHead>
@@ -212,14 +212,14 @@ function TraderStatement() {
         </CardHeader>
         <CardContent className="p-0">
           <Tabs defaultValue="all" dir="rtl">
-            <TabsList className="mx-3 mt-2">
+            <TabsList className="mx-3 mt-2 flex">
               <TabsTrigger value="all">الكل ({filteredTx.length})</TabsTrigger>
               <TabsTrigger value="payments">القبوضات ({payments.length})</TabsTrigger>
               <TabsTrigger value="charges">الشحنات ({charges.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="all"><TxTable rows={filteredTx} /></TabsContent>
-            <TabsContent value="payments"><TxTable rows={payments} hideType /></TabsContent>
-            <TabsContent value="charges"><TxTable rows={charges} hideType /></TabsContent>
+            <TabsContent value="all"><div className="overflow-x-auto"><TxTable rows={filteredTx} /></div></TabsContent>
+            <TabsContent value="payments"><div className="overflow-x-auto"><TxTable rows={payments} hideType /></div></TabsContent>
+            <TabsContent value="charges"><div className="overflow-x-auto"><TxTable rows={charges} hideType /></div></TabsContent>
           </Tabs>
         </CardContent>
       </Card>

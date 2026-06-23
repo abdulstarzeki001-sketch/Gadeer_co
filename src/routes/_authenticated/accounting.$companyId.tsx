@@ -60,11 +60,11 @@ function CompanyStatement() {
   const balance = (data?.transactions ?? []).reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
 
   return (
-    <div className="p-6 space-y-4 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" asChild><Link to="/accounting"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
+    <div className="p-3 sm:p-6 space-y-4 max-w-5xl mx-auto">
+      <div className="flex items-center justify-between gap-2">
+        <Button variant="ghost" size="sm" asChild><Link to="/accounting"><ArrowRight className="h-4 w-4 ml-1" /><span className="hidden sm:inline">رجوع</span></Link></Button>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button><Plus className="h-4 w-4 ml-1" />تسديد</Button></DialogTrigger>
+          <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">تسديد</span></Button></DialogTrigger>
           <DialogContent dir="rtl">
             <DialogHeader><DialogTitle>تسجيل تسديد</DialogTitle></DialogHeader>
             <div className="space-y-3">
@@ -81,13 +81,13 @@ function CompanyStatement() {
           <p className="text-sm text-muted-foreground">{data?.company?.governorate}</p>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold tabular-nums" dir="ltr">{fmtMoney(balance)}</div>
+          <div className="text-2xl sm:text-3xl font-bold tabular-nums break-all" dir="ltr">{fmtMoney(balance)}</div>
           <div className="text-xs text-muted-foreground mt-1">الرصيد الحالي</div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader><CardTitle className="text-base">الحركات</CardTitle></CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader><TableRow>
               <TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>الوصف</TableHead><TableHead>وثيقة</TableHead>

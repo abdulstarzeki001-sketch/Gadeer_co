@@ -101,14 +101,14 @@ function TradersList() {
   });
 
   return (
-    <div className="p-6 space-y-4 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">التجار</h1>
-          <p className="text-sm text-muted-foreground">إدارة التجار وأرصدتهم</p>
+    <div className="p-3 sm:p-6 space-y-4 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold">التجار</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">إدارة التجار وأرصدتهم</p>
         </div>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
-          <DialogTrigger asChild><Button><Plus className="h-4 w-4 ml-1" />تاجر جديد</Button></DialogTrigger>
+          <DialogTrigger asChild><Button size="sm" className="shrink-0"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">تاجر جديد</span><span className="sm:hidden">جديد</span></Button></DialogTrigger>
           <DialogContent dir="rtl">
             <DialogHeader><DialogTitle>{editing ? "تعديل تاجر" : "تاجر جديد"}</DialogTitle></DialogHeader>
             <div className="space-y-3">
@@ -123,7 +123,7 @@ function TradersList() {
       </div>
       <Card>
         <CardHeader><CardTitle className="text-base">قائمة التجار</CardTitle></CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader><TableRow>
               <TableHead>الاسم</TableHead>
