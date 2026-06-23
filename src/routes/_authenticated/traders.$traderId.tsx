@@ -224,7 +224,6 @@ function TraderStatement() {
         </CardContent>
       </Card>
       </div>
-      </div>
 
       <PdfPreviewDialog
         open={previewOpen}
