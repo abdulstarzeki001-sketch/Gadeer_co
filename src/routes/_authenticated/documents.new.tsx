@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X } from "lucide-react";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, FileText } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
@@ -93,6 +93,22 @@ function CreateDocument() {
     company_name_project: "",
     governorate_name: "",
     ref_number: "",
+    document_number: "326727",
+    document_date: "2026-02-25",
+    document_time: "10:11",
+    checkpoint_name_control: "سيطرة دارمان",
+    driver_name: "",
+    vehicle_number: "",
+    registration_governorate: "",
+    cargo_typedetails: "",
+    weight_quantity: "",
+    destination_governorate: "بغداد",
+    granting_license_approval: "",
+    license_approval_number: "",
+    license_approval_date: "",
+    license_text_specialization: "",
+    item_name: "",
+    item_qty: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -314,6 +330,76 @@ function CreateDocument() {
           <div className="space-y-2">
             <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
             <Input type="number" min="0" step="0.01" value={form.document_value} onChange={(e) => setForm({ ...form, document_value: e.target.value })} dir="ltr" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-5 w-5 text-primary" />تفاصيل الوثيقة</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم الوثيقة</Label>
+            <Input value={form.document_number} onChange={(e) => setForm({ ...form, document_number: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">تاريخ الوثيقة</Label>
+            <Input type="date" value={form.document_date} onChange={(e) => setForm({ ...form, document_date: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">وقت الوثيقة</Label>
+            <Input type="time" value={form.document_time} onChange={(e) => setForm({ ...form, document_time: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم سيطرة الدخول</Label>
+            <Input value={form.checkpoint_name_control} onChange={(e) => setForm({ ...form, checkpoint_name_control: e.target.value })} />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">اسم السائق</Label>
+            <Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} placeholder="عبدالله محمد عبدالله" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم العجلة</Label>
+            <Input value={form.vehicle_number} onChange={(e) => setForm({ ...form, vehicle_number: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">محافظة تسجيل العجلة</Label>
+            <Input value={form.registration_governorate} onChange={(e) => setForm({ ...form, registration_governorate: e.target.value })} />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">نوع / تفاصيل الحمولة</Label>
+            <Input value={form.cargo_typedetails} onChange={(e) => setForm({ ...form, cargo_typedetails: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الوزن / الكمية</Label>
+            <Input value={form.weight_quantity} onChange={(e) => setForm({ ...form, weight_quantity: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الوجهة النهائية / المحافظة</Label>
+            <Input value={form.destination_governorate} onChange={(e) => setForm({ ...form, destination_governorate: e.target.value })} />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">الجهة المانحة للإجازة / الموافقة</Label>
+            <Input value={form.granting_license_approval} onChange={(e) => setForm({ ...form, granting_license_approval: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم الإجازة / الموافقة</Label>
+            <Input value={form.license_approval_number} onChange={(e) => setForm({ ...form, license_approval_number: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">تاريخ الإجازة / الموافقة</Label>
+            <Input type="date" value={form.license_approval_date} onChange={(e) => setForm({ ...form, license_approval_date: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">منطوق الإجازة / الاختصاص</Label>
+            <Input value={form.license_text_specialization} onChange={(e) => setForm({ ...form, license_text_specialization: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم المنتج</Label>
+            <Input value={form.item_name} onChange={(e) => setForm({ ...form, item_name: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الكمية والوحدة</Label>
+            <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
           </div>
         </CardContent>
       </Card>
