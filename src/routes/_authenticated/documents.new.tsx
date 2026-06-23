@@ -149,6 +149,13 @@ function CreateDocument() {
       if (!form.company_id) throw new Error("اختر شركة النقل");
       if (!selectedRef) throw new Error("اختر شركة مرجعية لتعبئة هيكل الوثيقة");
 
+      const parsed = docSchema.safeParse(form);
+      if (!parsed.success) {
+        const first = parsed.error.issues[0];
+        throw new Error(first?.message ?? "تحقق من الحقول");
+      }
+      if (!qrUpload) throw new Error("يرجى رفع صورة QR");
+
       const client = clients.find((c) => c.id === form.company_id);
       if (!client) throw new Error("شركة النقل غير موجودة");
 
@@ -196,6 +203,14 @@ function CreateDocument() {
   });
 
   const openPreview = () => {
+    if (!selectedRef) { toast.error("اختر شركة مرجعية أولاً"); return; }
+    if (!form.company_id) { toast.error("اختر شركة النقل"); return; }
+    const parsed = docSchema.safeParse(form);
+    if (!parsed.success) {
+      parsed.error.issues.slice(0, 3).forEach((i) => toast.error(i.message));
+      return;
+    }
+    if (!qrUpload) { toast.error("يرجى رفع صورة QR"); return; }
     const client = clients.find((c) => c.id === form.company_id);
     sessionStorage.setItem("document-preview", JSON.stringify({
       ...form,
