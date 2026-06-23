@@ -4,6 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* iPhone safe-area support */
+html, body { -webkit-text-size-adjust: 100%; }
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+/* Prevent iOS auto-zoom on input focus (font-size >= 16px) */
+input, select, textarea { font-size: 16px; }
+@media (min-width: 640px) {
+  input, select, textarea { font-size: inherit; }
+}
+
 @page{
   size:A4;
   margin:0;
