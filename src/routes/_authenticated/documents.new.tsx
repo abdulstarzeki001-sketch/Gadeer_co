@@ -216,8 +216,6 @@ function CreateDocument() {
         const first = parsed.error.issues[0];
         throw new Error(first?.message ?? "تحقق من الحقول");
       }
-      if (!qrUpload) throw new Error("يرجى رفع صورة QR");
-
       const client = clients.find((c) => c.id === form.company_id);
       if (!client) throw new Error("شركة النقل غير موجودة");
 
@@ -238,9 +236,12 @@ function CreateDocument() {
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
 
-      const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
-      const qr = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
-      await supabase.from("documents").update({ qr_code_data: qr }).eq("id", doc.id);
+      let imageData = qrUpload;
+      if (!imageData) {
+        const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
+        imageData = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
+      }
+      await supabase.from("documents").update({ qr_code_data: imageData }).eq("id", doc.id);
 
       const val = parseFloat(form.document_value);
       if (val > 0) {
@@ -273,12 +274,12 @@ function CreateDocument() {
       parsed.error.issues.slice(0, 3).forEach((i) => toast.error(i.message));
       return;
     }
-    if (!qrUpload) { toast.error("يرجى رفع صورة QR"); return; }
     persistDriver();
     const client = clients.find((c) => c.id === form.company_id);
     sessionStorage.setItem("document-preview", JSON.stringify({
       ...form,
       company_name: client?.company_name ?? "",
+      uploaded_image: qrUpload ?? "",
     }));
     window.open("/documents/preview", "_blank");
   };
@@ -478,10 +479,10 @@ function CreateDocument() {
                     <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع QR</Label>
+                    <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع صورة (اختياري) — ستظهر في الوثيقة</Label>
                     <Input type="file" accept="image/*" onChange={onQrFile} />
                     {qrUpload && (
-                      <img src={qrUpload} alt="QR" className="h-24 w-24 rounded border object-contain bg-white p-1" />
+                      <img src={qrUpload} alt="صورة مرفوعة" className="h-32 w-auto rounded border object-contain bg-white p-1" />
                     )}
                   </div>
                 </div>
