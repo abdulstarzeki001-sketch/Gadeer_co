@@ -44,18 +44,18 @@ function Dashboard() {
   });
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">اللوحة الرئيسية</h1>
-          <p className="text-sm text-muted-foreground">نظرة عامة على النظام</p>
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold">اللوحة الرئيسية</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">نظرة عامة على النظام</p>
         </div>
-        <Button asChild>
-          <Link to="/documents/new"><Plus className="h-4 w-4 ml-1" />وثيقة جديدة</Link>
+        <Button size="sm" asChild className="shrink-0">
+          <Link to="/documents/new"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">وثيقة جديدة</span><span className="sm:hidden">جديدة</span></Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard icon={<Building2 className="h-5 w-5" />} label="الشركات" value={stats?.companies ?? 0} />
         <StatCard icon={<FileText className="h-5 w-5" />} label="الوثائق" value={stats?.documents ?? 0} />
         <StatCard icon={<Wallet className="h-5 w-5" />} label="قيمة الوثائق" value={fmtMoney(stats?.totalValue ?? 0)} />
@@ -88,11 +88,11 @@ function Dashboard() {
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
     <Card>
-      <CardContent className="p-4 flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">{icon}</div>
-        <div>
+      <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+        <div className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center">{icon}</div>
+        <div className="min-w-0">
           <div className="text-xs text-muted-foreground">{label}</div>
-          <div className="text-xl font-bold">{value}</div>
+          <div className="text-base sm:text-xl font-bold tabular-nums break-all">{value}</div>
         </div>
       </CardContent>
     </Card>
