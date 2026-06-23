@@ -46,19 +46,22 @@ function DocumentView() {
   };
 
   return (
-    <div className="bg-muted/30 min-h-screen py-6">
-      <div className="max-w-[210mm] mx-auto px-4 mb-3 flex items-center justify-between no-print">
-        <Button variant="ghost" asChild><Link to="/documents"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setPreviewOpen(true)}><Eye className="h-4 w-4 ml-1" />معاينة</Button>
-          <Button onClick={handleDownload} disabled={downloading}>
-            <Download className="h-4 w-4 ml-1" />
-            {downloading ? "جاري التحميل..." : "تحميل PDF"}
+    <div className="bg-muted/30 min-h-screen py-3 sm:py-6">
+      <div className="max-w-[210mm] mx-auto px-3 sm:px-4 mb-3 flex items-center justify-between gap-2 no-print">
+        <Button variant="ghost" size="sm" asChild><Link to="/documents"><ArrowRight className="h-4 w-4 ml-1" /><span className="hidden sm:inline">رجوع</span></Link></Button>
+        <div className="flex gap-1.5">
+          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}><Eye className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">معاينة</span></Button>
+          <Button size="sm" onClick={handleDownload} disabled={downloading}>
+            <Download className="h-4 w-4 sm:ml-1" />
+            <span className="hidden sm:inline">{downloading ? "جاري التحميل..." : "تحميل PDF"}</span>
+            <span className="sm:hidden">PDF</span>
           </Button>
         </div>
       </div>
-      <div ref={ref} className="shadow-lg print:shadow-none mx-auto" style={{ width: "210mm" }}>
-        <DocumentTemplate doc={data} />
+      <div className="overflow-x-auto">
+        <div ref={ref} className="shadow-lg print:shadow-none mx-auto bg-white" style={{ width: "210mm" }}>
+          <DocumentTemplate doc={data} />
+        </div>
       </div>
       <PdfPreviewDialog
         open={previewOpen}
