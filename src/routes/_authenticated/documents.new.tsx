@@ -19,6 +19,19 @@ const IRAQ_GOVERNORATES = [
   "بابل","كربلاء","النجف","واسط","ميسان","ذي قار","المثنى","القادسية","حلبجة",
 ];
 
+type SavedDriver = { name: string; vehicle: string; governorate: string };
+const DRIVERS_KEY = "saved-drivers-v1";
+const loadDrivers = (): SavedDriver[] => {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(localStorage.getItem(DRIVERS_KEY) ?? "[]"); } catch { return []; }
+};
+const saveDriver = (d: SavedDriver) => {
+  if (typeof window === "undefined" || !d.name.trim()) return;
+  const list = loadDrivers().filter((x) => x.name.trim() !== d.name.trim());
+  list.unshift(d);
+  localStorage.setItem(DRIVERS_KEY, JSON.stringify(list.slice(0, 100)));
+};
+
 const docSchema = z.object({
   document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
   document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
