@@ -161,9 +161,9 @@
 
 .subject-field{
   flex:1;
-  border:1px solid #cfcfcf;
-  border-radius:8px;
-  padding:1mm 2mm;
+  border:1px solid #e2e2e2;
+  border-radius:7px;
+  padding:1mm 1mm;
   background:#f6f7fb;
   color:#111827;
   height:8mm;
