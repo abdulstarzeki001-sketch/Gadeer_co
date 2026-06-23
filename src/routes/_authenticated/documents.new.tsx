@@ -14,6 +14,11 @@ import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
 import { z } from "zod";
 
+const IRAQ_GOVERNORATES = [
+  "بغداد","البصرة","نينوى","أربيل","السليمانية","دهوك","كركوك","الأنبار","صلاح الدين","ديالى",
+  "بابل","كربلاء","النجف","واسط","ميسان","ذي قار","المثنى","القادسية","حلبجة",
+];
+
 const docSchema = z.object({
   document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
   document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
