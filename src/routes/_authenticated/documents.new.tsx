@@ -396,7 +396,21 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs">اسم السائق</Label>
-                    <Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} placeholder="عبدالله محمد عبدالله" />
+                    <Input
+                      list="saved-drivers-list"
+                      value={form.driver_name}
+                      onChange={(e) => onDriverNameChange(e.target.value)}
+                      placeholder="عبدالله محمد عبدالله — ابدأ بالكتابة أو اضغط للاختيار"
+                      autoComplete="off"
+                    />
+                    <datalist id="saved-drivers-list">
+                      {savedDrivers.map((d) => (
+                        <option key={d.name} value={d.name}>{`${d.vehicle} — ${d.governorate}`}</option>
+                      ))}
+                    </datalist>
+                    {savedDrivers.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground">{savedDrivers.length} سائق محفوظ — يتم تعبئة رقم العجلة والمحافظة تلقائياً عند الاختيار</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">رقم العجلة</Label>
