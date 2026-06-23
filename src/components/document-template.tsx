@@ -120,10 +120,6 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
               </tr>
             ))}
             <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
-            <tr>
-              <th>معلومات الشركة — الطاقة الإنتاجية السنوية</th>
-              <th>الكمية المُدخلة (طن)</th>
-            </tr>
             {items.length === 0 ? (
               <tr>
                 <td>
