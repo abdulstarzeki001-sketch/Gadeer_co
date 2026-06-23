@@ -14,6 +14,11 @@ import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
 import { z } from "zod";
 
+const IRAQ_GOVERNORATES = [
+  "بغداد","البصرة","نينوى","أربيل","السليمانية","دهوك","كركوك","الأنبار","صلاح الدين","ديالى",
+  "بابل","كربلاء","النجف","واسط","ميسان","ذي قار","المثنى","القادسية","حلبجة",
+];
+
 const docSchema = z.object({
   document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
   document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
@@ -368,7 +373,12 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">محافظة تسجيل العجلة</Label>
-                    <Input value={form.registration_governorate} onChange={(e) => setForm({ ...form, registration_governorate: e.target.value })} />
+                    <Select value={form.registration_governorate || undefined} onValueChange={(v) => setForm({ ...form, registration_governorate: v })}>
+                      <SelectTrigger><SelectValue placeholder="اختر المحافظة" /></SelectTrigger>
+                      <SelectContent>
+                        {IRAQ_GOVERNORATES.map((g) => (<SelectItem key={g} value={g}>{g}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs">نوع / تفاصيل الحمولة</Label>
