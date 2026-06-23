@@ -12,14 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
-
-const usd = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-const fmtMoney = (n: number) => usd.format(Number(n) || 0);
+import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
