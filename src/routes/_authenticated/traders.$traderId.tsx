@@ -146,9 +146,9 @@ function TraderStatement() {
               {(data?.documents ?? []).map((d) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-mono text-xs"><Link to="/documents/$id" params={{ id: d.id }} className="text-primary hover:underline">{d.document_number}</Link></TableCell>
-                  <TableCell>{new Date(d.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+                  <TableCell dir="ltr">{new Date(d.created_at).toLocaleDateString("en-GB")}</TableCell>
                   <TableCell>{d.company_name}</TableCell>
-                  <TableCell className="font-mono" dir="ltr">${Number(d.document_value).toFixed(2)}</TableCell>
+                  <TableCell className="font-mono tabular-nums" dir="ltr">{fmtMoney(Number(d.document_value))}</TableCell>
                   <TableCell>{d.status}</TableCell>
                 </TableRow>
               ))}
@@ -206,9 +206,9 @@ function TxTable({ rows, hideType }: { rows: any[]; hideType?: boolean }) {
       <TableBody>
         {rows.map((t) => (
           <TableRow key={t.id}>
-            <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+            <TableCell dir="ltr">{new Date(t.created_at).toLocaleDateString("en-GB")}</TableCell>
             {!hideType && <TableCell>{t.type === "payment" ? <span className="text-green-600">قبض</span> : <span className="text-orange-600">شحن</span>}</TableCell>}
-            <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
+            <TableCell className={`font-mono tabular-nums ${t.type === "payment" ? "text-green-600" : "text-orange-600"}`} dir="ltr">{t.type === "payment" ? "-" : "+"}{fmtMoney(Number(t.amount))}</TableCell>
             <TableCell>{t.driver_name ?? "—"}</TableCell>
             <TableCell className="text-xs">{t.cargo_typedetails ?? "—"}</TableCell>
             <TableCell className="text-xs">{t.document_number ?? t.description ?? "—"}</TableCell>
