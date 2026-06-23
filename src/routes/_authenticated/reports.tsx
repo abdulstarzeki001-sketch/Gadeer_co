@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, DollarSign, Users, FileText } from "lucide-react";
+import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({ meta: [{ title: "التقارير - الكمارك" }] }),
@@ -58,8 +59,8 @@ function ReportsPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={DollarSign} label="إجمالي الديون" value={`$${(totals?.outstanding ?? 0).toFixed(2)}`} tone="text-orange-600" />
-        <StatCard icon={TrendingUp} label="إجمالي الشحنات" value={`$${(totals?.totalCharges ?? 0).toFixed(2)}`} />
+        <StatCard icon={DollarSign} label="إجمالي الديون" value={fmtMoney(totals?.outstanding ?? 0)} tone="text-orange-600" />
+        <StatCard icon={TrendingUp} label="إجمالي الشحنات" value={fmtMoney(totals?.totalCharges ?? 0)} />
         <StatCard icon={Users} label="عدد التجار" value={String(totals?.tradersCount ?? 0)} />
         <StatCard icon={FileText} label="عدد الوثائق" value={String(totals?.docsCount ?? 0)} />
       </div>
@@ -77,7 +78,7 @@ function ReportsPage() {
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">{r.name}</TableCell>
                   <TableCell dir="ltr" className="text-xs">{r.phone ?? "—"}</TableCell>
-                  <TableCell className="text-left font-mono text-orange-600" dir="ltr">{r.balance.toFixed(2)}</TableCell>
+                  <TableCell className="text-left font-mono tabular-nums text-orange-600" dir="ltr">{fmtMoney(r.balance)}</TableCell>
                   <TableCell><Button variant="ghost" size="icon" asChild><Link to="/traders/$traderId" params={{ traderId: r.id }}><Eye className="h-4 w-4" /></Link></Button></TableCell>
                 </TableRow>
               ))}
@@ -97,7 +98,7 @@ function ReportsPage() {
                 {creditors.map(r => (
                   <TableRow key={r.id}>
                     <TableCell>{r.name}</TableCell>
-                    <TableCell className="text-left font-mono text-green-600" dir="ltr">{r.balance.toFixed(2)}</TableCell>
+                    <TableCell className="text-left font-mono tabular-nums text-green-600" dir="ltr">{fmtMoney(r.balance)}</TableCell>
                     <TableCell><Button variant="ghost" size="icon" asChild><Link to="/traders/$traderId" params={{ traderId: r.id }}><Eye className="h-4 w-4" /></Link></Button></TableCell>
                   </TableRow>
                 ))}
