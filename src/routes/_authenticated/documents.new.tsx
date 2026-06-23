@@ -170,6 +170,22 @@ function CreateDocument() {
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
 
+  const [savedDrivers, setSavedDrivers] = useState<SavedDriver[]>([]);
+  useEffect(() => { setSavedDrivers(loadDrivers()); }, []);
+
+  const onDriverNameChange = (name: string) => {
+    const match = savedDrivers.find((d) => d.name === name);
+    setForm((f) => match
+      ? { ...f, driver_name: name, vehicle_number: match.vehicle, registration_governorate: match.governorate }
+      : { ...f, driver_name: name });
+  };
+  const persistDriver = () => {
+    if (form.driver_name && form.vehicle_number && form.registration_governorate) {
+      saveDriver({ name: form.driver_name.trim(), vehicle: form.vehicle_number.trim(), governorate: form.registration_governorate });
+      setSavedDrivers(loadDrivers());
+    }
+  };
+
   const pickReference = (idx: number) => {
     const r = REFERENCE[idx];
     setRefIndex(idx);
@@ -242,6 +258,7 @@ function CreateDocument() {
       return doc;
     },
     onSuccess: (doc) => {
+      persistDriver();
       toast.success(`تم إنشاء الوثيقة ${doc.document_number}`);
       navigate({ to: "/documents/$id", params: { id: doc.id } });
     },
@@ -257,6 +274,7 @@ function CreateDocument() {
       return;
     }
     if (!qrUpload) { toast.error("يرجى رفع صورة QR"); return; }
+    persistDriver();
     const client = clients.find((c) => c.id === form.company_id);
     sessionStorage.setItem("document-preview", JSON.stringify({
       ...form,
