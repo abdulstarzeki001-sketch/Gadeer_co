@@ -19,6 +19,19 @@ const IRAQ_GOVERNORATES = [
   "بابل","كربلاء","النجف","واسط","ميسان","ذي قار","المثنى","القادسية","حلبجة",
 ];
 
+type SavedDriver = { name: string; vehicle: string; governorate: string };
+const DRIVERS_KEY = "saved-drivers-v1";
+const loadDrivers = (): SavedDriver[] => {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(localStorage.getItem(DRIVERS_KEY) ?? "[]"); } catch { return []; }
+};
+const saveDriver = (d: SavedDriver) => {
+  if (typeof window === "undefined" || !d.name.trim()) return;
+  const list = loadDrivers().filter((x) => x.name.trim() !== d.name.trim());
+  list.unshift(d);
+  localStorage.setItem(DRIVERS_KEY, JSON.stringify(list.slice(0, 100)));
+};
+
 const docSchema = z.object({
   document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
   document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
@@ -157,6 +170,22 @@ function CreateDocument() {
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
 
+  const [savedDrivers, setSavedDrivers] = useState<SavedDriver[]>([]);
+  useEffect(() => { setSavedDrivers(loadDrivers()); }, []);
+
+  const onDriverNameChange = (name: string) => {
+    const match = savedDrivers.find((d) => d.name === name);
+    setForm((f) => match
+      ? { ...f, driver_name: name, vehicle_number: match.vehicle, registration_governorate: match.governorate }
+      : { ...f, driver_name: name });
+  };
+  const persistDriver = () => {
+    if (form.driver_name && form.vehicle_number && form.registration_governorate) {
+      saveDriver({ name: form.driver_name.trim(), vehicle: form.vehicle_number.trim(), governorate: form.registration_governorate });
+      setSavedDrivers(loadDrivers());
+    }
+  };
+
   const pickReference = (idx: number) => {
     const r = REFERENCE[idx];
     setRefIndex(idx);
@@ -229,6 +258,7 @@ function CreateDocument() {
       return doc;
     },
     onSuccess: (doc) => {
+      persistDriver();
       toast.success(`تم إنشاء الوثيقة ${doc.document_number}`);
       navigate({ to: "/documents/$id", params: { id: doc.id } });
     },
@@ -244,6 +274,7 @@ function CreateDocument() {
       return;
     }
     if (!qrUpload) { toast.error("يرجى رفع صورة QR"); return; }
+    persistDriver();
     const client = clients.find((c) => c.id === form.company_id);
     sessionStorage.setItem("document-preview", JSON.stringify({
       ...form,
@@ -365,7 +396,21 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs">اسم السائق</Label>
-                    <Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} placeholder="عبدالله محمد عبدالله" />
+                    <Input
+                      list="saved-drivers-list"
+                      value={form.driver_name}
+                      onChange={(e) => onDriverNameChange(e.target.value)}
+                      placeholder="عبدالله محمد عبدالله — ابدأ بالكتابة أو اضغط للاختيار"
+                      autoComplete="off"
+                    />
+                    <datalist id="saved-drivers-list">
+                      {savedDrivers.map((d) => (
+                        <option key={d.name} value={d.name}>{`${d.vehicle} — ${d.governorate}`}</option>
+                      ))}
+                    </datalist>
+                    {savedDrivers.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground">{savedDrivers.length} سائق محفوظ — يتم تعبئة رقم العجلة والمحافظة تلقائياً عند الاختيار</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">رقم العجلة</Label>
