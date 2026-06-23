@@ -201,7 +201,10 @@ function CreateDocument() {
       license_approval_date: cleanField(r.LicenseApprovalDate),
       license_text_specialization: cleanField(r.LicenseTextSpecialization),
       item_name: cleanField(r.TypeIndustryProduction),
-      item_qty: cleanField(r.Unit),
+      item_qty: (() => {
+        const u = cleanField(r.Unit);
+        return u.includes("عدد") ? "عدد" : u.includes("طن") || !u ? "طن" : u;
+      })(),
     }));
   };
 
