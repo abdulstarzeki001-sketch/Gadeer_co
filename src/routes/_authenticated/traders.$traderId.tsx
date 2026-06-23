@@ -218,6 +218,7 @@ function TraderStatement() {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
