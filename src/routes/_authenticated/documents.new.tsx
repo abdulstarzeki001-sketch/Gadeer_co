@@ -92,6 +92,7 @@ function CreateDocument() {
     brand: "",
     company_name_project: "",
     governorate_name: "",
+    ref_number: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -105,6 +106,7 @@ function CreateDocument() {
       company_name_project: r.CompanyNameProject,
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
+      ref_number: r.Number ? String(r.Number) : "",
     }));
   };
 
@@ -249,9 +251,41 @@ function CreateDocument() {
               </DialogContent>
             </Dialog>
             {selectedRef && (
-              <div className="text-xs text-muted-foreground rounded-md border p-2 space-y-0.5 bg-muted/30">
-                <div>المحافظة: {selectedRef.GovernorateName}</div>
-                <div className="truncate">العلامة: {selectedRef.Brand}</div>
+              <div className="rounded-md border p-3 space-y-3 bg-muted/30">
+                <div className="text-xs text-muted-foreground">
+                  تم تعبئة الخانات التالية تلقائياً — يمكنك تعديلها
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">رقم التسجيل</Label>
+                    <Input
+                      value={form.ref_number}
+                      onChange={(e) => setForm({ ...form, ref_number: e.target.value })}
+                      dir="ltr"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">المحافظة</Label>
+                    <Input
+                      value={form.governorate_name}
+                      onChange={(e) => setForm({ ...form, governorate_name: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-xs">اسم الشركة / المشروع</Label>
+                    <Input
+                      value={form.company_name_project}
+                      onChange={(e) => setForm({ ...form, company_name_project: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-xs">العلامة التجارية / المنتجات</Label>
+                    <Input
+                      value={form.brand}
+                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -277,14 +311,9 @@ function CreateDocument() {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
-              <Input type="number" min="0" step="0.01" value={form.document_value} onChange={(e) => setForm({ ...form, document_value: e.target.value })} dir="ltr" />
-            </div>
-            <div className="space-y-2"><Label>العلامة التجارية</Label>
-              <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
-            </div>
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
+            <Input type="number" min="0" step="0.01" value={form.document_value} onChange={(e) => setForm({ ...form, document_value: e.target.value })} dir="ltr" />
           </div>
         </CardContent>
       </Card>
