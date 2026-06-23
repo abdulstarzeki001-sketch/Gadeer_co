@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Eye } from "lucide-react";
+import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/documents/")({
   head: () => ({ meta: [{ title: "الوثائق - الكمارك" }] }),
@@ -69,7 +70,7 @@ function DocumentsList() {
                   <TableCell>{d.driver_name}</TableCell>
                   <TableCell>{d.vehicle_number}</TableCell>
                   <TableCell>{d.checkpoint_name_control}</TableCell>
-                  <TableCell>{new Date(d.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+                  <TableCell dir="ltr">{fmtDate(d.created_at)}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" asChild>
                       <Link to="/documents/$id" params={{ id: d.id }}><Eye className="h-4 w-4" /></Link>

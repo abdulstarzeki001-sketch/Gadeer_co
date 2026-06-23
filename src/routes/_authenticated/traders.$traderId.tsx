@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
@@ -114,15 +115,15 @@ function TraderStatement() {
         <CardContent className="grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-xs text-muted-foreground">إجمالي الشحنات</div>
-            <div className="text-xl font-bold text-orange-600" dir="ltr">${totalCharges.toFixed(2)}</div>
+            <div className="text-xl font-bold text-orange-600 tabular-nums" dir="ltr">{fmtMoney(totalCharges)}</div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">إجمالي التسديدات</div>
-            <div className="text-xl font-bold text-green-600" dir="ltr">${totalPayments.toFixed(2)}</div>
+            <div className="text-xs text-muted-foreground">إجمالي القبوضات</div>
+            <div className="text-xl font-bold text-green-600 tabular-nums" dir="ltr">{fmtMoney(totalPayments)}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">الرصيد الحالي</div>
-            <div className="text-2xl font-bold" dir="ltr">${balance.toFixed(2)}</div>
+            <div className={`text-2xl font-bold tabular-nums ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : ""}`} dir="ltr">{fmtMoney(balance)}</div>
           </div>
         </CardContent>
       </Card>
@@ -138,9 +139,9 @@ function TraderStatement() {
               {(data?.documents ?? []).map((d) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-mono text-xs"><Link to="/documents/$id" params={{ id: d.id }} className="text-primary hover:underline">{d.document_number}</Link></TableCell>
-                  <TableCell>{new Date(d.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+                  <TableCell dir="ltr">{new Date(d.created_at).toLocaleDateString("en-GB")}</TableCell>
                   <TableCell>{d.company_name}</TableCell>
-                  <TableCell className="font-mono" dir="ltr">${Number(d.document_value).toFixed(2)}</TableCell>
+                  <TableCell className="font-mono tabular-nums" dir="ltr">{fmtMoney(Number(d.document_value))}</TableCell>
                   <TableCell>{d.status}</TableCell>
                 </TableRow>
               ))}
@@ -198,9 +199,9 @@ function TxTable({ rows, hideType }: { rows: any[]; hideType?: boolean }) {
       <TableBody>
         {rows.map((t) => (
           <TableRow key={t.id}>
-            <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+            <TableCell dir="ltr">{new Date(t.created_at).toLocaleDateString("en-GB")}</TableCell>
             {!hideType && <TableCell>{t.type === "payment" ? <span className="text-green-600">قبض</span> : <span className="text-orange-600">شحن</span>}</TableCell>}
-            <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
+            <TableCell className={`font-mono tabular-nums ${t.type === "payment" ? "text-green-600" : "text-orange-600"}`} dir="ltr">{t.type === "payment" ? "-" : "+"}{fmtMoney(Number(t.amount))}</TableCell>
             <TableCell>{t.driver_name ?? "—"}</TableCell>
             <TableCell className="text-xs">{t.cargo_typedetails ?? "—"}</TableCell>
             <TableCell className="text-xs">{t.document_number ?? t.description ?? "—"}</TableCell>

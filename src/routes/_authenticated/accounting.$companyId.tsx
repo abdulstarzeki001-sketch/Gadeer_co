@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ArrowRight, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { fmtMoney, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/accounting/$companyId")({
   head: () => ({ meta: [{ title: "كشف حساب - الكمارك" }] }),
@@ -80,7 +81,7 @@ function CompanyStatement() {
           <p className="text-sm text-muted-foreground">{data?.company?.governorate}</p>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold" dir="ltr">${balance.toFixed(2)}</div>
+          <div className="text-3xl font-bold tabular-nums" dir="ltr">{fmtMoney(balance)}</div>
           <div className="text-xs text-muted-foreground mt-1">الرصيد الحالي</div>
         </CardContent>
       </Card>
@@ -94,9 +95,9 @@ function CompanyStatement() {
             <TableBody>
               {(data?.transactions ?? []).map((t) => (
                 <TableRow key={t.id}>
-                  <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+                  <TableCell dir="ltr">{fmtDate(t.created_at)}</TableCell>
                   <TableCell>{t.type === "payment" ? <span className="text-green-600">تسديد</span> : <span className="text-orange-600">شحن</span>}</TableCell>
-                  <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
+                  <TableCell className={`font-mono tabular-nums ${t.type === "payment" ? "text-green-600" : "text-orange-600"}`} dir="ltr">{t.type === "payment" ? "-" : "+"}{fmtMoney(t.amount)}</TableCell>
                   <TableCell>{t.description}</TableCell>
                   <TableCell className="font-mono text-xs">{t.document_number}</TableCell>
                 </TableRow>

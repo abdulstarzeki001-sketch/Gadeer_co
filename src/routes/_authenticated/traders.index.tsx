@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Eye, Pencil, Trash2, Phone, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/traders/")({
   head: () => ({ meta: [{ title: "التجار - الكمارك" }] }),
@@ -137,7 +138,7 @@ function TradersList() {
                   <TableCell className="font-medium">{t.name}</TableCell>
                   <TableCell dir="ltr" className="text-xs">{t.phone ? <span className="inline-flex items-center gap-1"><Phone className="h-3 w-3" />{t.phone}</span> : "—"}</TableCell>
                   <TableCell className="text-xs">{t.address ? <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{t.address}</span> : "—"}</TableCell>
-                  <TableCell className="text-left font-mono" dir="ltr">{(balances[t.id] ?? 0).toFixed(2)}</TableCell>
+                  <TableCell className="text-left font-mono tabular-nums" dir="ltr">{fmtMoney(balances[t.id] ?? 0)}</TableCell>
                   <TableCell className="flex gap-1">
                     <Button variant="ghost" size="icon" asChild><Link to="/traders/$traderId" params={{ traderId: t.id }}><Eye className="h-4 w-4" /></Link></Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil className="h-4 w-4" /></Button>
