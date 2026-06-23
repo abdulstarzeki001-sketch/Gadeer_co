@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X } from "lucide-react";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
@@ -187,6 +187,15 @@ function CreateDocument() {
   };
 
   const refCount = useMemo(() => REFERENCE.length, []);
+
+  const [qrUpload, setQrUpload] = useState<string | null>(null);
+  const onQrFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => setQrUpload(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(f);
+  };
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-3xl mx-auto">
