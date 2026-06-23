@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowRight, Plus, Printer, FileText, Download } from "lucide-react";
+import { ArrowRight, Plus, Printer, FileText, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { fmtMoney } from "@/lib/format";
 import { exportElementToPdf } from "@/lib/export-pdf";
+import { PdfPreviewDialog } from "@/components/pdf-preview-dialog";
 
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
@@ -30,6 +31,7 @@ function TraderStatement() {
   const [cargoFilter, setCargoFilter] = useState("all");
   const statementRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["trader-statement", traderId],
@@ -106,6 +108,9 @@ function TraderStatement() {
       <div className="flex items-center justify-between print:hidden">
         <Button variant="ghost" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+            <Eye className="h-4 w-4 ml-1" />معاينة PDF
+          </Button>
           <Button variant="outline" onClick={handleDownload} disabled={downloading}>
             <Download className="h-4 w-4 ml-1" />
             {downloading ? "جاري التحميل..." : "تنزيل PDF"}
@@ -219,6 +224,13 @@ function TraderStatement() {
         </CardContent>
       </Card>
       </div>
+
+      <PdfPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        getElement={() => statementRef.current}
+        fileName={`statement-${data?.trader?.name ?? "trader"}.pdf`}
+      />
     </div>
   );
 }
