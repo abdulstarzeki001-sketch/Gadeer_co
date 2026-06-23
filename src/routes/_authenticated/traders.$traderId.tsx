@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
 
@@ -78,6 +79,8 @@ function TraderStatement() {
   const balance = filteredTx.reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
   const totalCharges = filteredTx.filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
   const totalPayments = filteredTx.filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const payments = filteredTx.filter(t => t.type === "payment");
+  const charges = filteredTx.filter(t => t.type !== "payment");
 
   return (
     <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
@@ -148,9 +151,9 @@ function TraderStatement() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">كشف الحركات</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <div className="flex flex-wrap gap-2 p-3 border-b print:hidden">
+        <CardHeader>
+          <CardTitle className="text-base">كشف الحركات</CardTitle>
+          <div className="flex flex-wrap gap-2 pt-2 print:hidden">
             <select value={driverFilter} onChange={(e) => setDriverFilter(e.target.value)} className="border rounded px-2 py-1 text-sm">
               <option value="all">كل السائقين</option>
               {drivers.map(d => <option key={d} value={d}>{d}</option>)}
@@ -163,26 +166,48 @@ function TraderStatement() {
               <Button variant="ghost" size="sm" onClick={() => { setDriverFilter("all"); setCargoFilter("all"); }}>مسح الفلاتر</Button>
             )}
           </div>
-          <Table>
-            <TableHeader><TableRow>
-              <TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>السائق</TableHead><TableHead>نوع الحمل</TableHead><TableHead>وثيقة</TableHead>
-            </TableRow></TableHeader>
-            <TableBody>
-              {filteredTx.map((t) => (
-                <TableRow key={t.id}>
-                  <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
-                  <TableCell>{t.type === "payment" ? <span className="text-green-600">تسديد</span> : <span className="text-orange-600">شحن</span>}</TableCell>
-                  <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
-                  <TableCell>{t.driver_name ?? "—"}</TableCell>
-                  <TableCell className="text-xs">{(t as any).cargo_typedetails ?? "—"}</TableCell>
-                  <TableCell className="font-mono text-xs">{t.document_number ?? "—"}</TableCell>
-                </TableRow>
-              ))}
-              {filteredTx.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
-            </TableBody>
-          </Table>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Tabs defaultValue="all" dir="rtl">
+            <TabsList className="mx-3 mt-2">
+              <TabsTrigger value="all">الكل ({filteredTx.length})</TabsTrigger>
+              <TabsTrigger value="payments">القبوضات ({payments.length})</TabsTrigger>
+              <TabsTrigger value="charges">الشحنات ({charges.length})</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all"><TxTable rows={filteredTx} /></TabsContent>
+            <TabsContent value="payments"><TxTable rows={payments} hideType /></TabsContent>
+            <TabsContent value="charges"><TxTable rows={charges} hideType /></TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function TxTable({ rows, hideType }: { rows: any[]; hideType?: boolean }) {
+  return (
+    <Table>
+      <TableHeader><TableRow>
+        <TableHead>التاريخ</TableHead>
+        {!hideType && <TableHead>النوع</TableHead>}
+        <TableHead>المبلغ</TableHead>
+        <TableHead>السائق</TableHead>
+        <TableHead>نوع الحمل</TableHead>
+        <TableHead>الوصف / وثيقة</TableHead>
+      </TableRow></TableHeader>
+      <TableBody>
+        {rows.map((t) => (
+          <TableRow key={t.id}>
+            <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+            {!hideType && <TableCell>{t.type === "payment" ? <span className="text-green-600">قبض</span> : <span className="text-orange-600">شحن</span>}</TableCell>}
+            <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
+            <TableCell>{t.driver_name ?? "—"}</TableCell>
+            <TableCell className="text-xs">{t.cargo_typedetails ?? "—"}</TableCell>
+            <TableCell className="text-xs">{t.document_number ?? t.description ?? "—"}</TableCell>
+          </TableRow>
+        ))}
+        {rows.length === 0 && <TableRow><TableCell colSpan={hideType ? 5 : 6} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
+      </TableBody>
+    </Table>
   );
 }
