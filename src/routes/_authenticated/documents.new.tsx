@@ -12,6 +12,24 @@ import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, Fil
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
+import { z } from "zod";
+
+const docSchema = z.object({
+  document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
+  document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
+  document_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "وقت الوثيقة غير صالح (HH:MM)"),
+  checkpoint_name_control: z.string().trim().min(2, "اسم سيطرة الدخول مطلوب").max(100),
+  driver_name: z.string().trim().min(2, "اسم السائق مطلوب").max(100),
+  vehicle_number: z.string().trim().min(1, "رقم العجلة مطلوب").max(20),
+  cargo_typedetails: z.string().trim().min(2, "نوع/تفاصيل الحمولة مطلوبة").max(200),
+  weight_quantity: z.string().trim().min(1, "الوزن/الكمية مطلوبة").max(50),
+  destination_governorate: z.string().trim().min(2, "الوجهة النهائية مطلوبة").max(50),
+  company_name_project: z.string().trim().min(2, "اسم الشركة/المشروع مطلوب").max(200),
+  license_approval_number: z.string().trim().min(1, "رقم الإجازة مطلوب").max(30),
+  license_approval_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الإجازة غير صالح"),
+  item_name: z.string().trim().min(2, "اسم المنتج مطلوب").max(150),
+  item_qty: z.string().trim().min(1, "الكمية والوحدة مطلوبة").max(50),
+});
 
 export const Route = createFileRoute("/_authenticated/documents/new")({
   head: () => ({ meta: [{ title: "إنشاء وثيقة - الكمارك" }] }),
