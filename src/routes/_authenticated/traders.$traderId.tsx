@@ -104,6 +104,20 @@ function TraderStatement() {
       </div>
 
       <Card>
+        <CardContent className="p-5 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs text-muted-foreground">صافي الرصيد (المستحقات − المدفوعات)</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {balance > 0 ? "مستحق على التاجر" : balance < 0 ? "رصيد دائن للتاجر" : "متوازن"}
+            </div>
+          </div>
+          <div className={`text-4xl font-extrabold tabular-nums ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : "text-foreground"}`} dir="ltr">
+            {fmtMoney(balance)}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader>
           <CardTitle>{data?.trader?.name}</CardTitle>
           <div className="text-sm text-muted-foreground space-y-0.5">
