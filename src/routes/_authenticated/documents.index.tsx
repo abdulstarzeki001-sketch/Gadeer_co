@@ -34,13 +34,13 @@ function DocumentsList() {
   );
 
   return (
-    <div className="p-6 space-y-4 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">الوثائق</h1>
-          <p className="text-sm text-muted-foreground">{docs.length} وثيقة</p>
+    <div className="p-3 sm:p-6 space-y-4 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold truncate">الوثائق</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">{docs.length} وثيقة</p>
         </div>
-        <Button asChild><Link to="/documents/new"><Plus className="h-4 w-4 ml-1" />وثيقة جديدة</Link></Button>
+        <Button size="sm" asChild className="shrink-0"><Link to="/documents/new"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">وثيقة جديدة</span><span className="sm:hidden">جديدة</span></Link></Button>
       </div>
       <Card>
         <CardHeader>
@@ -49,7 +49,7 @@ function DocumentsList() {
             <Input placeholder="بحث برقم الوثيقة أو الشركة أو السائق..." value={search} onChange={(e) => setSearch(e.target.value)} className="pr-9" />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
