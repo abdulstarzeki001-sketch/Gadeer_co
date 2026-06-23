@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
 
@@ -78,6 +79,8 @@ function TraderStatement() {
   const balance = filteredTx.reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
   const totalCharges = filteredTx.filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
   const totalPayments = filteredTx.filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const payments = filteredTx.filter(t => t.type === "payment");
+  const charges = filteredTx.filter(t => t.type !== "payment");
 
   return (
     <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
