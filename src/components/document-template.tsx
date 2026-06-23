@@ -67,6 +67,7 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
     ["الجهة المانحة للإجازة / الموافقة", doc.granting_license_approval || "-"],
     ["رقم الإجازة / الموافقة", doc.license_approval_number || "-"],
     ["تاريخ الإجازة / الموافقة", doc.license_approval_date || "-"],
+    ["منطوق الإجازة / الاختصاص", doc.license_text_specialization || "-"],
     ["العلامة التجارية", doc.brand || "-"],
   ];
 
