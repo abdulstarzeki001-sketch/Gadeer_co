@@ -36,8 +36,29 @@ export const Route = createFileRoute("/_authenticated/documents/new")({
   component: CreateDocument,
 });
 
-type RefCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
+type RefCompany = {
+  Number: number;
+  Brand: string;
+  CompanyNameProject: string;
+  GovernorateName: string;
+  CargoDetails?: string;
+  GrantingLicenseApproval?: string;
+  LicenseApprovalDate?: string;
+  LicenseApprovalNumber?: number | string;
+  LicenseTextSpecialization?: string;
+  TypeIndustryProduction?: string;
+  Unit?: string;
+};
 const REFERENCE = (companiesJson as RefCompany[]).filter((r) => r.CompanyNameProject);
+
+// CargoDetails / TypeIndustryProduction values sometimes include a header
+// followed by a tab and then the real value. Take the segment after the last tab.
+const cleanField = (v?: string | number | null) => {
+  if (v == null) return "";
+  const s = String(v).trim();
+  const idx = s.lastIndexOf("\t");
+  return (idx >= 0 ? s.slice(idx + 1) : s).trim();
+};
 
 function CreateDocument() {
   const navigate = useNavigate();
@@ -141,6 +162,13 @@ function CreateDocument() {
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
       ref_number: r.Number ? String(r.Number) : "",
+      cargo_typedetails: cleanField(r.CargoDetails),
+      granting_license_approval: cleanField(r.GrantingLicenseApproval),
+      license_approval_number: cleanField(r.LicenseApprovalNumber),
+      license_approval_date: cleanField(r.LicenseApprovalDate),
+      license_text_specialization: cleanField(r.LicenseTextSpecialization),
+      item_name: cleanField(r.TypeIndustryProduction),
+      item_qty: cleanField(r.Unit),
     }));
   };
 
