@@ -484,8 +484,14 @@ function CreateDocument() {
                     <Input value={form.item_name} onChange={(e) => setForm({ ...form, item_name: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs">الكمية والوحدة</Label>
-                    <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
+                    <Label className="text-xs">الوحدة</Label>
+                    <Select value={form.item_qty} onValueChange={(v) => setForm({ ...form, item_qty: v })}>
+                      <SelectTrigger><SelectValue placeholder="اختر الوحدة" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="طن">طن</SelectItem>
+                        <SelectItem value="عدد">عدد</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع صورة (اختياري) — ستظهر في الوثيقة</Label>
