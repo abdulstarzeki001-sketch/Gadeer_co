@@ -13,6 +13,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
 
+const usd = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const fmtMoney = (n: number) => usd.format(Number(n) || 0);
+
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
   component: TraderStatement,
@@ -114,15 +122,15 @@ function TraderStatement() {
         <CardContent className="grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-xs text-muted-foreground">إجمالي الشحنات</div>
-            <div className="text-xl font-bold text-orange-600" dir="ltr">${totalCharges.toFixed(2)}</div>
+            <div className="text-xl font-bold text-orange-600 tabular-nums" dir="ltr">{fmtMoney(totalCharges)}</div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">إجمالي التسديدات</div>
-            <div className="text-xl font-bold text-green-600" dir="ltr">${totalPayments.toFixed(2)}</div>
+            <div className="text-xs text-muted-foreground">إجمالي القبوضات</div>
+            <div className="text-xl font-bold text-green-600 tabular-nums" dir="ltr">{fmtMoney(totalPayments)}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">الرصيد الحالي</div>
-            <div className="text-2xl font-bold" dir="ltr">${balance.toFixed(2)}</div>
+            <div className={`text-2xl font-bold tabular-nums ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : ""}`} dir="ltr">{fmtMoney(balance)}</div>
           </div>
         </CardContent>
       </Card>
