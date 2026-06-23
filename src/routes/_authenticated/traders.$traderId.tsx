@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
+import { ArrowRight, Plus, Printer, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
 import { fmtMoney } from "@/lib/format";
+import { exportElementToPdf } from "@/lib/export-pdf";
 
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
@@ -27,6 +28,8 @@ function TraderStatement() {
   const [desc, setDesc] = useState("");
   const [driverFilter, setDriverFilter] = useState("all");
   const [cargoFilter, setCargoFilter] = useState("all");
+  const statementRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["trader-statement", traderId],
@@ -83,11 +86,30 @@ function TraderStatement() {
   const payments = filteredTx.filter(t => t.type === "payment");
   const charges = filteredTx.filter(t => t.type !== "payment");
 
+  const handleDownload = async () => {
+    const el = statementRef.current;
+    if (!el) return;
+    setDownloading(true);
+    try {
+      const fileName = `statement-${data?.trader?.name ?? "trader"}.pdf`;
+      await exportElementToPdf(el, fileName);
+      toast.success("تم تنزيل كشف الحساب");
+    } catch {
+      toast.error("فشل تنزيل PDF");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
       <div className="flex items-center justify-between print:hidden">
         <Button variant="ghost" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleDownload} disabled={downloading}>
+            <Download className="h-4 w-4 ml-1" />
+            {downloading ? "جاري التحميل..." : "تنزيل PDF"}
+          </Button>
           <Button variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 ml-1" />تسديد</Button></DialogTrigger>
@@ -103,6 +125,7 @@ function TraderStatement() {
         </div>
       </div>
 
+      <div ref={statementRef} className="space-y-4 bg-background p-4 rounded">
       <Card>
         <CardContent className="p-5 flex items-center justify-between gap-4">
           <div>
@@ -195,6 +218,7 @@ function TraderStatement() {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
