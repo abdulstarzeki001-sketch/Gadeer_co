@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X } from "lucide-react";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
@@ -187,6 +187,15 @@ function CreateDocument() {
   };
 
   const refCount = useMemo(() => REFERENCE.length, []);
+
+  const [qrUpload, setQrUpload] = useState<string | null>(null);
+  const onQrFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => setQrUpload(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(f);
+  };
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-3xl mx-auto">
@@ -381,6 +390,95 @@ function CreateDocument() {
           <div className="space-y-2">
             <Label className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5 text-accent" />قيمة الوثيقة ($)</Label>
             <Input type="number" min="0" step="0.01" value={form.document_value} onChange={(e) => setForm({ ...form, document_value: e.target.value })} dir="ltr" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-5 w-5 text-primary" />إنشاء وثيقة PDF</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم الوثيقة</Label>
+            <Input value={form.document_number} onChange={(e) => setForm({ ...form, document_number: e.target.value })} placeholder="رقم الوثيقة" dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">تاريخ الوثيقة</Label>
+            <Input type="date" value={form.document_date} onChange={(e) => setForm({ ...form, document_date: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">وقت الوثيقة</Label>
+            <Input type="time" value={form.document_time} onChange={(e) => setForm({ ...form, document_time: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم سيطرة الدخول</Label>
+            <Input value={form.checkpoint_name_control} onChange={(e) => setForm({ ...form, checkpoint_name_control: e.target.value })} placeholder="اسم سيطرة الدخول" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">اسم السائق</Label>
+            <Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} placeholder="اسم السائق" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم العجلة</Label>
+            <Input value={form.vehicle_number} onChange={(e) => setForm({ ...form, vehicle_number: e.target.value })} placeholder="رقم العجلة" dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">محافظة تسجيل العجلة</Label>
+            <Input value={form.registration_governorate} onChange={(e) => setForm({ ...form, registration_governorate: e.target.value })} placeholder="محافظة تسجيل العجلة" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">نوع / تفاصيل الحمولة</Label>
+            <Input value={form.cargo_typedetails} onChange={(e) => setForm({ ...form, cargo_typedetails: e.target.value })} placeholder="نوع / تفاصيل الحمولة" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الوزن / الكمية</Label>
+            <Input value={form.weight_quantity} onChange={(e) => setForm({ ...form, weight_quantity: e.target.value })} placeholder="الوزن / الكمية" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الوجهة النهائية / المحافظة</Label>
+            <Input value={form.destination_governorate} onChange={(e) => setForm({ ...form, destination_governorate: e.target.value })} placeholder="الوجهة النهائية / المحافظة" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم المحافظة</Label>
+            <Input value={form.governorate_name} onChange={(e) => setForm({ ...form, governorate_name: e.target.value })} placeholder="اسم المحافظة" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم الشركة / المشروع</Label>
+            <Input value={form.company_name_project} onChange={(e) => setForm({ ...form, company_name_project: e.target.value })} placeholder="اسم الشركة / المشروع" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">الجهة المانحة للإجازة / الموافقة</Label>
+            <Input value={form.granting_license_approval} onChange={(e) => setForm({ ...form, granting_license_approval: e.target.value })} placeholder="الجهة المانحة للإجازة / الموافقة" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">رقم الإجازة / الموافقة</Label>
+            <Input value={form.license_approval_number} onChange={(e) => setForm({ ...form, license_approval_number: e.target.value })} placeholder="رقم الإجازة / الموافقة" dir="ltr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">تاريخ الإجازة / الموافقة</Label>
+            <Input type="date" value={form.license_approval_date} onChange={(e) => setForm({ ...form, license_approval_date: e.target.value })} dir="ltr" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">منطوق الإجازة / الاختصاص</Label>
+            <Input value={form.license_text_specialization} onChange={(e) => setForm({ ...form, license_text_specialization: e.target.value })} placeholder="منطوق الإجازة / الاختصاص" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs">العلامة التجارية</Label>
+            <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="العلامة التجارية" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">اسم المنتج</Label>
+            <Input value={form.item_name} onChange={(e) => setForm({ ...form, item_name: e.target.value })} placeholder="اسم المنتج" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">الكمية والوحدة</Label>
+            <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="الكمية والوحدة" />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع QR</Label>
+            <Input type="file" accept="image/*" onChange={onQrFile} />
+            {qrUpload && (
+              <img src={qrUpload} alt="QR" className="h-24 w-24 rounded border object-contain bg-white p-1" />
+            )}
           </div>
         </CardContent>
       </Card>
