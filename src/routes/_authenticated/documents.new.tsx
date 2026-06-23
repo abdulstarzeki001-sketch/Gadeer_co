@@ -236,12 +236,9 @@ function CreateDocument() {
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
 
-      let imageData = qrUpload;
-      if (!imageData) {
-        const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
-        imageData = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
+      if (qrUpload) {
+        await supabase.from("documents").update({ qr_code_data: qrUpload }).eq("id", doc.id);
       }
-      await supabase.from("documents").update({ qr_code_data: imageData }).eq("id", doc.id);
 
       const val = parseFloat(form.document_value);
       if (val > 0) {
