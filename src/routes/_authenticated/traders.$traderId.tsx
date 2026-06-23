@@ -172,7 +172,7 @@ function TraderStatement() {
 
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4" />وثائق التاجر</CardTitle></CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader><TableRow>
               <TableHead>رقم الوثيقة</TableHead><TableHead>التاريخ</TableHead><TableHead>شركة النقل</TableHead><TableHead>القيمة</TableHead><TableHead>الحالة</TableHead>
@@ -212,14 +212,14 @@ function TraderStatement() {
         </CardHeader>
         <CardContent className="p-0">
           <Tabs defaultValue="all" dir="rtl">
-            <TabsList className="mx-3 mt-2">
+            <TabsList className="mx-3 mt-2 flex">
               <TabsTrigger value="all">الكل ({filteredTx.length})</TabsTrigger>
               <TabsTrigger value="payments">القبوضات ({payments.length})</TabsTrigger>
               <TabsTrigger value="charges">الشحنات ({charges.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="all"><TxTable rows={filteredTx} /></TabsContent>
-            <TabsContent value="payments"><TxTable rows={payments} hideType /></TabsContent>
-            <TabsContent value="charges"><TxTable rows={charges} hideType /></TabsContent>
+            <TabsContent value="all"><div className="overflow-x-auto"><TxTable rows={filteredTx} /></div></TabsContent>
+            <TabsContent value="payments"><div className="overflow-x-auto"><TxTable rows={payments} hideType /></div></TabsContent>
+            <TabsContent value="charges"><div className="overflow-x-auto"><TxTable rows={charges} hideType /></div></TabsContent>
           </Tabs>
         </CardContent>
       </Card>
