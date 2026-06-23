@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, Upload } from "lucide-react";
 import { toast } from "sonner";
-import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
 import { z } from "zod";
 
@@ -236,12 +235,9 @@ function CreateDocument() {
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
 
-      let imageData = qrUpload;
-      if (!imageData) {
-        const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
-        imageData = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
+      if (qrUpload) {
+        await supabase.from("documents").update({ qr_code_data: qrUpload }).eq("id", doc.id);
       }
-      await supabase.from("documents").update({ qr_code_data: imageData }).eq("id", doc.id);
 
       const val = parseFloat(form.document_value);
       if (val > 0) {
