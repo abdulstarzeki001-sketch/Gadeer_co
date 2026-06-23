@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, FileText, Wallet, Plus } from "lucide-react";
+import { fmtMoney, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({ meta: [{ title: "اللوحة الرئيسية - الكمارك" }] }),
@@ -57,8 +58,8 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={<Building2 className="h-5 w-5" />} label="الشركات" value={stats?.companies ?? 0} />
         <StatCard icon={<FileText className="h-5 w-5" />} label="الوثائق" value={stats?.documents ?? 0} />
-        <StatCard icon={<Wallet className="h-5 w-5" />} label="قيمة الوثائق ($)" value={(stats?.totalValue ?? 0).toFixed(2)} />
-        <StatCard icon={<Wallet className="h-5 w-5" />} label="مجموع الحركات ($)" value={(stats?.totalCharge ?? 0).toFixed(2)} />
+        <StatCard icon={<Wallet className="h-5 w-5" />} label="قيمة الوثائق" value={fmtMoney(stats?.totalValue ?? 0)} />
+        <StatCard icon={<Wallet className="h-5 w-5" />} label="مجموع الحركات" value={fmtMoney(stats?.totalCharge ?? 0)} />
       </div>
 
       <Card>
@@ -71,7 +72,7 @@ function Dashboard() {
                   <div className="font-medium">{d.document_number}</div>
                   <div className="text-xs text-muted-foreground">{d.company_name} — {d.driver_name}</div>
                 </div>
-                <div className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleDateString("ar-IQ")}</div>
+                <div className="text-xs text-muted-foreground" dir="ltr">{fmtDate(d.created_at)}</div>
               </Link>
             ))}
             {recent && recent.length === 0 && (
