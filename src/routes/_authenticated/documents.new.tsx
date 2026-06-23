@@ -422,6 +422,13 @@ function CreateDocument() {
                     <Label className="text-xs">الكمية والوحدة</Label>
                     <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
                   </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع QR</Label>
+                    <Input type="file" accept="image/*" onChange={onQrFile} />
+                    {qrUpload && (
+                      <img src={qrUpload} alt="QR" className="h-24 w-24 rounded border object-contain bg-white p-1" />
+                    )}
+                  </div>
                 </div>
               </div>
             )}
