@@ -52,10 +52,10 @@ function ReportsPage() {
   const creditors = (data?.rows ?? []).filter(r => r.balance < 0);
 
   return (
-    <div className="p-6 space-y-4 max-w-6xl mx-auto">
+    <div className="p-3 sm:p-6 space-y-4 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">التقارير</h1>
-        <p className="text-sm text-muted-foreground">نظرة شاملة على المحاسبة</p>
+        <h1 className="text-xl sm:text-2xl font-bold">التقارير</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">نظرة شاملة على المحاسبة</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -67,7 +67,7 @@ function ReportsPage() {
 
       <Card>
         <CardHeader><CardTitle className="text-base">التجار المدينون (الأعلى رصيداً)</CardTitle></CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader><TableRow>
               <TableHead>التاجر</TableHead><TableHead>الهاتف</TableHead>
@@ -91,7 +91,7 @@ function ReportsPage() {
       {creditors.length > 0 && (
         <Card>
           <CardHeader><CardTitle className="text-base">تجار لهم رصيد دائن</CardTitle></CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-x-auto">
             <Table>
               <TableHeader><TableRow><TableHead>التاجر</TableHead><TableHead className="text-left">الرصيد ($)</TableHead><TableHead className="w-20"></TableHead></TableRow></TableHeader>
               <TableBody>
@@ -114,9 +114,9 @@ function ReportsPage() {
 function StatCard({ icon: Icon, label, value, tone }: { icon: any; label: string; value: string; tone?: string }) {
   return (
     <Card>
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5" />{label}</div>
-        <div className={`text-2xl font-bold mt-1 ${tone ?? ""}`} dir="ltr">{value}</div>
+        <div className={`text-base sm:text-2xl font-bold mt-1 tabular-nums break-all ${tone ?? ""}`} dir="ltr">{value}</div>
       </CardContent>
     </Card>
   );
