@@ -106,38 +106,30 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
 
         <table className="info-table">
           <colgroup>
-            <col style={{ width: "30%" }} />
-            <col style={{ width: "20%" }} />
-            <col style={{ width: "50%" }} />
+            <col style={{ width: "35%" }} />
+            <col style={{ width: "65%" }} />
           </colgroup>
           <thead>
-            <tr><th colSpan={3}>المعلومات الشخصية</th></tr>
+            <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
           </thead>
           <tbody>
             {rows.map(([label, value], i) => (
               <tr key={i}>
                 <td>{label}</td>
-                <td colSpan={2}>{value}</td>
+                <td>{value}</td>
               </tr>
             ))}
-            <tr><th colSpan={3}>المواد / المنتجات المرخّصة</th></tr>
-            <tr>
-              <td><strong>اسم المنتج</strong></td>
-              <td><strong>الوحدة</strong></td>
-              <td><strong>منطوق الإجازة / الاختصاص</strong></td>
-            </tr>
+            <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
             {items.length === 0 ? (
               <tr>
                 <td>-</td>
                 <td>-</td>
-                <td>{doc.license_text_specialization || "-"}</td>
               </tr>
             ) : (
               items.map((it) => (
                 <tr key={it.id}>
                   <td>{it.item_name}</td>
                   <td>{it.production_capacity} {it.unit}</td>
-                  <td>{doc.license_text_specialization || "-"}</td>
                 </tr>
               ))
             )}

@@ -201,10 +201,7 @@ function CreateDocument() {
       license_approval_date: cleanField(r.LicenseApprovalDate),
       license_text_specialization: cleanField(r.LicenseTextSpecialization),
       item_name: cleanField(r.TypeIndustryProduction),
-      item_qty: (() => {
-        const u = cleanField(r.Unit);
-        return u.includes("عدد") ? "عدد" : u.includes("طن") || !u ? "طن" : u;
-      })(),
+      item_qty: cleanField(r.Unit),
     }));
   };
 
@@ -487,14 +484,8 @@ function CreateDocument() {
                     <Input value={form.item_name} onChange={(e) => setForm({ ...form, item_name: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs">الوحدة</Label>
-                    <Select value={form.item_qty} onValueChange={(v) => setForm({ ...form, item_qty: v })}>
-                      <SelectTrigger><SelectValue placeholder="اختر الوحدة" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="طن">طن</SelectItem>
-                        <SelectItem value="عدد">عدد</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-xs">الكمية والوحدة</Label>
+                    <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع صورة (اختياري) — ستظهر في الوثيقة</Label>
