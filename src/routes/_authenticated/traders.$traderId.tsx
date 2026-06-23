@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,8 @@ function TraderStatement() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [desc, setDesc] = useState("");
+  const [driverFilter, setDriverFilter] = useState("all");
+  const [cargoFilter, setCargoFilter] = useState("all");
 
   const { data } = useQuery({
     queryKey: ["trader-statement", traderId],
@@ -65,9 +67,17 @@ function TraderStatement() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const balance = (data?.transactions ?? []).reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
-  const totalCharges = (data?.transactions ?? []).filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
-  const totalPayments = (data?.transactions ?? []).filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const allTx = data?.transactions ?? [];
+  const drivers = useMemo(() => Array.from(new Set(allTx.map(t => t.driver_name).filter(Boolean))) as string[], [allTx]);
+  const cargos = useMemo(() => Array.from(new Set(allTx.map(t => (t as any).cargo_typedetails).filter(Boolean))) as string[], [allTx]);
+  const filteredTx = allTx.filter(t => {
+    if (driverFilter !== "all" && t.driver_name !== driverFilter) return false;
+    if (cargoFilter !== "all" && (t as any).cargo_typedetails !== cargoFilter) return false;
+    return true;
+  });
+  const balance = filteredTx.reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
+  const totalCharges = filteredTx.filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const totalPayments = filteredTx.filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
 
   return (
     <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
@@ -140,21 +150,35 @@ function TraderStatement() {
       <Card>
         <CardHeader><CardTitle className="text-base">كشف الحركات</CardTitle></CardHeader>
         <CardContent className="p-0">
+          <div className="flex flex-wrap gap-2 p-3 border-b print:hidden">
+            <select value={driverFilter} onChange={(e) => setDriverFilter(e.target.value)} className="border rounded px-2 py-1 text-sm">
+              <option value="all">كل السائقين</option>
+              {drivers.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+            <select value={cargoFilter} onChange={(e) => setCargoFilter(e.target.value)} className="border rounded px-2 py-1 text-sm">
+              <option value="all">كل أنواع الحمل</option>
+              {cargos.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            {(driverFilter !== "all" || cargoFilter !== "all") && (
+              <Button variant="ghost" size="sm" onClick={() => { setDriverFilter("all"); setCargoFilter("all"); }}>مسح الفلاتر</Button>
+            )}
+          </div>
           <Table>
             <TableHeader><TableRow>
-              <TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>الوصف</TableHead><TableHead>وثيقة</TableHead>
+              <TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>السائق</TableHead><TableHead>نوع الحمل</TableHead><TableHead>وثيقة</TableHead>
             </TableRow></TableHeader>
             <TableBody>
-              {(data?.transactions ?? []).map((t) => (
+              {filteredTx.map((t) => (
                 <TableRow key={t.id}>
                   <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
                   <TableCell>{t.type === "payment" ? <span className="text-green-600">تسديد</span> : <span className="text-orange-600">شحن</span>}</TableCell>
                   <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
-                  <TableCell>{t.description}</TableCell>
+                  <TableCell>{t.driver_name ?? "—"}</TableCell>
+                  <TableCell className="text-xs">{(t as any).cargo_typedetails ?? "—"}</TableCell>
                   <TableCell className="font-mono text-xs">{t.document_number ?? "—"}</TableCell>
                 </TableRow>
               ))}
-              {(data?.transactions ?? []).length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
+              {filteredTx.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
