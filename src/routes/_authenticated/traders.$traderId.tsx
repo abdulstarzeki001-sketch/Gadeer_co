@@ -125,6 +125,7 @@ function TraderStatement() {
         </div>
       </div>
 
+      <div ref={statementRef} className="space-y-4 bg-background p-4 rounded">
       <Card>
         <CardContent className="p-5 flex items-center justify-between gap-4">
           <div>
