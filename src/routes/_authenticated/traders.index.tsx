@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Eye, Pencil, Trash2, Phone, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/traders/")({
   head: () => ({ meta: [{ title: "التجار - الكمارك" }] }),
