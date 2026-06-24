@@ -127,6 +127,7 @@ export type Database = {
           status: string
           subject: string | null
           trader_id: string | null
+          type_industry_production: string | null
           vehicle_number: string | null
           weight_quantity: string | null
           x_coordinate: string | null
@@ -158,6 +159,7 @@ export type Database = {
           status?: string
           subject?: string | null
           trader_id?: string | null
+          type_industry_production?: string | null
           vehicle_number?: string | null
           weight_quantity?: string | null
           x_coordinate?: string | null
@@ -189,6 +191,7 @@ export type Database = {
           status?: string
           subject?: string | null
           trader_id?: string | null
+          type_industry_production?: string | null
           vehicle_number?: string | null
           weight_quantity?: string | null
           x_coordinate?: string | null
