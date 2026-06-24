@@ -160,7 +160,7 @@
 }
 
 .subject-field{
-  flex:0 0 auto;
+  flex:1 1 auto;
   border:1px solid #e2e2e2;
   border-radius:6px;
   padding:1mm 1mm;
