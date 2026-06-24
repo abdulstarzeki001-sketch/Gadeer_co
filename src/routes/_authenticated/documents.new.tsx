@@ -18,7 +18,19 @@ export const Route = createFileRoute("/_authenticated/documents/new")({
   component: CreateDocument,
 });
 
-type RefCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
+type RefCompany = {
+  Number: number;
+  Brand: string;
+  CompanyNameProject: string;
+  GovernorateName: string;
+  CargoDetails?: string;
+  GrantingLicenseApproval?: string;
+  LicenseApprovalDate?: string;
+  LicenseApprovalNumber?: number | string;
+  LicenseTextSpecialization?: string;
+  TypeIndustryProduction?: string;
+  Unit?: string;
+};
 const REFERENCE = (companiesJson as RefCompany[]).filter((r) => r.CompanyNameProject);
 
 function CreateDocument() {
