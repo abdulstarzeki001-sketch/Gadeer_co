@@ -212,6 +212,9 @@ input, select, textarea { font-size: 16px; }
   padding:0.7mm 1.5mm;
   box-sizing:border-box;
   vertical-align:middle;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  white-space:normal;
 }
 
 .info-table td{
@@ -228,13 +231,13 @@ input, select, textarea { font-size: 16px; }
 }
 
 .info-table td:first-child{
-  width:35%;
+  width:50%;
   font-weight:600;
   color:#222;
 }
 
 .info-table td:nth-child(2){
-  width:65%;
+  width:50%;
   font-weight:600;
   color:#222;
 }
