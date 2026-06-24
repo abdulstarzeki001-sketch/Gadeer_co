@@ -121,6 +121,7 @@ function CreateDocument() {
     license_text_specialization: "",
     item_name: "",
     item_qty: "",
+    type_industry_production: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -135,6 +136,12 @@ function CreateDocument() {
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
       ref_number: r.Number ? String(r.Number) : "",
+      cargo_typedetails: r.CargoDetails ?? f.cargo_typedetails,
+      granting_license_approval: r.GrantingLicenseApproval ?? f.granting_license_approval,
+      license_approval_number: r.LicenseApprovalNumber != null ? String(r.LicenseApprovalNumber) : f.license_approval_number,
+      license_approval_date: r.LicenseApprovalDate ?? f.license_approval_date,
+      license_text_specialization: r.LicenseTextSpecialization ?? f.license_text_specialization,
+      type_industry_production: r.TypeIndustryProduction ?? "",
     }));
   };
 
