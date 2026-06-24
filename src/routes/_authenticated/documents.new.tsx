@@ -18,7 +18,19 @@ export const Route = createFileRoute("/_authenticated/documents/new")({
   component: CreateDocument,
 });
 
-type RefCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
+type RefCompany = {
+  Number: number;
+  Brand: string;
+  CompanyNameProject: string;
+  GovernorateName: string;
+  CargoDetails?: string;
+  GrantingLicenseApproval?: string;
+  LicenseApprovalDate?: string;
+  LicenseApprovalNumber?: number | string;
+  LicenseTextSpecialization?: string;
+  TypeIndustryProduction?: string;
+  Unit?: string;
+};
 const REFERENCE = (companiesJson as RefCompany[]).filter((r) => r.CompanyNameProject);
 
 function CreateDocument() {
@@ -109,6 +121,7 @@ function CreateDocument() {
     license_text_specialization: "",
     item_name: "",
     item_qty: "",
+    type_industry_production: "",
   });
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
@@ -123,6 +136,12 @@ function CreateDocument() {
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
       ref_number: r.Number ? String(r.Number) : "",
+      cargo_typedetails: r.CargoDetails ?? f.cargo_typedetails,
+      granting_license_approval: r.GrantingLicenseApproval ?? f.granting_license_approval,
+      license_approval_number: r.LicenseApprovalNumber != null ? String(r.LicenseApprovalNumber) : f.license_approval_number,
+      license_approval_date: r.LicenseApprovalDate ?? f.license_approval_date,
+      license_text_specialization: r.LicenseTextSpecialization ?? f.license_text_specialization,
+      type_industry_production: r.TypeIndustryProduction ?? "",
     }));
   };
 
@@ -147,6 +166,18 @@ function CreateDocument() {
         document_value: parseFloat(form.document_value) || 0,
         trader_id: form.trader_id || null,
         created_by: uid,
+        cargo_typedetails: form.cargo_typedetails || null,
+        weight_quantity: form.weight_quantity || null,
+        driver_name: form.driver_name || null,
+        vehicle_number: form.vehicle_number || null,
+        registration_governorate: form.registration_governorate || null,
+        destination_governorate: form.destination_governorate || null,
+        checkpoint_name_control: form.checkpoint_name_control || null,
+        granting_license_approval: form.granting_license_approval || null,
+        license_approval_number: form.license_approval_number || null,
+        license_approval_date: form.license_approval_date || null,
+        license_text_specialization: form.license_text_specialization || null,
+        type_industry_production: form.type_industry_production || null,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
