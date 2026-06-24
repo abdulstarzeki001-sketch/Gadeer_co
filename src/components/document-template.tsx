@@ -120,19 +120,13 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
               </tr>
             ))}
             <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
-            {items.length === 0 ? (
-              <tr>
-                <td>-</td>
-                <td>-</td>
-              </tr>
-            ) : (
+            {items.length > 0 &&
               items.map((it) => (
                 <tr key={it.id}>
                   <td>{it.item_name}</td>
                   <td>{it.production_capacity} {it.unit}</td>
                 </tr>
-              ))
-            )}
+              ))}
           </tbody>
         </table>
 
