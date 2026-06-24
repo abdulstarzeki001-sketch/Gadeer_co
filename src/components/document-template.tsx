@@ -106,7 +106,8 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
 
         <table className="info-table">
           <colgroup>
-            <col style={{ width: "100%" }} />
+            <col style={{ width: "50%" }} />
+            <col style={{ width: "50%" }} />
           </colgroup>
           <thead>
             <tr><th colSpan={2}>المعلومات الشخصية</th></tr>
@@ -118,15 +119,20 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
                 <td>{value}</td>
               </tr>
             ))}
-            <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
+            <tr className="section-header">
+              <th>معلومات الشركة — الطاقة الإنتاجية السنوية</th>
+              <th>الكمية المُدخلة (طن)</th>
+            </tr>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={2}>{doc.weight_quantity || "-"}</td>
+                <td>-</td>
+                <td>{doc.weight_quantity || "-"}</td>
               </tr>
             ) : (
               items.map((it) => (
                 <tr key={it.id}>
-                  <td colSpan={2}>{doc.weight_quantity || "-"}</td>
+                  <td>{it.production_capacity || "-"}</td>
+                  <td>{doc.weight_quantity || "-"}</td>
                 </tr>
               ))
             )}
