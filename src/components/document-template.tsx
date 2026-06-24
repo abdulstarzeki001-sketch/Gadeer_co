@@ -32,6 +32,7 @@ interface DocumentData {
   notes?: string | null;
   qr_code_data?: string | null;
   document_value?: number | string | null;
+  type_industry_production?: string | null;
   created_at: string;
   items?: DocumentItem[];
 }
@@ -120,19 +121,17 @@ export function DocumentTemplate({ doc }: { doc: DocumentData }) {
               </tr>
             ))}
             <tr><th colSpan={2}>المواد / المنتجات المرخّصة</th></tr>
-            {items.length === 0 ? (
-              <tr>
-                <td>-</td>
-                <td>-</td>
-              </tr>
-            ) : (
+            <tr>
+              <td>{doc.type_industry_production || "-"}</td>
+              <td>{doc.weight_quantity || "-"}</td>
+            </tr>
+            {items.length > 0 &&
               items.map((it) => (
                 <tr key={it.id}>
                   <td>{it.item_name}</td>
                   <td>{it.production_capacity} {it.unit}</td>
                 </tr>
-              ))
-            )}
+              ))}
           </tbody>
         </table>
 
