@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowRight, Plus, Printer, FileText, Download, Eye } from "lucide-react";
+import { ArrowRight, Plus, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { fmtMoney } from "@/lib/format";
-import { exportElementToPdf } from "@/lib/export-pdf";
-import { PdfPreviewDialog } from "@/components/pdf-preview-dialog";
 
 export const Route = createFileRoute("/_authenticated/traders/$traderId")({
   head: () => ({ meta: [{ title: "كشف حساب التاجر" }] }),
@@ -27,11 +23,6 @@ function TraderStatement() {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [desc, setDesc] = useState("");
-  const [driverFilter, setDriverFilter] = useState("all");
-  const [cargoFilter, setCargoFilter] = useState("all");
-  const statementRef = useRef<HTMLDivElement>(null);
-  const [downloading, setDownloading] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["trader-statement", traderId],
@@ -74,50 +65,18 @@ function TraderStatement() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const allTx = data?.transactions ?? [];
-  const drivers = useMemo(() => Array.from(new Set(allTx.map(t => t.driver_name).filter(Boolean))) as string[], [allTx]);
-  const cargos = useMemo(() => Array.from(new Set(allTx.map(t => (t as any).cargo_typedetails).filter(Boolean))) as string[], [allTx]);
-  const filteredTx = allTx.filter(t => {
-    if (driverFilter !== "all" && t.driver_name !== driverFilter) return false;
-    if (cargoFilter !== "all" && (t as any).cargo_typedetails !== cargoFilter) return false;
-    return true;
-  });
-  const balance = filteredTx.reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
-  const totalCharges = filteredTx.filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
-  const totalPayments = filteredTx.filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
-  const payments = filteredTx.filter(t => t.type === "payment");
-  const charges = filteredTx.filter(t => t.type !== "payment");
-
-  const handleDownload = async () => {
-    const el = statementRef.current;
-    if (!el) return;
-    setDownloading(true);
-    try {
-      const fileName = `statement-${data?.trader?.name ?? "trader"}.pdf`;
-      await exportElementToPdf(el, fileName);
-      toast.success("تم تنزيل كشف الحساب");
-    } catch {
-      toast.error("فشل تنزيل PDF");
-    } finally {
-      setDownloading(false);
-    }
-  };
+  const balance = (data?.transactions ?? []).reduce((s, t) => s + (t.type === "payment" ? -1 : 1) * Number(t.amount || 0), 0);
+  const totalCharges = (data?.transactions ?? []).filter(t => t.type !== "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const totalPayments = (data?.transactions ?? []).filter(t => t.type === "payment").reduce((s, t) => s + Number(t.amount || 0), 0);
 
   return (
-    <div className="p-3 sm:p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
-      <div className="flex items-center justify-between gap-2 print:hidden">
-        <Button variant="ghost" size="sm" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" /><span className="hidden sm:inline">رجوع</span></Link></Button>
-        <div className="flex gap-1.5 flex-wrap justify-end">
-          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
-            <Eye className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">معاينة PDF</span>
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownload} disabled={downloading}>
-            <Download className="h-4 w-4 sm:ml-1" />
-            <span className="hidden sm:inline">{downloading ? "جاري التحميل..." : "تنزيل PDF"}</span>
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()}><Printer className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">طباعة</span></Button>
+    <div className="p-6 space-y-4 max-w-5xl mx-auto print:p-0 print:max-w-none">
+      <div className="flex items-center justify-between print:hidden">
+        <Button variant="ghost" asChild><Link to="/traders"><ArrowRight className="h-4 w-4 ml-1" />رجوع</Link></Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4 ml-1" />طباعة</Button>
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 sm:ml-1" /><span className="hidden sm:inline">تسديد</span></Button></DialogTrigger>
+            <DialogTrigger asChild><Button><Plus className="h-4 w-4 ml-1" />تسديد</Button></DialogTrigger>
             <DialogContent dir="rtl">
               <DialogHeader><DialogTitle>تسجيل تسديد</DialogTitle></DialogHeader>
               <div className="space-y-3">
@@ -130,21 +89,6 @@ function TraderStatement() {
         </div>
       </div>
 
-      <div ref={statementRef} className="space-y-4 bg-background p-2 sm:p-4 rounded">
-      <Card>
-        <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-xs text-muted-foreground">صافي الرصيد (المستحقات − المدفوعات)</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {balance > 0 ? "مستحق على التاجر" : balance < 0 ? "رصيد دائن للتاجر" : "متوازن"}
-            </div>
-          </div>
-          <div className={`text-2xl sm:text-4xl font-extrabold tabular-nums shrink-0 ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : "text-foreground"}`} dir="ltr">
-            {fmtMoney(balance)}
-          </div>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>{data?.trader?.name}</CardTitle>
@@ -154,25 +98,25 @@ function TraderStatement() {
             {data?.trader?.notes && <div className="text-xs italic">{data.trader.notes}</div>}
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+        <CardContent className="grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-xs text-muted-foreground">إجمالي الشحنات</div>
-            <div className="text-sm sm:text-xl font-bold text-orange-600 tabular-nums break-all" dir="ltr">{fmtMoney(totalCharges)}</div>
+            <div className="text-xl font-bold text-orange-600" dir="ltr">${totalCharges.toFixed(2)}</div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">إجمالي القبوضات</div>
-            <div className="text-sm sm:text-xl font-bold text-green-600 tabular-nums break-all" dir="ltr">{fmtMoney(totalPayments)}</div>
+            <div className="text-xs text-muted-foreground">إجمالي التسديدات</div>
+            <div className="text-xl font-bold text-green-600" dir="ltr">${totalPayments.toFixed(2)}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">الرصيد الحالي</div>
-            <div className={`text-base sm:text-2xl font-bold tabular-nums break-all ${balance > 0 ? "text-orange-600" : balance < 0 ? "text-green-600" : ""}`} dir="ltr">{fmtMoney(balance)}</div>
+            <div className="text-2xl font-bold" dir="ltr">${balance.toFixed(2)}</div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4" />وثائق التاجر</CardTitle></CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
               <TableHead>رقم الوثيقة</TableHead><TableHead>التاريخ</TableHead><TableHead>شركة النقل</TableHead><TableHead>القيمة</TableHead><TableHead>الحالة</TableHead>
@@ -181,9 +125,9 @@ function TraderStatement() {
               {(data?.documents ?? []).map((d) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-mono text-xs"><Link to="/documents/$id" params={{ id: d.id }} className="text-primary hover:underline">{d.document_number}</Link></TableCell>
-                  <TableCell dir="ltr">{new Date(d.created_at).toLocaleDateString("en-GB")}</TableCell>
+                  <TableCell>{new Date(d.created_at).toLocaleDateString("ar-IQ")}</TableCell>
                   <TableCell>{d.company_name}</TableCell>
-                  <TableCell className="font-mono tabular-nums" dir="ltr">{fmtMoney(Number(d.document_value))}</TableCell>
+                  <TableCell className="font-mono" dir="ltr">${Number(d.document_value).toFixed(2)}</TableCell>
                   <TableCell>{d.status}</TableCell>
                 </TableRow>
               ))}
@@ -194,71 +138,27 @@ function TraderStatement() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">كشف الحركات</CardTitle>
-          <div className="flex flex-wrap gap-2 pt-2 print:hidden">
-            <select value={driverFilter} onChange={(e) => setDriverFilter(e.target.value)} className="border rounded px-2 py-1 text-sm">
-              <option value="all">كل السائقين</option>
-              {drivers.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
-            <select value={cargoFilter} onChange={(e) => setCargoFilter(e.target.value)} className="border rounded px-2 py-1 text-sm">
-              <option value="all">كل أنواع الحمل</option>
-              {cargos.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            {(driverFilter !== "all" || cargoFilter !== "all") && (
-              <Button variant="ghost" size="sm" onClick={() => { setDriverFilter("all"); setCargoFilter("all"); }}>مسح الفلاتر</Button>
-            )}
-          </div>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base">كشف الحركات</CardTitle></CardHeader>
         <CardContent className="p-0">
-          <Tabs defaultValue="all" dir="rtl">
-            <TabsList className="mx-3 mt-2 flex">
-              <TabsTrigger value="all">الكل ({filteredTx.length})</TabsTrigger>
-              <TabsTrigger value="payments">القبوضات ({payments.length})</TabsTrigger>
-              <TabsTrigger value="charges">الشحنات ({charges.length})</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all"><div className="overflow-x-auto"><TxTable rows={filteredTx} /></div></TabsContent>
-            <TabsContent value="payments"><div className="overflow-x-auto"><TxTable rows={payments} hideType /></div></TabsContent>
-            <TabsContent value="charges"><div className="overflow-x-auto"><TxTable rows={charges} hideType /></div></TabsContent>
-          </Tabs>
+          <Table>
+            <TableHeader><TableRow>
+              <TableHead>التاريخ</TableHead><TableHead>النوع</TableHead><TableHead>المبلغ</TableHead><TableHead>الوصف</TableHead><TableHead>وثيقة</TableHead>
+            </TableRow></TableHeader>
+            <TableBody>
+              {(data?.transactions ?? []).map((t) => (
+                <TableRow key={t.id}>
+                  <TableCell>{new Date(t.created_at).toLocaleDateString("ar-IQ")}</TableCell>
+                  <TableCell>{t.type === "payment" ? <span className="text-green-600">تسديد</span> : <span className="text-orange-600">شحن</span>}</TableCell>
+                  <TableCell className="font-mono" dir="ltr">{Number(t.amount).toFixed(2)}</TableCell>
+                  <TableCell>{t.description}</TableCell>
+                  <TableCell className="font-mono text-xs">{t.document_number ?? "—"}</TableCell>
+                </TableRow>
+              ))}
+              {(data?.transactions ?? []).length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-      </div>
-
-      <PdfPreviewDialog
-        open={previewOpen}
-        onOpenChange={setPreviewOpen}
-        getElement={() => statementRef.current}
-        fileName={`statement-${data?.trader?.name ?? "trader"}.pdf`}
-      />
     </div>
-  );
-}
-
-function TxTable({ rows, hideType }: { rows: any[]; hideType?: boolean }) {
-  return (
-    <Table>
-      <TableHeader><TableRow>
-        <TableHead>التاريخ</TableHead>
-        {!hideType && <TableHead>النوع</TableHead>}
-        <TableHead>المبلغ</TableHead>
-        <TableHead>السائق</TableHead>
-        <TableHead>نوع الحمل</TableHead>
-        <TableHead>الوصف / وثيقة</TableHead>
-      </TableRow></TableHeader>
-      <TableBody>
-        {rows.map((t) => (
-          <TableRow key={t.id}>
-            <TableCell dir="ltr">{new Date(t.created_at).toLocaleDateString("en-GB")}</TableCell>
-            {!hideType && <TableCell>{t.type === "payment" ? <span className="text-green-600">قبض</span> : <span className="text-orange-600">شحن</span>}</TableCell>}
-            <TableCell className={`font-mono tabular-nums ${t.type === "payment" ? "text-green-600" : "text-orange-600"}`} dir="ltr">{t.type === "payment" ? "-" : "+"}{fmtMoney(Number(t.amount))}</TableCell>
-            <TableCell>{t.driver_name ?? "—"}</TableCell>
-            <TableCell className="text-xs">{t.cargo_typedetails ?? "—"}</TableCell>
-            <TableCell className="text-xs">{t.document_number ?? t.description ?? "—"}</TableCell>
-          </TableRow>
-        ))}
-        {rows.length === 0 && <TableRow><TableCell colSpan={hideType ? 5 : 6} className="text-center text-muted-foreground py-8">لا حركات</TableCell></TableRow>}
-      </TableBody>
-    </Table>
   );
 }

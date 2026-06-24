@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
@@ -37,6 +38,19 @@ function AuthPage() {
     navigate({ to: "/" });
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/` },
+    });
+    setLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("تم إنشاء الحساب — تحقق من بريدك");
+  };
+
   const handleGoogle = async () => {
     setLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
@@ -60,22 +74,42 @@ function AuthPage() {
           <CardDescription>منصة المنتج المحلي — تسجيل الدخول</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignIn} className="space-y-4" dir="rtl">
-            <div className="space-y-2">
-              <Label>البريد الإلكتروني</Label>
-              <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" />
-            </div>
-            <div className="space-y-2">
-              <Label>كلمة السر</Label>
-              <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              دخول
-            </Button>
-            <p className="text-xs text-muted-foreground text-center">
-              التسجيل الذاتي مغلق — الحسابات تُمنح من قِبل المسؤول فقط
-            </p>
-          </form>
+          <Tabs defaultValue="signin" dir="rtl">
+            <TabsList className="grid grid-cols-2 w-full">
+              <TabsTrigger value="signin">دخول</TabsTrigger>
+              <TabsTrigger value="signup">حساب جديد</TabsTrigger>
+            </TabsList>
+            <TabsContent value="signin">
+              <form onSubmit={handleSignIn} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>البريد الإلكتروني</Label>
+                  <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" />
+                </div>
+                <div className="space-y-2">
+                  <Label>كلمة السر</Label>
+                  <Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  دخول
+                </Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="signup">
+              <form onSubmit={handleSignUp} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>البريد الإلكتروني</Label>
+                  <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} dir="ltr" />
+                </div>
+                <div className="space-y-2">
+                  <Label>كلمة السر</Label>
+                  <Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  إنشاء حساب
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>

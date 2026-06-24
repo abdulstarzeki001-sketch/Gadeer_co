@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, DollarSign, Users, FileText } from "lucide-react";
-import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({ meta: [{ title: "التقارير - الكمارك" }] }),
@@ -52,22 +51,22 @@ function ReportsPage() {
   const creditors = (data?.rows ?? []).filter(r => r.balance < 0);
 
   return (
-    <div className="p-3 sm:p-6 space-y-4 max-w-6xl mx-auto">
+    <div className="p-6 space-y-4 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold">التقارير</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">نظرة شاملة على المحاسبة</p>
+        <h1 className="text-2xl font-bold">التقارير</h1>
+        <p className="text-sm text-muted-foreground">نظرة شاملة على المحاسبة</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={DollarSign} label="إجمالي الديون" value={fmtMoney(totals?.outstanding ?? 0)} tone="text-orange-600" />
-        <StatCard icon={TrendingUp} label="إجمالي الشحنات" value={fmtMoney(totals?.totalCharges ?? 0)} />
+        <StatCard icon={DollarSign} label="إجمالي الديون" value={`$${(totals?.outstanding ?? 0).toFixed(2)}`} tone="text-orange-600" />
+        <StatCard icon={TrendingUp} label="إجمالي الشحنات" value={`$${(totals?.totalCharges ?? 0).toFixed(2)}`} />
         <StatCard icon={Users} label="عدد التجار" value={String(totals?.tradersCount ?? 0)} />
         <StatCard icon={FileText} label="عدد الوثائق" value={String(totals?.docsCount ?? 0)} />
       </div>
 
       <Card>
         <CardHeader><CardTitle className="text-base">التجار المدينون (الأعلى رصيداً)</CardTitle></CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
               <TableHead>التاجر</TableHead><TableHead>الهاتف</TableHead>
@@ -78,7 +77,7 @@ function ReportsPage() {
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">{r.name}</TableCell>
                   <TableCell dir="ltr" className="text-xs">{r.phone ?? "—"}</TableCell>
-                  <TableCell className="text-left font-mono tabular-nums text-orange-600" dir="ltr">{fmtMoney(r.balance)}</TableCell>
+                  <TableCell className="text-left font-mono text-orange-600" dir="ltr">{r.balance.toFixed(2)}</TableCell>
                   <TableCell><Button variant="ghost" size="icon" asChild><Link to="/traders/$traderId" params={{ traderId: r.id }}><Eye className="h-4 w-4" /></Link></Button></TableCell>
                 </TableRow>
               ))}
@@ -91,14 +90,14 @@ function ReportsPage() {
       {creditors.length > 0 && (
         <Card>
           <CardHeader><CardTitle className="text-base">تجار لهم رصيد دائن</CardTitle></CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
+          <CardContent className="p-0">
             <Table>
               <TableHeader><TableRow><TableHead>التاجر</TableHead><TableHead className="text-left">الرصيد ($)</TableHead><TableHead className="w-20"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {creditors.map(r => (
                   <TableRow key={r.id}>
                     <TableCell>{r.name}</TableCell>
-                    <TableCell className="text-left font-mono tabular-nums text-green-600" dir="ltr">{fmtMoney(r.balance)}</TableCell>
+                    <TableCell className="text-left font-mono text-green-600" dir="ltr">{r.balance.toFixed(2)}</TableCell>
                     <TableCell><Button variant="ghost" size="icon" asChild><Link to="/traders/$traderId" params={{ traderId: r.id }}><Eye className="h-4 w-4" /></Link></Button></TableCell>
                   </TableRow>
                 ))}
@@ -114,9 +113,9 @@ function ReportsPage() {
 function StatCard({ icon: Icon, label, value, tone }: { icon: any; label: string; value: string; tone?: string }) {
   return (
     <Card>
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5" />{label}</div>
-        <div className={`text-base sm:text-2xl font-bold mt-1 tabular-nums break-all ${tone ?? ""}`} dir="ltr">{value}</div>
+        <div className={`text-2xl font-bold mt-1 ${tone ?? ""}`} dir="ltr">{value}</div>
       </CardContent>
     </Card>
   );

@@ -247,7 +247,6 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
-          cargo_typedetails: string | null
           company_id: string
           created_at: string
           created_by: string | null
@@ -261,7 +260,6 @@ export type Database = {
         }
         Insert: {
           amount?: number
-          cargo_typedetails?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -275,7 +273,6 @@ export type Database = {
         }
         Update: {
           amount?: number
-          cargo_typedetails?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null

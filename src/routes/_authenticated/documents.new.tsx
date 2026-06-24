@@ -8,74 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X, Upload } from "lucide-react";
+import { Building2, DollarSign, Send, Eye, ChevronsUpDown, Check, Search, X } from "lucide-react";
 import { toast } from "sonner";
+import QRCode from "qrcode";
 import companiesJson from "@/data/companies.json";
-import { z } from "zod";
-
-const IRAQ_GOVERNORATES = [
-  "بغداد","البصرة","نينوى","أربيل","السليمانية","دهوك","كركوك","الأنبار","صلاح الدين","ديالى",
-  "بابل","كربلاء","النجف","واسط","ميسان","ذي قار","المثنى","القادسية","حلبجة",
-];
-
-type SavedDriver = { name: string; vehicle: string; governorate: string };
-const DRIVERS_KEY = "saved-drivers-v1";
-const loadDrivers = (): SavedDriver[] => {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(DRIVERS_KEY) ?? "[]"); } catch { return []; }
-};
-const saveDriver = (d: SavedDriver) => {
-  if (typeof window === "undefined" || !d.name.trim()) return;
-  const list = loadDrivers().filter((x) => x.name.trim() !== d.name.trim());
-  list.unshift(d);
-  localStorage.setItem(DRIVERS_KEY, JSON.stringify(list.slice(0, 100)));
-};
-
-const docSchema = z.object({
-  document_number: z.string().trim().regex(/^\d{3,12}$/, "رقم الوثيقة يجب أن يكون أرقاماً (3-12 خانة)"),
-  document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الوثيقة غير صالح").refine((v) => !Number.isNaN(Date.parse(v)), "تاريخ الوثيقة غير صالح"),
-  document_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "وقت الوثيقة غير صالح (HH:MM)"),
-  checkpoint_name_control: z.string().trim().min(2, "اسم سيطرة الدخول مطلوب").max(100),
-  driver_name: z.string().trim().min(2, "اسم السائق مطلوب").max(100),
-  vehicle_number: z.string().trim().min(1, "رقم العجلة مطلوب").max(20),
-  cargo_typedetails: z.string().trim().min(2, "نوع/تفاصيل الحمولة مطلوبة").max(200),
-  weight_quantity: z.string().trim().min(1, "الوزن/الكمية مطلوبة").max(50),
-  destination_governorate: z.string().trim().min(2, "الوجهة النهائية مطلوبة").max(50),
-  company_name_project: z.string().trim().min(2, "اسم الشركة/المشروع مطلوب").max(200),
-  license_approval_number: z.string().trim().min(1, "رقم الإجازة مطلوب").max(30),
-  license_approval_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "تاريخ الإجازة غير صالح"),
-  item_name: z.string().trim().min(2, "اسم المنتج مطلوب").max(150),
-  item_qty: z.string().trim().min(1, "الكمية والوحدة مطلوبة").max(50),
-});
 
 export const Route = createFileRoute("/_authenticated/documents/new")({
   head: () => ({ meta: [{ title: "إنشاء وثيقة - الكمارك" }] }),
   component: CreateDocument,
 });
 
-type RefCompany = {
-  Number: number;
-  Brand: string;
-  CompanyNameProject: string;
-  GovernorateName: string;
-  CargoDetails?: string;
-  GrantingLicenseApproval?: string;
-  LicenseApprovalDate?: string;
-  LicenseApprovalNumber?: number | string;
-  LicenseTextSpecialization?: string;
-  TypeIndustryProduction?: string;
-  Unit?: string;
-};
+type RefCompany = { Number: number; Brand: string; CompanyNameProject: string; GovernorateName: string };
 const REFERENCE = (companiesJson as RefCompany[]).filter((r) => r.CompanyNameProject);
-
-// CargoDetails / TypeIndustryProduction values sometimes include a header
-// followed by a tab and then the real value. Take the segment after the last tab.
-const cleanField = (v?: string | number | null) => {
-  if (v == null) return "";
-  const s = String(v).trim();
-  const idx = s.lastIndexOf("\t");
-  return (idx >= 0 ? s.slice(idx + 1) : s).trim();
-};
 
 function CreateDocument() {
   const navigate = useNavigate();
@@ -169,22 +113,6 @@ function CreateDocument() {
 
   const selectedRef = refIndex != null ? REFERENCE[refIndex] : null;
 
-  const [savedDrivers, setSavedDrivers] = useState<SavedDriver[]>([]);
-  useEffect(() => { setSavedDrivers(loadDrivers()); }, []);
-
-  const onDriverNameChange = (name: string) => {
-    const match = savedDrivers.find((d) => d.name === name);
-    setForm((f) => match
-      ? { ...f, driver_name: name, vehicle_number: match.vehicle, registration_governorate: match.governorate }
-      : { ...f, driver_name: name });
-  };
-  const persistDriver = () => {
-    if (form.driver_name && form.vehicle_number && form.registration_governorate) {
-      saveDriver({ name: form.driver_name.trim(), vehicle: form.vehicle_number.trim(), governorate: form.registration_governorate });
-      setSavedDrivers(loadDrivers());
-    }
-  };
-
   const pickReference = (idx: number) => {
     const r = REFERENCE[idx];
     setRefIndex(idx);
@@ -195,13 +123,6 @@ function CreateDocument() {
       governorate_name: r.GovernorateName ?? "",
       brand: r.Brand ?? "",
       ref_number: r.Number ? String(r.Number) : "",
-      cargo_typedetails: cleanField(r.CargoDetails),
-      granting_license_approval: cleanField(r.GrantingLicenseApproval),
-      license_approval_number: cleanField(r.LicenseApprovalNumber),
-      license_approval_date: cleanField(r.LicenseApprovalDate),
-      license_text_specialization: cleanField(r.LicenseTextSpecialization),
-      item_name: cleanField(r.TypeIndustryProduction),
-      item_qty: cleanField(r.Unit),
     }));
   };
 
@@ -210,11 +131,6 @@ function CreateDocument() {
       if (!form.company_id) throw new Error("اختر شركة النقل");
       if (!selectedRef) throw new Error("اختر شركة مرجعية لتعبئة هيكل الوثيقة");
 
-      const parsed = docSchema.safeParse(form);
-      if (!parsed.success) {
-        const first = parsed.error.issues[0];
-        throw new Error(first?.message ?? "تحقق من الحقول");
-      }
       const client = clients.find((c) => c.id === form.company_id);
       if (!client) throw new Error("شركة النقل غير موجودة");
 
@@ -231,24 +147,13 @@ function CreateDocument() {
         document_value: parseFloat(form.document_value) || 0,
         trader_id: form.trader_id || null,
         created_by: uid,
-        driver_name: form.driver_name || null,
-        vehicle_number: form.vehicle_number || null,
-        registration_governorate: form.registration_governorate || null,
-        checkpoint_name_control: form.checkpoint_name_control || null,
-        cargo_typedetails: form.cargo_typedetails || null,
-        weight_quantity: form.weight_quantity || null,
-        destination_governorate: form.destination_governorate || null,
-        granting_license_approval: form.granting_license_approval || null,
-        license_approval_number: form.license_approval_number || null,
-        license_approval_date: form.license_approval_date || null,
-        license_text_specialization: form.license_text_specialization || null,
       };
       const { data: doc, error } = await supabase.from("documents").insert(insertPayload).select().single();
       if (error) throw error;
 
-      if (qrUpload) {
-        await supabase.from("documents").update({ qr_code_data: qrUpload }).eq("id", doc.id);
-      }
+      const verifyUrl = `${window.location.origin}/verify/${doc.document_number}`;
+      const qr = await QRCode.toDataURL(verifyUrl, { width: 300, margin: 1 });
+      await supabase.from("documents").update({ qr_code_data: qr }).eq("id", doc.id);
 
       const val = parseFloat(form.document_value);
       if (val > 0) {
@@ -257,8 +162,6 @@ function CreateDocument() {
           trader_id: form.trader_id || null,
           document_id: doc.id,
           document_number: doc.document_number,
-          driver_name: form.driver_name || null,
-          cargo_typedetails: form.cargo_typedetails || null,
           type: "charge",
           amount: val,
           description: `وثيقة شحن - ${client.company_name}`,
@@ -268,7 +171,6 @@ function CreateDocument() {
       return doc;
     },
     onSuccess: (doc) => {
-      persistDriver();
       toast.success(`تم إنشاء الوثيقة ${doc.document_number}`);
       navigate({ to: "/documents/$id", params: { id: doc.id } });
     },
@@ -276,33 +178,15 @@ function CreateDocument() {
   });
 
   const openPreview = () => {
-    if (!selectedRef) { toast.error("اختر شركة مرجعية أولاً"); return; }
-    if (!form.company_id) { toast.error("اختر شركة النقل"); return; }
-    const parsed = docSchema.safeParse(form);
-    if (!parsed.success) {
-      parsed.error.issues.slice(0, 3).forEach((i) => toast.error(i.message));
-      return;
-    }
-    persistDriver();
     const client = clients.find((c) => c.id === form.company_id);
     sessionStorage.setItem("document-preview", JSON.stringify({
       ...form,
       company_name: client?.company_name ?? "",
-      uploaded_image: qrUpload ?? "",
     }));
     window.open("/documents/preview", "_blank");
   };
 
   const refCount = useMemo(() => REFERENCE.length, []);
-
-  const [qrUpload, setQrUpload] = useState<string | null>(null);
-  const onQrFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => setQrUpload(typeof reader.result === "string" ? reader.result : null);
-    reader.readAsDataURL(f);
-  };
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); createMut.mutate(); }} className="p-6 space-y-6 max-w-3xl mx-auto">
@@ -406,21 +290,7 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs">اسم السائق</Label>
-                    <Input
-                      list="saved-drivers-list"
-                      value={form.driver_name}
-                      onChange={(e) => onDriverNameChange(e.target.value)}
-                      placeholder="عبدالله محمد عبدالله — ابدأ بالكتابة أو اضغط للاختيار"
-                      autoComplete="off"
-                    />
-                    <datalist id="saved-drivers-list">
-                      {savedDrivers.map((d) => (
-                        <option key={d.name} value={d.name}>{`${d.vehicle} — ${d.governorate}`}</option>
-                      ))}
-                    </datalist>
-                    {savedDrivers.length > 0 && (
-                      <p className="text-[10px] text-muted-foreground">{savedDrivers.length} سائق محفوظ — يتم تعبئة رقم العجلة والمحافظة تلقائياً عند الاختيار</p>
-                    )}
+                    <Input value={form.driver_name} onChange={(e) => setForm({ ...form, driver_name: e.target.value })} placeholder="عبدالله محمد عبدالله" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">رقم العجلة</Label>
@@ -428,12 +298,7 @@ function CreateDocument() {
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">محافظة تسجيل العجلة</Label>
-                    <Select value={form.registration_governorate || undefined} onValueChange={(v) => setForm({ ...form, registration_governorate: v })}>
-                      <SelectTrigger><SelectValue placeholder="اختر المحافظة" /></SelectTrigger>
-                      <SelectContent>
-                        {IRAQ_GOVERNORATES.map((g) => (<SelectItem key={g} value={g}>{g}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
+                    <Input value={form.registration_governorate} onChange={(e) => setForm({ ...form, registration_governorate: e.target.value })} />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <Label className="text-xs">نوع / تفاصيل الحمولة</Label>
@@ -486,13 +351,6 @@ function CreateDocument() {
                   <div className="space-y-1.5">
                     <Label className="text-xs">الكمية والوحدة</Label>
                     <Input value={form.item_qty} onChange={(e) => setForm({ ...form, item_qty: e.target.value })} placeholder="7 طن" />
-                  </div>
-                  <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-xs flex items-center gap-1"><Upload className="h-3.5 w-3.5" />ارفع صورة (اختياري) — ستظهر في الوثيقة</Label>
-                    <Input type="file" accept="image/*" onChange={onQrFile} />
-                    {qrUpload && (
-                      <img src={qrUpload} alt="صورة مرفوعة" className="h-32 w-auto rounded border object-contain bg-white p-1" />
-                    )}
                   </div>
                 </div>
               </div>

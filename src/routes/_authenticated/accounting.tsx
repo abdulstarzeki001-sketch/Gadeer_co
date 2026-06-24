@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/accounting")({
   head: () => ({ meta: [{ title: "المحاسبة - الكمارك" }] }),
@@ -33,11 +32,11 @@ function AccountingPage() {
   });
 
   return (
-    <div className="p-3 sm:p-6 space-y-4 max-w-6xl mx-auto">
-      <div><h1 className="text-xl sm:text-2xl font-bold">المحاسبة</h1><p className="text-xs sm:text-sm text-muted-foreground">ملخص الأرصدة بالدولار</p></div>
+    <div className="p-6 space-y-4 max-w-6xl mx-auto">
+      <div><h1 className="text-2xl font-bold">المحاسبة</h1><p className="text-sm text-muted-foreground">ملخص الأرصدة بالدولار</p></div>
       <Card>
         <CardHeader><CardTitle className="text-base">الشركات ذات الأرصدة</CardTitle></CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -52,7 +51,7 @@ function AccountingPage() {
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">{r.company_name}</TableCell>
                   <TableCell>{r.governorate}</TableCell>
-                  <TableCell className="text-left font-mono tabular-nums" dir="ltr">{fmtMoney(r.balance)}</TableCell>
+                  <TableCell className="text-left font-mono" dir="ltr">{r.balance.toFixed(2)}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" asChild>
                       <Link to="/accounting/$companyId" params={{ companyId: r.id }}><Eye className="h-4 w-4" /></Link>

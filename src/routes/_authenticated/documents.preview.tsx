@@ -20,7 +20,7 @@ function PreviewPage() {
     const raw = sessionStorage.getItem("document-preview");
     if (!raw) return;
     const form = JSON.parse(raw);
-    const buildDoc = (imageData: string) => {
+    QRCode.toDataURL(`${window.location.origin}/verify/PREVIEW`, { width: 300, margin: 1 }).then((qr) => {
       setDoc({
         document_number: "PREVIEW",
         company_name: form.company_name || "—",
@@ -43,17 +43,12 @@ function PreviewPage() {
         license_text_specialization: form.license_text_specialization,
         brand: form.brand,
         notes: form.notes,
-        qr_code_data: imageData,
+        qr_code_data: qr,
         document_value: form.document_value,
         created_at: new Date().toISOString(),
         items: [],
       });
-    };
-    if (form.uploaded_image) {
-      buildDoc(form.uploaded_image);
-    } else {
-      QRCode.toDataURL(`${window.location.origin}/verify/PREVIEW`, { width: 300, margin: 1 }).then(buildDoc);
-    }
+    });
   }, []);
 
   if (!doc) return <div className="p-8 text-center">جاري تحميل المعاينة...</div>;
