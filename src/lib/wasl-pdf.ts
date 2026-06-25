@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { PDF_ASSETS } from "./wasl-assets";
 
 const FONT_STACK = "'Cairo','Segoe UI','Tahoma',Arial,sans-serif";
