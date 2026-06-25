@@ -1,0 +1,9 @@
+name = "tempdoc-craft"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-25"
+compatibility_flags = ["nodejs_compat"]
+
+# Do not commit secrets here.
+# Add these in Cloudflare Pages > Settings > Environment variables:
+# VITE_SUPABASE_URL
+# VITE_SUPABASE_PUBLISHABLE_KEY
