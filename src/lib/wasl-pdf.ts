@@ -32,7 +32,7 @@ function esc(v: unknown): string {
     .replace(/>/g, "&gt;");
 }
 
-function buildHtml(form: WaslForm, qrDataUrl: string): HTMLDivElement {
+function buildHtml(form: WaslForm, qrDataUrl: string): string {
   const A = PDF_ASSETS;
   const rows: [string, string][] = [
     ["اسم سيطرة الدخول", form.entryPoint],
@@ -69,15 +69,10 @@ function buildHtml(form: WaslForm, qrDataUrl: string): HTMLDivElement {
     ? `<img class="barcode-box" src="${qrDataUrl}" alt="QR" />`
     : `<div class="barcode-box"></div>`;
 
-  const el = document.createElement("div");
-  el.dir = "rtl";
-  el.style.position = "fixed";
-  el.style.left = "-10000px";
-  el.style.top = "0";
-  el.style.background = "#ffffff";
-
-  el.innerHTML =
-    `<div class="a4-page" dir="rtl">` +
+  return (
+    `<!doctype html><html dir="rtl"><head><meta charset="utf-8"><style>` +
+    `html,body{margin:0;padding:0;background:#fff;color:#222;font-family:${FONT_STACK};}` +
+    `</style></head><body><div class="a4-page" dir="rtl">` +
     `<style>` +
     `@font-face{font-family:'Cairo';font-style:normal;font-weight:400;font-display:block;src:url(${A.CAIRO_REGULAR_B64}) format('truetype');}` +
     `@font-face{font-family:'Cairo';font-style:normal;font-weight:700;font-display:block;src:url(${A.CAIRO_BOLD_B64}) format('truetype');}` +
@@ -146,19 +141,30 @@ function buildHtml(form: WaslForm, qrDataUrl: string): HTMLDivElement {
     `<div class="footer-center"><div>مكتب رئيس الوزراء / المركز الوطني للتحول الرقمي</div><div>بغداد – كرادة مريم</div><div>المركز الوطني للتحول الرقمي @2025</div></div>` +
     `<div class="footer-right"><div>Prime Minister's Office</div><div>National Center for Digital Transformation</div><div>Tel: 5599</div></div>` +
     `</footer>` +
-    `</div>`;
-
-  return el;
+    `</div></body></html>`
+  );
 }
 
 export async function generateDocumentPdf(
   form: WaslForm,
   qrDataUrl: string,
 ): Promise<Blob> {
-  const wrapper = buildHtml(form, qrDataUrl);
-  document.body.appendChild(wrapper);
+  const html = buildHtml(form, qrDataUrl);
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.left = "-10000px";
+  iframe.style.top = "0";
+  iframe.style.width = "230mm";
+  iframe.style.height = "320mm";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
   try {
-    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+    const doc = iframe.contentDocument!;
+    doc.open();
+    doc.write(html);
+    doc.close();
+    const win = iframe.contentWindow!;
+    const fonts = (doc as Document & { fonts?: FontFaceSet }).fonts;
     if (fonts) {
       try {
         await Promise.all([
@@ -170,14 +176,16 @@ export async function generateDocumentPdf(
       }
       if (fonts.ready) await fonts.ready;
     }
-    await new Promise((r) => setTimeout(r, 80));
+    await new Promise((r) => setTimeout(r, 120));
 
-    const target = wrapper.querySelector(".a4-page") as HTMLElement;
+    const target = doc.querySelector(".a4-page") as HTMLElement;
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
       backgroundColor: "#ffffff",
       logging: false,
+      windowWidth: target.scrollWidth,
+      windowHeight: target.scrollHeight,
     });
 
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -186,9 +194,10 @@ export async function generateDocumentPdf(
     const imgH = (canvas.height * pageW) / canvas.width;
     const imgData = canvas.toDataURL("image/jpeg", 0.95);
     pdf.addImage(imgData, "JPEG", 0, 0, pageW, Math.min(imgH, pageH));
+    void win;
     return pdf.output("blob");
   } finally {
-    document.body.removeChild(wrapper);
+    document.body.removeChild(iframe);
   }
 }
 
