@@ -63,6 +63,52 @@
   }
 }
 
+/* Emoji fonts for icon glyphs */
+.card-icon, .qs .icon, .hero .badge {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Cairo", system-ui, sans-serif;
+}
+
+/* Hide mobile hamburger on desktop */
+@media (min-width: 769px) {
+  header .menu-toggle, header .mobile-menu-toggle { display: none !important; }
+}
+
+/* Cover input types the theme misses (default, time, file, tel, etc.) */
+input:not([type]),
+input[type="time"],
+input[type="tel"],
+input[type="search"],
+input[type="url"] {
+  width: 100%;
+  padding: 13px 14px !important;
+  border: 1.5px solid var(--gh-line) !important;
+  border-radius: 12px !important;
+  background: var(--gh-soft) !important;
+  font-family: inherit !important;
+  font-size: 0.96rem !important;
+  font-weight: 500 !important;
+  color: var(--gh-ink) !important;
+  outline: none;
+  margin: 6px 0 !important;
+  transition: 0.25s;
+}
+input:not([type]):focus,
+input[type="time"]:focus {
+  border-color: var(--gh-gold) !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(201,161,74,0.13) !important;
+}
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px dashed var(--gh-line);
+  border-radius: 12px;
+  background: var(--gh-soft);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
 /* =====================================================
    GHADEER • PREMIUM THEME
    نظام التصميم الفاخر الموحد لجميع الصفحات
