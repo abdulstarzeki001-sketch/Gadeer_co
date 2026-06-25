@@ -7,12 +7,13 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import ghadeerLogo from "../assets/ghadeer-logo.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -135,9 +136,61 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteShell>
+        <Outlet />
+      </SiteShell>
       <Toaster richColors position="top-center" dir="rtl" />
     </QueryClientProvider>
+  );
+}
+
+function SiteShell({ children }: { children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = () => setMenuOpen(false);
+  return (
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Link to="/" className="brand" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+          <img src={ghadeerLogo.url} alt="شعار الغدير" />
+          <div className="brand-name" style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+            <span>شركة الغدير</span>
+            <small>GHADEER LOGISTICS</small>
+          </div>
+        </Link>
+        <nav style={{ position: "relative" }}>
+          <ul style={{ listStyle: "none", display: "flex", margin: 0, padding: 0 }}>
+            <li><Link to="/">الرئيسية</Link></li>
+            <li><Link to="/wasl">اعمل وصل</Link></li>
+          </ul>
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
+            aria-label="القائمة"
+          >☰</button>
+          {menuOpen && (
+            <div className="mobile-menu open" onClick={close}>
+              <Link to="/" onClick={close} style={{ display: "block" }}>🏠 الرئيسية</Link>
+              <Link to="/wasl" onClick={close} style={{ display: "block" }}>📄 اعمل وصل</Link>
+            </div>
+          )}
+        </nav>
+      </header>
+      <main style={{ flex: 1 }}>{children}</main>
+      <footer>
+        📍 زاخو – إبراهيم الخليل &nbsp;•&nbsp; 📞 07504084359 &nbsp;•&nbsp; 📧 starzeki001@gmail.com
+        <br />© 2026 شركة الغدير للنقل والتخليص الكمركي – جميع الحقوق محفوظة
+      </footer>
+      <style>{`
+        nav ul li { list-style: none; }
+        .menu-toggle { display: none; }
+        .mobile-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; min-width: 220px; padding: 8px; z-index: 1000; }
+        .mobile-menu.open { display: block; }
+        @media (max-width: 768px) {
+          nav > ul { display: none !important; }
+          .menu-toggle { display: inline-flex; }
+        }
+      `}</style>
+    </div>
   );
 }
