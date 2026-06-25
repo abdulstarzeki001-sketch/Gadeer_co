@@ -1,349 +1,117 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import companiesJson from "@/data/companies.json";
-import {
-  generateDocumentPdf,
-  fileToDataUrl,
-  downloadBlob,
-  type WaslForm,
-} from "@/lib/wasl-pdf";
-
-type RefCompany = {
-  Number: number;
-  Brand: string;
-  CompanyNameProject: string;
-  GovernorateName: string;
-  GrantingLicenseApproval?: string;
-  LicenseApprovalDate?: string;
-  LicenseApprovalNumber?: number | string;
-  LicenseTextSpecialization?: string;
-  TypeIndustryProduction?: string;
-  Unit?: string;
-};
-
-const COMPANIES = (companiesJson as RefCompany[]).filter(
-  (c) => c.CompanyNameProject,
-);
-
-const PROVINCES = [
-  "بغداد","نينوى","البصرة","ذي قار","الأنبار","النجف","كربلاء","بابل",
-  "ديالى","ميسان","واسط","صلاح الدين","أربيل","دهوك","السليمانية","كركوك",
-  "المثنى","القادسية",
-];
-const ENTRY_POINTS = [
-  "سيطرة دارمان","سيطرة جيمن","سيطرة السد","سيطرة باوه محمود",
-];
-
-function normalizeDate(v: unknown): string {
-  if (v == null) return "";
-  const s = String(v).trim();
-  if (!s || s.toLowerCase() === "none") return "";
-  const parts = s.split(/[-/]/).map((p) => p.trim());
-  if (parts.length !== 3) return "";
-  let y: string, m: string, d: string;
-  if (parts[0].length === 4) { y = parts[0]; m = parts[1]; d = parts[2]; }
-  else if (parts[2].length === 4) { d = parts[0]; m = parts[1]; y = parts[2]; }
-  else return "";
-  const yi = +y, mi = +m, di = +d;
-  if (!yi || !mi || !di) return "";
-  if (yi < 1900 || yi > 2100 || mi < 1 || mi > 12 || di < 1 || di > 31) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${yi}-${pad(mi)}-${pad(di)}`;
-}
-
-const EMPTY: WaslForm = {
-  docNumber: "", docDate: "", docTime: "",
-  entryPoint: "", driverName: "", vehicleNumber: "", vehicleProvince: "",
-  weight: "", destination: "",
-  companyName: "", provinceName: "", trademark: "",
-  cargoType: "", licenseAuthority: "", licenseNumber: "",
-  licenseDate: "", licenseDescription: "", licensedProducts: "",
-};
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "إنشاء الوثيقة المؤقتة - منصة المنتج المحلي" },
-      { name: "description", content: "نموذج إصدار الوثيقة المؤقتة لبيانات الحمولة وتحميلها كملف PDF." },
+      { title: "الرئيسية | شركة الغدير للنقل والتخليص الكمركي" },
+      { name: "description", content: "بوابة شركة الغدير لإصدار الوثائق المؤقتة وإدارة العمليات." },
     ],
   }),
-  component: WaslPage,
+  component: HomePage,
 });
 
-function WaslPage() {
-  const [form, setForm] = useState<WaslForm>(EMPTY);
-  const [qrFile, setQrFile] = useState<File | null>(null);
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [busy, setBusy] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  const set = <K extends keyof WaslForm>(k: K, v: WaslForm[K]) =>
-    setForm((p) => ({ ...p, [k]: v }));
-
-  const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    const out: RefCompany[] = [];
-    for (let i = 0; i < COMPANIES.length && out.length < 20; i++) {
-      const c = COMPANIES[i];
-      const num = String(c.Number ?? "");
-      const name = (c.CompanyNameProject || "").toLowerCase();
-      const brand = (c.Brand || "").toLowerCase();
-      const lic = String(c.LicenseApprovalNumber ?? "");
-      if (num.includes(q) || name.includes(q) || brand.includes(q) || lic.includes(q)) {
-        out.push(c);
-      }
-    }
-    return out;
-  }, [query]);
-
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, []);
-
-  const pick = (c: RefCompany) => {
-    setForm((p) => ({
-      ...p,
-      companyName: c.CompanyNameProject || "",
-      trademark: c.Brand || "",
-      provinceName: c.GovernorateName || "",
-      licenseNumber: c.LicenseApprovalNumber != null ? String(c.LicenseApprovalNumber) : "",
-      licenseAuthority: c.GrantingLicenseApproval || "",
-      licenseDate: normalizeDate(c.LicenseApprovalDate),
-      licenseDescription: c.LicenseTextSpecialization || "",
-      cargoType: c.LicenseTextSpecialization || "",
-      licensedProducts: c.TypeIndustryProduction || "",
-    }));
-    setQuery(`${c.Number} - ${c.CompanyNameProject}`);
-    setOpen(false);
-  };
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!qrFile) {
-      setStatus({ msg: "لازم ترفع صورة QR Code", ok: false });
-      return;
-    }
-    setBusy(true);
-    setStatus({ msg: "جاري إنشاء PDF...", ok: true });
-    try {
-      const qrDataUrl = await fileToDataUrl(qrFile);
-      const blob = await generateDocumentPdf(form, qrDataUrl);
-      const filename = `وثيقة-${form.docNumber || Date.now()}.pdf`;
-      downloadBlob(blob, filename);
-      setStatus({ msg: "تم إنشاء الوثيقة بنجاح ✓", ok: true });
-    } catch (err) {
-      console.error(err);
-      setStatus({ msg: "فشل إنشاء الوثيقة. حاول مرة أخرى.", ok: false });
-    } finally {
-      setBusy(false);
-    }
-  };
-
+function HomePage() {
   return (
-    <div style={{
-      minHeight: "100vh", padding: "20px 0", background: "#f4f6f8",
-      fontFamily: "'Cairo', Tahoma, Arial, sans-serif", direction: "rtl",
-    }}>
-      <div style={{
-        maxWidth: 860, margin: "0 auto", background: "#fff",
-        borderRadius: 12, padding: 24, boxShadow: "0 6px 24px rgba(0,0,0,.08)",
-      }}>
-        <div style={{ textAlign: "center", marginBottom: 16 }}>
-          <h1 style={{ margin: "8px 0 2px", fontSize: 20 }}>
-            جمهورية العراق - الهيئة العامة للكمارك
-          </h1>
-          <h2 style={{ margin: 0, fontSize: 14, color: "#444", fontWeight: 500 }}>
-            منصة المنتج المحلي - إصدار الوثيقة المؤقتة
-          </h2>
+    <div style={{ padding: "1.4rem 0 3rem" }}>
+      <section className="hero" style={{ textAlign: "center", margin: "30px auto 24px", maxWidth: 720, padding: "0 16px" }}>
+        <div
+          className="badge"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            background: "rgba(201,161,74,0.12)",
+            border: "1px solid rgba(201,161,74,0.3)",
+            color: "var(--gh-gold-dark)",
+            padding: "6px 14px",
+            borderRadius: 99,
+            fontSize: "0.78rem",
+            fontWeight: 700,
+            letterSpacing: "0.5px",
+            marginBottom: 14,
+          }}
+        >
+          <span className="dot" style={{
+            width: 7, height: 7, borderRadius: "50%",
+            background: "#16a34a", boxShadow: "0 0 8px #16a34a",
+          }} />
+          منصة إدارة العمليات والحسابات
         </div>
+        <h1
+          style={{
+            fontSize: "2rem",
+            margin: "0 0 10px",
+            background:
+              "linear-gradient(135deg, var(--gh-navy) 0%, var(--gh-navy-2) 70%, var(--gh-gold-dark) 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.8px",
+          }}
+        >
+          لوحة التحكم الرئيسية
+        </h1>
+        <p style={{ color: "var(--gh-muted)", margin: 0, fontSize: "1rem", lineHeight: 1.7 }}>
+          أهلاً بك في نظام شركة الغدير. اختر القسم للانتقال إليه.
+        </p>
+      </section>
 
-        <form onSubmit={onSubmit}>
-          <Section title="معلومات الوثيقة">
-            <Field label="رقم الوثيقة">
-              <input required value={form.docNumber} onChange={(e) => set("docNumber", e.target.value)} />
-            </Field>
-            <Field label="تاريخ إنشاء الوثيقة">
-              <input type="date" required value={form.docDate} onChange={(e) => set("docDate", e.target.value)} />
-            </Field>
-            <Field label="التوقيت">
-              <input type="time" required value={form.docTime} onChange={(e) => set("docTime", e.target.value)} />
-            </Field>
-          </Section>
-
-          <Section title="المعلومات الشخصية">
-            <Field label="نقطة السيطرة">
-              <select required value={form.entryPoint} onChange={(e) => set("entryPoint", e.target.value)}>
-                <option value="">-- اختر --</option>
-                {ENTRY_POINTS.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </Field>
-            <Field label="اسم السائق">
-              <input required value={form.driverName} onChange={(e) => set("driverName", e.target.value)} />
-            </Field>
-            <Field label="رقم العجلة">
-              <input required value={form.vehicleNumber} onChange={(e) => set("vehicleNumber", e.target.value)} />
-            </Field>
-            <Field label="محافظة تسجيل العجلة">
-              <ProvinceSelect value={form.vehicleProvince} onChange={(v) => set("vehicleProvince", v)} />
-            </Field>
-            <Field label="الوزن / الكمية (طن)">
-              <input required value={form.weight} onChange={(e) => set("weight", e.target.value)} />
-            </Field>
-            <Field label="محافظة الوجهة النهائية">
-              <ProvinceSelect value={form.destination} onChange={(v) => set("destination", v)} />
-            </Field>
-
-            <div ref={wrapRef} style={{ position: "relative", marginBottom: 10 }}>
-              <label style={{ fontSize: 13, color: "#374151", display: "block", marginBottom: 5 }}>
-                بحث عن الشركة (بالرقم أو الاسم أو العلامة التجارية)
-              </label>
-              <input
-                value={query}
-                onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-                onFocus={() => setOpen(true)}
-                placeholder={`ابحث ضمن ${COMPANIES.length} شركة...`}
-                style={inputStyle}
-              />
-              {open && query.trim() && (
-                <div style={resultsStyle}>
-                  {matches.length === 0 ? (
-                    <div style={{ padding: "9px 12px", fontSize: 13, color: "#888" }}>
-                      لا توجد نتائج
-                    </div>
-                  ) : matches.map((c) => (
-                    <div key={c.Number} onClick={() => pick(c)} style={rowStyle}
-                         onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f4f6")}
-                         onMouseLeave={(e) => (e.currentTarget.style.background = "")}>
-                      <span style={{ color: "#990707", fontWeight: 700, marginLeft: 8 }}>#{c.Number}</span>
-                      <span style={{ fontWeight: 600 }}>{c.CompanyNameProject}</span>
-                      {c.Brand && <span style={{ color: "#888", marginRight: 8 }}>— {c.Brand}</span>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Field label="اسم الشركة / المشروع">
-              <input required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} />
-            </Field>
-            <Field label="نوع / تفاصيل الحمولة">
-              <input required value={form.cargoType} onChange={(e) => set("cargoType", e.target.value)} />
-            </Field>
-            <Field label="اسم المحافظة">
-              <ProvinceSelect value={form.provinceName} onChange={(v) => set("provinceName", v)} />
-            </Field>
-          </Section>
-
-          <Section title="معلومات الإجازة والترخيص">
-            <Field label="الجهة المانحة للإجازة / الموافقة">
-              <input required value={form.licenseAuthority} onChange={(e) => set("licenseAuthority", e.target.value)} />
-            </Field>
-            <Field label="رقم الإجازة / الموافقة">
-              <input required value={form.licenseNumber} onChange={(e) => set("licenseNumber", e.target.value)} />
-            </Field>
-            <Field label="تاريخ الإجازة / الموافقة">
-              <input type="date" required value={form.licenseDate} onChange={(e) => set("licenseDate", e.target.value)} />
-            </Field>
-            <Field label="منطوق الإجازة / الاختصاص">
-              <input required value={form.licenseDescription} onChange={(e) => set("licenseDescription", e.target.value)} />
-            </Field>
-            <Field label="العلامة التجارية">
-              <textarea required rows={3} value={form.trademark} onChange={(e) => set("trademark", e.target.value)} />
-            </Field>
-            <Field label="المواد / المنتجات المرخصة">
-              <input required value={form.licensedProducts} onChange={(e) => set("licensedProducts", e.target.value)} />
-            </Field>
-          </Section>
-
-          <Section title="رمز الاستجابة السريعة (QR Code)">
-            <Field label="قم برفع صورة QR Code (مطلوب)">
-              <input type="file" accept="image/*" required
-                     onChange={(e) => setQrFile(e.target.files?.[0] ?? null)} />
-            </Field>
-          </Section>
-
-          {status && (
-            <div style={{
-              margin: "16px 0", padding: "12px 16px", borderRadius: 8, fontSize: 14,
-              border: `1px solid ${status.ok ? "#2e7d32" : "#c62828"}`,
-              background: status.ok ? "#e8f5e9" : "#ffebee",
-              color: status.ok ? "#155724" : "#721c24",
-            }}>{status.msg}</div>
-          )}
-
-          <button type="submit" disabled={busy} style={{
-            marginTop: 16, padding: "12px 24px", border: "none", borderRadius: 10,
-            background: busy ? "#ccc" : "#990707", color: "#fff",
-            fontSize: 15, cursor: busy ? "not-allowed" : "pointer",
-            width: "100%", fontFamily: "inherit",
-          }}>
-            {busy ? "جاري الإنشاء..." : "إنشاء الوثيقة PDF"}
-          </button>
-        </form>
+      <div className="section-title" style={{
+        maxWidth: 1100, margin: "0 auto 14px", padding: "0 16px",
+        display: "flex", alignItems: "center", gap: 12,
+        color: "var(--gh-navy)", fontWeight: 800, fontSize: "1.05rem",
+      }}>
+        <span style={{
+          width: 5, height: 22,
+          background: "linear-gradient(180deg, var(--gh-gold-light), var(--gh-gold-dark))",
+          borderRadius: 4,
+        }} />
+        الوصول السريع
+        <small style={{ color: "var(--gh-muted)", fontWeight: 500, fontSize: "0.82rem", marginRight: "auto" }}>
+          اختر القسم للانتقال
+        </small>
       </div>
 
-      <style>{`
-        section input, section select, section textarea {
-          padding: 9px 8px; border: 1px solid #d1d5db; border-radius: 8px;
-          font-size: 14px; direction: rtl; font-family: inherit; width: 100%;
-          background: #fff;
-        }
-        section textarea { resize: vertical; }
-      `}</style>
+      <div className="dashboard-grid">
+        <DashCard icon="📄" title="اعمل وصل" desc="إصدار الوثيقة المؤقتة وطباعتها PDF" to="/wasl" />
+        <DashCardSoon icon="👥" title="العملاء" desc="إدارة وإضافة عملاء جدد" />
+        <DashCardSoon icon="🧾" title="الوصولات" desc="عرض وتحرير وصولات العملاء" />
+        <DashCardSoon icon="📊" title="كشف الحساب" desc="مراجعة العمليات المالية والرصيد" />
+        <DashCardSoon icon="💰" title="المصروفات" desc="إضافة وتتبع مصروفات الشركة" />
+        <DashCardSoon icon="📈" title="التقارير" desc="ملخص شامل لجميع العملاء" />
+      </div>
     </div>
   );
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "9px 8px", border: "1px solid #d1d5db",
-  borderRadius: 8, fontSize: 14, direction: "rtl", fontFamily: "inherit",
-};
-const resultsStyle: React.CSSProperties = {
-  position: "absolute", top: "100%", right: 0, left: 0, zIndex: 1000,
-  background: "#fff", border: "1px solid #d1d5db", borderRadius: 8,
-  maxHeight: 280, overflowY: "auto", marginTop: 4,
-  boxShadow: "0 6px 18px rgba(0,0,0,.12)",
-};
-const rowStyle: React.CSSProperties = {
-  padding: "9px 12px", cursor: "pointer",
-  borderBottom: "1px solid #f0f0f0", fontSize: 13,
-};
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function DashCard({ icon, title, desc, to }: { icon: string; title: string; desc: string; to: string }) {
   return (
-    <section style={{
-      border: "1px solid #e5e7eb", borderRadius: 10,
-      padding: 16, marginTop: 14,
-    }}>
-      <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#111827" }}>{title}</h3>
-      {children}
-    </section>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 10 }}>
-      <label style={{ fontSize: 13, color: "#374151" }}>{label}</label>
-      {children}
+    <div className="dashboard-card">
+      <div className="card-icon" style={cardIconStyle}>{icon}</div>
+      <h3>{title}</h3>
+      <p>{desc}</p>
+      <Link to={to}>فتح ←</Link>
     </div>
   );
 }
 
-function ProvinceSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function DashCardSoon({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <select required value={value} onChange={(e) => onChange(e.target.value)}>
-      <option value="">-- اختر --</option>
-      {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
-    </select>
+    <div className="dashboard-card" style={{ opacity: 0.6 }}>
+      <div className="card-icon" style={cardIconStyle}>{icon}</div>
+      <h3>{title}</h3>
+      <p>{desc}</p>
+      <a aria-disabled style={{ pointerEvents: "none", filter: "grayscale(0.5)" }}>قريباً</a>
+    </div>
   );
 }
+
+const cardIconStyle: React.CSSProperties = {
+  width: 56, height: 56, borderRadius: 16, margin: "0 auto 6px",
+  display: "flex", alignItems: "center", justifyContent: "center",
+  fontSize: "1.6rem",
+  background: "linear-gradient(135deg, rgba(201,161,74,0.15), rgba(201,161,74,0.05))",
+  border: "1px solid rgba(201,161,74,0.25)",
+  color: "var(--gh-gold-dark)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
+};

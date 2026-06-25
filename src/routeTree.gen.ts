@@ -9,8 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WaslRouteImport } from './routes/wasl'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WaslRoute = WaslRouteImport.update({
+  id: '/wasl',
+  path: '/wasl',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +25,39 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/wasl': typeof WaslRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/wasl': typeof WaslRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/wasl': typeof WaslRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/wasl'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/wasl'
+  id: '__root__' | '/' | '/wasl'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  WaslRoute: typeof WaslRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wasl': {
+      id: '/wasl'
+      path: '/wasl'
+      fullPath: '/wasl'
+      preLoaderRoute: typeof WaslRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +70,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  WaslRoute: WaslRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
