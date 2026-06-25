@@ -10,32 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaslRouteImport } from './routes/wasl'
+import { Route as IndexRouteImport } from './routes/index'
 
 const WaslRoute = WaslRouteImport.update({
   id: '/wasl',
   path: '/wasl',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/wasl': typeof WaslRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/wasl': typeof WaslRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/wasl': typeof WaslRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/wasl'
+  fullPaths: '/' | '/wasl'
   fileRoutesByTo: FileRoutesByTo
-  to: '/wasl'
-  id: '__root__' | '/wasl'
+  to: '/' | '/wasl'
+  id: '__root__' | '/' | '/wasl'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   WaslRoute: typeof WaslRoute
 }
 
@@ -48,10 +58,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WaslRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   WaslRoute: WaslRoute,
 }
 export const routeTree = rootRouteImport
