@@ -47,10 +47,26 @@ function CreateDocument() {
     const q = refQuery.trim().toLowerCase();
     if (!q) return REFERENCE;
     const tokens = q.split(/\s+/).filter(Boolean);
-    return REFERENCE.filter((r) => {
+    const matched = REFERENCE.filter((r) => {
       const hay = `${r.CompanyNameProject ?? ""} ${r.Brand ?? ""} ${r.GovernorateName ?? ""}`.toLowerCase();
       return tokens.every((t) => hay.includes(t));
     });
+    // ترتيب: تطابق Brand أولاً، ثم CompanyNameProject، ثم البقية.
+    // داخل كل فئة: يبدأ بالنص > يحتوي النص كاملاً > يحتوي أيّ توكن.
+    const score = (r: RefCompany) => {
+      const brand = (r.Brand ?? "").toLowerCase();
+      const name = (r.CompanyNameProject ?? "").toLowerCase();
+      if (brand === q) return 0;
+      if (name === q) return 1;
+      if (brand.startsWith(q)) return 2;
+      if (name.startsWith(q)) return 3;
+      if (brand.includes(q)) return 4;
+      if (name.includes(q)) return 5;
+      if (tokens.every((t) => brand.includes(t))) return 6;
+      if (tokens.every((t) => name.includes(t))) return 7;
+      return 8;
+    };
+    return [...matched].sort((a, b) => score(a) - score(b));
   }, [refQuery]);
 
   // reset pagination on query change or reopen
