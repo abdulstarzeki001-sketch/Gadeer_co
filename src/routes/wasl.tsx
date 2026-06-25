@@ -149,22 +149,12 @@ function WaslPage() {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh", padding: "20px 0", background: "#f4f6f8",
-      fontFamily: "'Cairo', Tahoma, Arial, sans-serif", direction: "rtl",
-    }}>
-      <div style={{
-        maxWidth: 860, margin: "0 auto", background: "#fff",
-        borderRadius: 12, padding: 24, boxShadow: "0 6px 24px rgba(0,0,0,.08)",
-      }}>
-        <div style={{ textAlign: "center", marginBottom: 16 }}>
-          <h1 style={{ margin: "8px 0 2px", fontSize: 20 }}>
-            جمهورية العراق - الهيئة العامة للكمارك
-          </h1>
-          <h2 style={{ margin: 0, fontSize: 14, color: "#444", fontWeight: 500 }}>
-            منصة المنتج المحلي - إصدار الوثيقة المؤقتة
-          </h2>
-        </div>
+    <div style={{ padding: "1.6rem 1rem 3rem", maxWidth: 880, margin: "0 auto" }}>
+      <h1>إصدار الوثيقة المؤقتة</h1>
+      <p style={{ textAlign: "center", color: "var(--gh-muted)", marginTop: "-1rem", marginBottom: "1.6rem" }}>
+        جمهورية العراق – الهيئة العامة للكمارك • منصة المنتج المحلي
+      </p>
+      <div className="add-form">
 
         <form onSubmit={onSubmit}>
           <Section title="معلومات الوثيقة">
@@ -290,15 +280,6 @@ function WaslPage() {
           </button>
         </form>
       </div>
-
-      <style>{`
-        section input, section select, section textarea {
-          padding: 9px 8px; border: 1px solid #d1d5db; border-radius: 8px;
-          font-size: 14px; direction: rtl; font-family: inherit; width: 100%;
-          background: #fff;
-        }
-        section textarea { resize: vertical; }
-      `}</style>
     </div>
   );
 }
