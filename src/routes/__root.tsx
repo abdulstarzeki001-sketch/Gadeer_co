@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import ghadeerLogo from "../assets/ghadeer-logo.png.asset.json";
+const ghadeerLogo = { url: "/ghadeer-logo.png" };
 
 function NotFoundComponent() {
   return (
