@@ -60,7 +60,7 @@ const EMPTY: WaslForm = {
   licenseDate: "", licenseDescription: "", licensedProducts: "",
 };
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/wasl")({
   head: () => ({
     meta: [
       { title: "إنشاء الوثيقة المؤقتة - منصة المنتج المحلي" },
