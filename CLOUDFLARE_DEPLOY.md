@@ -11,10 +11,12 @@ Framework preset: Vite
 Build command: npm run build
 Build output directory: dist
 Root directory: /
-Node version: 20 or newer
+Node version: 22
 ```
 
-The repository includes `wrangler.toml` with:
+The repository includes `.node-version` so Cloudflare can use Node 22.
+
+The repository also includes `wrangler.toml` with:
 
 ```toml
 pages_build_output_dir = "./dist"
