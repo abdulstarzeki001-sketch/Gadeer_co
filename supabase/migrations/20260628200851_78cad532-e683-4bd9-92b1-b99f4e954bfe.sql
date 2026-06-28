@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "auth read companies" ON public.companies;
+CREATE POLICY "admin read companies" ON public.companies FOR SELECT TO authenticated USING (private.has_role(auth.uid(), 'admin'::app_role));
