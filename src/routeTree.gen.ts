@@ -9,55 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WaslRouteImport } from './routes/wasl'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWaslRouteImport } from './routes/_authenticated/wasl'
 
-const WaslRoute = WaslRouteImport.update({
-  id: '/wasl',
-  path: '/wasl',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWaslRoute = AuthenticatedWaslRouteImport.update({
+  id: '/_authenticated/wasl',
+  path: '/wasl',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/wasl': typeof WaslRoute
+  '/wasl': typeof AuthenticatedWaslRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/wasl': typeof WaslRoute
+  '/wasl': typeof AuthenticatedWaslRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/wasl': typeof WaslRoute
+  '/_authenticated/wasl': typeof AuthenticatedWaslRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/wasl'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/wasl'
-  id: '__root__' | '/' | '/wasl'
+  id: '__root__' | '/' | '/_authenticated/wasl'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  WaslRoute: typeof WaslRoute
+  AuthenticatedWaslRoute: typeof AuthenticatedWaslRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wasl': {
-      id: '/wasl'
-      path: '/wasl'
-      fullPath: '/wasl'
-      preLoaderRoute: typeof WaslRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/wasl': {
+      id: '/_authenticated/wasl'
+      path: '/wasl'
+      fullPath: '/wasl'
+      preLoaderRoute: typeof AuthenticatedWaslRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  WaslRoute: WaslRoute,
+  AuthenticatedWaslRoute: AuthenticatedWaslRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
