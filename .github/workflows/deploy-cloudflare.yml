@@ -18,11 +18,15 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-      - name: Build
-        run: npm run build
+      - name: Install dependencies (bun)
+        run: bun install --frozen-lockfile
+
+      - name: Build (bun)
+        run: bun run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
