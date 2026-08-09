@@ -38,6 +38,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
         run: |
+          # ensure server code uses the non-reserved binding name SITE_ASSETS
+          if grep -R "env.ASSETS" .output/server >/dev/null 2>&1; then
+            find .output/server -type f -name '*.mjs' -exec sed -i 's/env.ASSETS/env.SITE_ASSETS/g' {} + || true
+          fi
           npx --yes wrangler@^3 pages deploy .output/public \
             --project-name="tempdoc-craft" \
             --branch=main \
