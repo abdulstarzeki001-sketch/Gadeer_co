@@ -39,6 +39,6 @@ jobs:
           CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
         run: |
           npx --yes wrangler@^3 pages deploy .output/public \
-            --project-name="${{ secrets.CLOUDFLARE_PROJECT_NAME }}" \
+            --project-name="tempdoc-craft" \
             --branch=main \
             --commit-message="ci deploy"
