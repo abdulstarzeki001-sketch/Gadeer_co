@@ -74,11 +74,11 @@ function HomePage() {
 
       <div className="dashboard-grid">
         <DashCard icon="📄" title="اعمل وصل" desc="إصدار الوثيقة المؤقتة وطباعتها PDF" to="/wasl" />
-        <DashCardSoon icon="👥" title="العملاء" desc="إدارة وإضافة عملاء جدد" />
-        <DashCardSoon icon="🧾" title="الوصولات" desc="عرض وتحرير وصولات العملاء" />
-        <DashCardSoon icon="📊" title="كشف الحساب" desc="مراجعة العمليات المالية والرصيد" />
-        <DashCardSoon icon="💰" title="المصروفات" desc="إضافة وتتبع مصروفات الشركة" />
-        <DashCardSoon icon="📈" title="التقارير" desc="ملخص شامل لجميع العملاء" />
+        <DashCard icon="👥" title="العملاء" desc="إدارة وإضافة عملاء جدد" to="/customers" />
+        <DashCard icon="🧾" title="الوصولات" desc="عرض وتحرير وصولات العملاء" to="/receipts" />
+        <DashCard icon="📊" title="كشف الحساب" desc="مراجعة العمليات المالية والرصيد" to="/accounts" />
+        <DashCard icon="💰" title="المصروفات" desc="إضافة وتتبع مصروفات الشركة" to="/expenses" />
+        <DashCard icon="📈" title="التقارير" desc="ملخص شامل لجميع العملاء" to="/reports" />
       </div>
     </div>
   );
@@ -91,17 +91,6 @@ function DashCard({ icon, title, desc, to }: { icon: string; title: string; desc
       <h3>{title}</h3>
       <p>{desc}</p>
       <Link to={to}>فتح ←</Link>
-    </div>
-  );
-}
-
-function DashCardSoon({ icon, title, desc }: { icon: string; title: string; desc: string }) {
-  return (
-    <div className="dashboard-card" style={{ opacity: 0.6 }}>
-      <div className="card-icon" style={cardIconStyle}>{icon}</div>
-      <h3>{title}</h3>
-      <p>{desc}</p>
-      <a aria-disabled style={{ pointerEvents: "none", filter: "grayscale(0.5)" }}>قريباً</a>
     </div>
   );
 }
