@@ -42,6 +42,8 @@ jobs:
           if grep -R "env.ASSETS" .output/server >/dev/null 2>&1; then
             find .output/server -type f -name '*.mjs' -exec sed -i 's/env.ASSETS/env.SITE_ASSETS/g' {} + || true
           fi
+          # remove server wrangler config to force Pages static deploy (avoid SSR worker creation)
+          rm -f .output/server/wrangler.json || true
           npx --yes wrangler@^3 pages deploy .output/public \
             --project-name="tempdoc-craft" \
             --branch=main \
