@@ -44,6 +44,8 @@ jobs:
           fi
           # remove server wrangler config to force Pages static deploy (avoid SSR worker creation)
           rm -f .output/server/wrangler.json || true
+          # remove any generated deploy redirect config that points to server wrangler.json
+          rm -f .wrangler/deploy/config.json || true
           npx --yes wrangler@^3 pages deploy .output/public \
             --project-name="tempdoc-craft" \
             --branch=main \
