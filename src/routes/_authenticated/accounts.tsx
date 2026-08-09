@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/accounts")({
@@ -67,7 +67,7 @@ function AccountsPage() {
     setLoading(false);
   }
 
-  async function handleAddAccount(event: React.FormEvent<HTMLFormElement>) {
+  async function handleAddAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
 
