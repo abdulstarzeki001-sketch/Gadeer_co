@@ -1,12 +1,9 @@
-name = "gadeer-co"
-type = "javascript"
-account_id = ""  # سيتم ملأه من GitHub Secrets
-workers_dev = true
+name = "tempdoc-craft"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-25"
+compatibility_flags = ["nodejs_compat"]
 
-[build]
-command = "npm run build"
-cwd = "./"
-watch_paths = ["src/**/*.ts", "src/**/*.tsx"]
-
-[build.upload]
-format = "service-worker"
+# Do not commit secrets here.
+# Add these in Cloudflare Pages > Settings > Environment variables:
+# VITE_SUPABASE_URL
+# VITE_SUPABASE_PUBLISHABLE_KEY

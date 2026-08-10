@@ -2,49 +2,51 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-env:
-  NODE_VERSION: '22'
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    
     permissions:
       contents: read
       deployments: write
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          node-version: '22'
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-      - name: Build application
-        run: npm run build
+      - name: Install dependencies (bun)
+        run: bun install --frozen-lockfile
+
+      - name: Build (bun)
+        run: bun run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: gadeer-co
-          directory: dist
-          productionBranch: main
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+        run: |
+          # ensure server code uses the non-reserved binding name SITE_ASSETS
+          if grep -R "env.ASSETS" .output/server >/dev/null 2>&1; then
+            find .output/server -type f -name '*.mjs' -exec sed -i 's/env.ASSETS/env.SITE_ASSETS/g' {} + || true
+          fi
+          # remove server wrangler config to force Pages static deploy (avoid SSR worker creation)
+          rm -f .output/server/wrangler.json || true
+          # remove any generated deploy redirect config that points to server wrangler.json
+          rm -f .wrangler/deploy/config.json || true
+          npx --yes wrangler@^3 pages deploy .output/public \
+            --project-name="tempdoc-craft" \
+            --branch=main \
+            --commit-message="ci deploy"
