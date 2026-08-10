@@ -1,12 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import companiesJson from "@/data/companies.json";
-import {
-  generateDocumentPdf,
-  fileToDataUrl,
-  downloadBlob,
-  type WaslForm,
-} from "@/lib/wasl-pdf";
+import { generateDocumentPdf, fileToDataUrl, downloadBlob, type WaslForm } from "@/lib/wasl-pdf";
 
 type RefCompany = {
   Number: number;
@@ -21,18 +16,29 @@ type RefCompany = {
   Unit?: string;
 };
 
-const COMPANIES = (companiesJson as RefCompany[]).filter(
-  (c) => c.CompanyNameProject,
-);
+const COMPANIES = (companiesJson as RefCompany[]).filter((c) => c.CompanyNameProject);
 
 const PROVINCES = [
-  "بغداد","نينوى","البصرة","ذي قار","الأنبار","النجف","كربلاء","بابل",
-  "ديالى","ميسان","واسط","صلاح الدين","أربيل","دهوك","السليمانية","كركوك",
-  "المثنى","القادسية",
+  "بغداد",
+  "نينوى",
+  "البصرة",
+  "ذي قار",
+  "الأنبار",
+  "النجف",
+  "كربلاء",
+  "بابل",
+  "ديالى",
+  "ميسان",
+  "واسط",
+  "صلاح الدين",
+  "أربيل",
+  "دهوك",
+  "السليمانية",
+  "كركوك",
+  "المثنى",
+  "القادسية",
 ];
-const ENTRY_POINTS = [
-  "سيطرة دارمان","سيطرة جيمن","سيطرة السد","سيطرة باوه محمود",
-];
+const ENTRY_POINTS = ["سيطرة دارمان", "سيطرة جيمن", "سيطرة السد", "سيطرة باوه محمود"];
 
 function normalizeDate(v: unknown): string {
   if (v == null) return "";
@@ -41,10 +47,18 @@ function normalizeDate(v: unknown): string {
   const parts = s.split(/[-/]/).map((p) => p.trim());
   if (parts.length !== 3) return "";
   let y: string, m: string, d: string;
-  if (parts[0].length === 4) { y = parts[0]; m = parts[1]; d = parts[2]; }
-  else if (parts[2].length === 4) { d = parts[0]; m = parts[1]; y = parts[2]; }
-  else return "";
-  const yi = +y, mi = +m, di = +d;
+  if (parts[0].length === 4) {
+    y = parts[0];
+    m = parts[1];
+    d = parts[2];
+  } else if (parts[2].length === 4) {
+    d = parts[0];
+    m = parts[1];
+    y = parts[2];
+  } else return "";
+  const yi = +y,
+    mi = +m,
+    di = +d;
   if (!yi || !mi || !di) return "";
   if (yi < 1900 || yi > 2100 || mi < 1 || mi > 12 || di < 1 || di > 31) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -52,19 +66,34 @@ function normalizeDate(v: unknown): string {
 }
 
 const EMPTY: WaslForm = {
-  docNumber: "", docDate: "", docTime: "",
-  entryPoint: "", driverName: "", vehicleNumber: "", vehicleProvince: "",
-  weight: "", destination: "",
-  companyName: "", provinceName: "", trademark: "",
-  cargoType: "", licenseAuthority: "", licenseNumber: "",
-  licenseDate: "", licenseDescription: "", licensedProducts: "",
+  docNumber: "",
+  docDate: "",
+  docTime: "",
+  entryPoint: "",
+  driverName: "",
+  vehicleNumber: "",
+  vehicleProvince: "",
+  weight: "",
+  destination: "",
+  companyName: "",
+  provinceName: "",
+  trademark: "",
+  cargoType: "",
+  licenseAuthority: "",
+  licenseNumber: "",
+  licenseDate: "",
+  licenseDescription: "",
+  licensedProducts: "",
 };
 
 export const Route = createFileRoute("/_authenticated/wasl")({
   head: () => ({
     meta: [
       { title: "إنشاء الوثيقة المؤقتة - منصة المنتج المحلي" },
-      { name: "description", content: "نموذج إصدار الوثيقة المؤقتة لبيانات الحمولة وتحميلها كملف PDF." },
+      {
+        name: "description",
+        content: "نموذج إصدار الوثيقة المؤقتة لبيانات الحمولة وتحميلها كملف PDF.",
+      },
     ],
   }),
   component: WaslPage,
@@ -151,39 +180,78 @@ function WaslPage() {
   return (
     <div style={{ padding: "1.6rem 1rem 3rem", maxWidth: 880, margin: "0 auto" }}>
       <h1>إصدار الوثيقة المؤقتة</h1>
-      <p style={{ textAlign: "center", color: "var(--gh-muted)", marginTop: "-1rem", marginBottom: "1.6rem" }}>
+      <p
+        style={{
+          textAlign: "center",
+          color: "var(--gh-muted)",
+          marginTop: "-1rem",
+          marginBottom: "1.6rem",
+        }}
+      >
         جمهورية العراق – الهيئة العامة للكمارك • منصة المنتج المحلي
       </p>
       <div className="add-form">
-
         <form onSubmit={onSubmit}>
           <Section title="معلومات الوثيقة">
             <Field label="رقم الوثيقة">
-              <input required value={form.docNumber} onChange={(e) => set("docNumber", e.target.value)} />
+              <input
+                required
+                value={form.docNumber}
+                onChange={(e) => set("docNumber", e.target.value)}
+              />
             </Field>
             <Field label="تاريخ إنشاء الوثيقة">
-              <input type="date" required value={form.docDate} onChange={(e) => set("docDate", e.target.value)} />
+              <input
+                type="date"
+                required
+                value={form.docDate}
+                onChange={(e) => set("docDate", e.target.value)}
+              />
             </Field>
             <Field label="التوقيت">
-              <input type="time" required value={form.docTime} onChange={(e) => set("docTime", e.target.value)} />
+              <input
+                type="time"
+                required
+                value={form.docTime}
+                onChange={(e) => set("docTime", e.target.value)}
+              />
             </Field>
           </Section>
 
           <Section title="المعلومات الشخصية">
             <Field label="نقطة السيطرة">
-              <select required value={form.entryPoint} onChange={(e) => set("entryPoint", e.target.value)}>
+              <select
+                required
+                value={form.entryPoint}
+                onChange={(e) => set("entryPoint", e.target.value)}
+              >
                 <option value="">-- اختر --</option>
-                {ENTRY_POINTS.map((p) => <option key={p} value={p}>{p}</option>)}
+                {ENTRY_POINTS.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="اسم السائق">
-              <input required value={form.driverName} onChange={(e) => set("driverName", e.target.value)} />
+              <input
+                required
+                value={form.driverName}
+                onChange={(e) => set("driverName", e.target.value)}
+              />
             </Field>
             <Field label="رقم العجلة">
-              <input required value={form.vehicleNumber} onChange={(e) => set("vehicleNumber", e.target.value)} />
+              <input
+                required
+                value={form.vehicleNumber}
+                onChange={(e) => set("vehicleNumber", e.target.value)}
+              />
             </Field>
             <Field label="محافظة تسجيل العجلة">
-              <ProvinceSelect value={form.vehicleProvince} onChange={(v) => set("vehicleProvince", v)} />
+              <ProvinceSelect
+                value={form.vehicleProvince}
+                onChange={(v) => set("vehicleProvince", v)}
+              />
             </Field>
             <Field label="الوزن / الكمية (طن)">
               <input required value={form.weight} onChange={(e) => set("weight", e.target.value)} />
@@ -198,7 +266,10 @@ function WaslPage() {
               </label>
               <input
                 value={query}
-                onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setOpen(true);
+                }}
                 onFocus={() => setOpen(true)}
                 placeholder={`ابحث ضمن ${COMPANIES.length} شركة...`}
                 style={inputStyle}
@@ -209,24 +280,42 @@ function WaslPage() {
                     <div style={{ padding: "9px 12px", fontSize: 13, color: "#888" }}>
                       لا توجد نتائج
                     </div>
-                  ) : matches.map((c) => (
-                    <div key={c.Number} onClick={() => pick(c)} style={rowStyle}
-                         onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f4f6")}
-                         onMouseLeave={(e) => (e.currentTarget.style.background = "")}>
-                      <span style={{ color: "#990707", fontWeight: 700, marginLeft: 8 }}>#{c.Number}</span>
-                      <span style={{ fontWeight: 600 }}>{c.CompanyNameProject}</span>
-                      {c.Brand && <span style={{ color: "#888", marginRight: 8 }}>— {c.Brand}</span>}
-                    </div>
-                  ))}
+                  ) : (
+                    matches.map((c) => (
+                      <div
+                        key={c.Number}
+                        onClick={() => pick(c)}
+                        style={rowStyle}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f4f6")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                      >
+                        <span style={{ color: "#990707", fontWeight: 700, marginLeft: 8 }}>
+                          #{c.Number}
+                        </span>
+                        <span style={{ fontWeight: 600 }}>{c.CompanyNameProject}</span>
+                        {c.Brand && (
+                          <span style={{ color: "#888", marginRight: 8 }}>— {c.Brand}</span>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
             </div>
 
             <Field label="اسم الشركة / المشروع">
-              <input required value={form.companyName} onChange={(e) => set("companyName", e.target.value)} />
+              <input
+                required
+                value={form.companyName}
+                onChange={(e) => set("companyName", e.target.value)}
+              />
             </Field>
             <Field label="نوع / تفاصيل الحمولة">
-              <input required value={form.cargoType} onChange={(e) => set("cargoType", e.target.value)} />
+              <input
+                required
+                value={form.cargoType}
+                onChange={(e) => set("cargoType", e.target.value)}
+              />
             </Field>
             <Field label="اسم المحافظة">
               <ProvinceSelect value={form.provinceName} onChange={(v) => set("provinceName", v)} />
@@ -235,47 +324,94 @@ function WaslPage() {
 
           <Section title="معلومات الإجازة والترخيص">
             <Field label="الجهة المانحة للإجازة / الموافقة">
-              <input required value={form.licenseAuthority} onChange={(e) => set("licenseAuthority", e.target.value)} />
+              <input
+                required
+                value={form.licenseAuthority}
+                onChange={(e) => set("licenseAuthority", e.target.value)}
+              />
             </Field>
             <Field label="رقم الإجازة / الموافقة">
-              <input required value={form.licenseNumber} onChange={(e) => set("licenseNumber", e.target.value)} />
+              <input
+                required
+                value={form.licenseNumber}
+                onChange={(e) => set("licenseNumber", e.target.value)}
+              />
             </Field>
             <Field label="تاريخ الإجازة / الموافقة">
-              <input type="date" required value={form.licenseDate} onChange={(e) => set("licenseDate", e.target.value)} />
+              <input
+                type="date"
+                required
+                value={form.licenseDate}
+                onChange={(e) => set("licenseDate", e.target.value)}
+              />
             </Field>
             <Field label="منطوق الإجازة / الاختصاص">
-              <input required value={form.licenseDescription} onChange={(e) => set("licenseDescription", e.target.value)} />
+              <input
+                required
+                value={form.licenseDescription}
+                onChange={(e) => set("licenseDescription", e.target.value)}
+              />
             </Field>
             <Field label="العلامة التجارية">
-              <textarea required rows={3} value={form.trademark} onChange={(e) => set("trademark", e.target.value)} />
+              <textarea
+                required
+                rows={3}
+                value={form.trademark}
+                onChange={(e) => set("trademark", e.target.value)}
+              />
             </Field>
             <Field label="المواد / المنتجات المرخصة">
-              <input required value={form.licensedProducts} onChange={(e) => set("licensedProducts", e.target.value)} />
+              <input
+                required
+                value={form.licensedProducts}
+                onChange={(e) => set("licensedProducts", e.target.value)}
+              />
             </Field>
           </Section>
 
           <Section title="رمز الاستجابة السريعة (QR Code)">
             <Field label="قم برفع صورة QR Code (مطلوب)">
-              <input type="file" accept="image/*" required
-                     onChange={(e) => setQrFile(e.target.files?.[0] ?? null)} />
+              <input
+                type="file"
+                accept="image/*"
+                required
+                onChange={(e) => setQrFile(e.target.files?.[0] ?? null)}
+              />
             </Field>
           </Section>
 
           {status && (
-            <div style={{
-              margin: "16px 0", padding: "12px 16px", borderRadius: 8, fontSize: 14,
-              border: `1px solid ${status.ok ? "#2e7d32" : "#c62828"}`,
-              background: status.ok ? "#e8f5e9" : "#ffebee",
-              color: status.ok ? "#155724" : "#721c24",
-            }}>{status.msg}</div>
+            <div
+              style={{
+                margin: "16px 0",
+                padding: "12px 16px",
+                borderRadius: 8,
+                fontSize: 14,
+                border: `1px solid ${status.ok ? "#2e7d32" : "#c62828"}`,
+                background: status.ok ? "#e8f5e9" : "#ffebee",
+                color: status.ok ? "#155724" : "#721c24",
+              }}
+            >
+              {status.msg}
+            </div>
           )}
 
-          <button type="submit" disabled={busy} style={{
-            marginTop: 16, padding: "12px 24px", border: "none", borderRadius: 10,
-            background: busy ? "#ccc" : "#990707", color: "#fff",
-            fontSize: 15, cursor: busy ? "not-allowed" : "pointer",
-            width: "100%", fontFamily: "inherit",
-          }}>
+          <button
+            type="submit"
+            disabled={busy}
+            style={{
+              marginTop: 16,
+              padding: "12px 24px",
+              border: "none",
+              borderRadius: 10,
+              background: busy ? "#ccc" : "#990707",
+              color: "#fff",
+              fontSize: 15,
+              cursor: busy ? "not-allowed" : "pointer",
+              width: "100%",
+              fontFamily: "inherit",
+            }}
+          >
             {busy ? "جاري الإنشاء..." : "إنشاء الوثيقة PDF"}
           </button>
         </form>
@@ -285,26 +421,45 @@ function WaslPage() {
 }
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "9px 8px", border: "1px solid #d1d5db",
-  borderRadius: 8, fontSize: 14, direction: "rtl", fontFamily: "inherit",
+  width: "100%",
+  padding: "9px 8px",
+  border: "1px solid #d1d5db",
+  borderRadius: 8,
+  fontSize: 14,
+  direction: "rtl",
+  fontFamily: "inherit",
 };
 const resultsStyle: React.CSSProperties = {
-  position: "absolute", top: "100%", right: 0, left: 0, zIndex: 1000,
-  background: "#fff", border: "1px solid #d1d5db", borderRadius: 8,
-  maxHeight: 280, overflowY: "auto", marginTop: 4,
+  position: "absolute",
+  top: "100%",
+  right: 0,
+  left: 0,
+  zIndex: 1000,
+  background: "#fff",
+  border: "1px solid #d1d5db",
+  borderRadius: 8,
+  maxHeight: 280,
+  overflowY: "auto",
+  marginTop: 4,
   boxShadow: "0 6px 18px rgba(0,0,0,.12)",
 };
 const rowStyle: React.CSSProperties = {
-  padding: "9px 12px", cursor: "pointer",
-  borderBottom: "1px solid #f0f0f0", fontSize: 13,
+  padding: "9px 12px",
+  cursor: "pointer",
+  borderBottom: "1px solid #f0f0f0",
+  fontSize: 13,
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section style={{
-      border: "1px solid #e5e7eb", borderRadius: 10,
-      padding: 16, marginTop: 14,
-    }}>
+    <section
+      style={{
+        border: "1px solid #e5e7eb",
+        borderRadius: 10,
+        padding: 16,
+        marginTop: 14,
+      }}
+    >
       <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#111827" }}>{title}</h3>
       {children}
     </section>
@@ -324,7 +479,11 @@ function ProvinceSelect({ value, onChange }: { value: string; onChange: (v: stri
   return (
     <select required value={value} onChange={(e) => onChange(e.target.value)}>
       <option value="">-- اختر --</option>
-      {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
+      {PROVINCES.map((p) => (
+        <option key={p} value={p}>
+          {p}
+        </option>
+      ))}
     </select>
   );
 }

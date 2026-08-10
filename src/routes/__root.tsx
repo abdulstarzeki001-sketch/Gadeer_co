@@ -20,16 +20,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">الصفحة غير موجودة</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            العودة إلى الرئيسية
           </Link>
         </div>
       </div>
@@ -47,11 +47,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">تعذّر تحميل الصفحة</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          حدث خطأ غير متوقع. يمكنك إعادة المحاولة أو العودة إلى الصفحة الرئيسية.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -61,13 +59,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            إعادة المحاولة
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            العودة إلى الرئيسية
           </a>
         </div>
       </div>
@@ -80,16 +78,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
-      { name: "description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
-      { property: "og:title", content: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
-      { property: "og:description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
+      { title: "شركة الغدير للنقل والتخليص الكمركي" },
+      {
+        name: "description",
+        content: "منصة شركة الغدير لإدارة العملاء والوصولات والحسابات والعمليات اللوجستية.",
+      },
+      { property: "og:title", content: "شركة الغدير للنقل والتخليص الكمركي" },
+      {
+        property: "og:description",
+        content: "منصة متكاملة لإدارة عمليات شركة الغدير وحساباتها.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "منصة المنتج المحلي - الهيئة العامة للكمارك" },
-      { name: "twitter:description", content: "نظام إصدار وثائق المنتج المحلي والتحقق منها للهيئة العامة للكمارك" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/caab6747-7df1-4139-a8a4-11017c5c4cd0/id-preview-c1f17de8--2250d21d-4d82-4c08-ab9b-ebff3185882c.lovable.app-1781624255039.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/caab6747-7df1-4139-a8a4-11017c5c4cd0/id-preview-c1f17de8--2250d21d-4d82-4c08-ab9b-ebff3185882c.lovable.app-1781624255039.png" },
+      { name: "twitter:title", content: "شركة الغدير للنقل والتخليص الكمركي" },
+      {
+        name: "twitter:description",
+        content: "منصة متكاملة لإدارة عمليات شركة الغدير وحساباتها.",
+      },
+      {
+        property: "og:image",
+        content: "/ghadeer-logo.png",
+      },
+      {
+        name: "twitter:image",
+        content: "/ghadeer-logo.png",
+      },
     ],
     links: [
       {
@@ -98,7 +111,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -155,28 +171,50 @@ function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Link to="/" className="brand" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+        <Link
+          to="/"
+          className="brand"
+          style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}
+        >
           <img src={ghadeerLogo.url} alt="شعار الغدير" />
-          <div className="brand-name" style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+          <div
+            className="brand-name"
+            style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}
+          >
             <span>شركة الغدير</span>
             <small>GHADEER LOGISTICS</small>
           </div>
         </Link>
         <nav style={{ position: "relative" }}>
           <ul style={{ listStyle: "none", display: "flex", margin: 0, padding: 0 }}>
-            <li><Link to="/">الرئيسية</Link></li>
-            <li><Link to="/wasl">اعمل وصل</Link></li>
+            <li>
+              <Link to="/">الرئيسية</Link>
+            </li>
+            <li>
+              <Link to="/wasl">اعمل وصل</Link>
+            </li>
           </ul>
           <button
             type="button"
             className="menu-toggle"
-            onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
-            aria-label="القائمة"
-          >☰</button>
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen((v) => !v);
+            }}
+            aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+          >
+            ☰
+          </button>
           {menuOpen && (
-            <div className="mobile-menu open" onClick={close}>
-              <Link to="/" onClick={close} style={{ display: "block" }}>🏠 الرئيسية</Link>
-              <Link to="/wasl" onClick={close} style={{ display: "block" }}>📄 اعمل وصل</Link>
+            <div id="mobile-navigation" className="mobile-menu open" onClick={close}>
+              <Link to="/" onClick={close} style={{ display: "block" }}>
+                🏠 الرئيسية
+              </Link>
+              <Link to="/wasl" onClick={close} style={{ display: "block" }}>
+                📄 اعمل وصل
+              </Link>
             </div>
           )}
         </nav>

@@ -51,9 +51,7 @@ function buildHtml(form: WaslForm, qrDataUrl: string): string {
     ["العلامة التجارية", form.trademark || "—"],
   ];
 
-  const rowsHtml = rows
-    .map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`)
-    .join("");
+  const rowsHtml = rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("");
 
   const productRow = `<tr><td>${
     esc(form.licensedProducts) || "لا توجد مواد مضافة"
@@ -145,10 +143,7 @@ function buildHtml(form: WaslForm, qrDataUrl: string): string {
   );
 }
 
-export async function generateDocumentPdf(
-  form: WaslForm,
-  qrDataUrl: string,
-): Promise<Blob> {
+export async function generateDocumentPdf(form: WaslForm, qrDataUrl: string): Promise<Blob> {
   const html = buildHtml(form, qrDataUrl);
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
@@ -167,10 +162,7 @@ export async function generateDocumentPdf(
     const fonts = (doc as Document & { fonts?: FontFaceSet }).fonts;
     if (fonts) {
       try {
-        await Promise.all([
-          fonts.load("400 16px Cairo"),
-          fonts.load("700 16px Cairo"),
-        ]);
+        await Promise.all([fonts.load("400 16px Cairo"), fonts.load("700 16px Cairo")]);
       } catch {
         /* fall back */
       }

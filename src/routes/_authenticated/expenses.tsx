@@ -4,7 +4,10 @@ export const Route = createFileRoute("/_authenticated/expenses")({
   head: () => ({
     meta: [
       { title: "المصروفات | لوحة التحكم" },
-      { name: "description", content: "إدارة المصروفات وتوثيقها للمشاريع والعملاء المرتبطين بحسابك." },
+      {
+        name: "description",
+        content: "إدارة المصروفات وتوثيقها للمشاريع والعملاء المرتبطين بحسابك.",
+      },
     ],
   }),
   component: ExpensesPage,
@@ -20,15 +23,28 @@ function ExpensesPage() {
         </p>
       </div>
 
-      <section style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 18, background: "#fff" }}>
+      <section
+        style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 18, background: "#fff" }}
+      >
         <h2 style={{ margin: "0 0 10px", fontSize: "1.1rem" }}>أضف مصروف جديد</h2>
         <p style={{ margin: 0, color: "#475569" }}>
-          أضف تفاصيل المصروف من نوع السفر، الوقود، أو المصروفات الأخرى مع الربط بفواتير العميل أو المشروع.
+          أضف تفاصيل المصروف من نوع السفر، الوقود، أو المصروفات الأخرى مع الربط بفواتير العميل أو
+          المشروع.
         </p>
       </section>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 18 }}>
-        <Link to="/" style={{ display: "inline-flex", padding: "10px 16px", borderRadius: 10, background: "#990707", color: "#fff", textDecoration: "none" }}>
+        <Link
+          to="/"
+          style={{
+            display: "inline-flex",
+            padding: "10px 16px",
+            borderRadius: 10,
+            background: "#990707",
+            color: "#fff",
+            textDecoration: "none",
+          }}
+        >
           العودة إلى لوحة التحكم
         </Link>
       </div>
