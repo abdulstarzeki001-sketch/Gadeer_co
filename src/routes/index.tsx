@@ -13,7 +13,10 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <div style={{ padding: "1.4rem 0 3rem" }}>
-      <section className="hero" style={{ textAlign: "center", margin: "30px auto 24px", maxWidth: 720, padding: "0 16px" }}>
+      <section
+        className="hero"
+        style={{ textAlign: "center", margin: "30px auto 24px", maxWidth: 720, padding: "0 16px" }}
+      >
         <div
           className="badge"
           style={{
@@ -31,10 +34,16 @@ function HomePage() {
             marginBottom: 14,
           }}
         >
-          <span className="dot" style={{
-            width: 7, height: 7, borderRadius: "50%",
-            background: "#16a34a", boxShadow: "0 0 8px #16a34a",
-          }} />
+          <span
+            className="dot"
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: "50%",
+              background: "#16a34a",
+              boxShadow: "0 0 8px #16a34a",
+            }}
+          />
           منصة إدارة العمليات والحسابات
         </div>
         <h1
@@ -56,18 +65,37 @@ function HomePage() {
         </p>
       </section>
 
-      <div className="section-title" style={{
-        maxWidth: 1100, margin: "0 auto 14px", padding: "0 16px",
-        display: "flex", alignItems: "center", gap: 12,
-        color: "var(--gh-navy)", fontWeight: 800, fontSize: "1.05rem",
-      }}>
-        <span style={{
-          width: 5, height: 22,
-          background: "linear-gradient(180deg, var(--gh-gold-light), var(--gh-gold-dark))",
-          borderRadius: 4,
-        }} />
+      <div
+        className="section-title"
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto 14px",
+          padding: "0 16px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          color: "var(--gh-navy)",
+          fontWeight: 800,
+          fontSize: "1.05rem",
+        }}
+      >
+        <span
+          style={{
+            width: 5,
+            height: 22,
+            background: "linear-gradient(180deg, var(--gh-gold-light), var(--gh-gold-dark))",
+            borderRadius: 4,
+          }}
+        />
         الوصول السريع
-        <small style={{ color: "var(--gh-muted)", fontWeight: 500, fontSize: "0.82rem", marginRight: "auto" }}>
+        <small
+          style={{
+            color: "var(--gh-muted)",
+            fontWeight: 500,
+            fontSize: "0.82rem",
+            marginRight: "auto",
+          }}
+        >
           اختر القسم للانتقال
         </small>
       </div>
@@ -76,7 +104,12 @@ function HomePage() {
         <DashCard icon="📄" title="اعمل وصل" desc="إصدار الوثيقة المؤقتة وطباعتها PDF" to="/wasl" />
         <DashCard icon="👥" title="العملاء" desc="إدارة وإضافة عملاء جدد" to="/customers" />
         <DashCard icon="🧾" title="الوصولات" desc="عرض وتحرير وصولات العملاء" to="/receipts" />
-        <DashCard icon="📊" title="كشف الحساب" desc="مراجعة العمليات المالية والرصيد" to="/accounts" />
+        <DashCard
+          icon="📊"
+          title="كشف الحساب"
+          desc="مراجعة العمليات المالية والرصيد"
+          to="/accounts"
+        />
         <DashCard icon="💰" title="المصروفات" desc="إضافة وتتبع مصروفات الشركة" to="/expenses" />
         <DashCard icon="📈" title="التقارير" desc="ملخص شامل لجميع العملاء" to="/reports" />
       </div>
@@ -84,10 +117,22 @@ function HomePage() {
   );
 }
 
-function DashCard({ icon, title, desc, to }: { icon: string; title: string; desc: string; to: string }) {
+function DashCard({
+  icon,
+  title,
+  desc,
+  to,
+}: {
+  icon: string;
+  title: string;
+  desc: string;
+  to: string;
+}) {
   return (
     <div className="dashboard-card">
-      <div className="card-icon" style={cardIconStyle}>{icon}</div>
+      <div className="card-icon" style={cardIconStyle}>
+        {icon}
+      </div>
       <h3>{title}</h3>
       <p>{desc}</p>
       <Link to={to}>فتح ←</Link>
@@ -96,8 +141,13 @@ function DashCard({ icon, title, desc, to }: { icon: string; title: string; desc
 }
 
 const cardIconStyle: React.CSSProperties = {
-  width: 56, height: 56, borderRadius: 16, margin: "0 auto 6px",
-  display: "flex", alignItems: "center", justifyContent: "center",
+  width: 56,
+  height: 56,
+  borderRadius: 16,
+  margin: "0 auto 6px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   fontSize: "1.6rem",
   background: "linear-gradient(135deg, rgba(201,161,74,0.15), rgba(201,161,74,0.05))",
   border: "1px solid rgba(201,161,74,0.25)",
