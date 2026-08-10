@@ -14,8 +14,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "deploy": "npm run build && wrangler deploy",
-    "deploy:preview": "npm run build && wrangler deploy --env staging"
+    "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json",
+    "deploy:preview": "npm run build && wrangler deploy --config .output/server/wrangler.json --env staging"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
