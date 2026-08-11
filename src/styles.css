@@ -893,3 +893,219 @@ main {
 table {
   animation: ghFadeUp 0.6s ease both;
 }
+
+/* Accounting workspace */
+.top-navigation {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+}
+.top-navigation a,
+.top-navigation button {
+  display: inline-flex;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.82rem;
+  background: transparent;
+  box-shadow: none !important;
+}
+.top-navigation a:hover,
+.top-navigation a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--gh-gold-light);
+}
+.accounting-page {
+  max-width: 1120px;
+  margin: auto;
+  padding: 1rem 0 3rem;
+}
+.page-heading {
+  padding: 26px 28px;
+  margin-bottom: 18px;
+  color: #fff;
+  border-radius: 22px;
+  background: linear-gradient(125deg, var(--gh-navy), #173869);
+  box-shadow: 0 16px 35px -20px #07152d;
+}
+.page-heading span {
+  color: var(--gh-gold-light);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+.page-heading h1 {
+  color: #fff !important;
+  margin: 5px 0;
+  font-size: 1.9rem;
+}
+.page-heading p {
+  margin: 0;
+  color: #d7e1ef;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.stat-card,
+.panel {
+  background: #fff;
+  border: 1px solid var(--gh-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px -22px #07152d;
+}
+.stat-card {
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  border-top: 3px solid var(--gh-gold);
+}
+.stat-card small {
+  color: var(--gh-muted);
+}
+.stat-card strong {
+  color: var(--gh-navy);
+  font-size: 1.35rem;
+}
+.panel {
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.panel h2 {
+  margin: 0 0 16px;
+  color: var(--gh-navy);
+  font-size: 1.08rem;
+}
+.data-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+.data-form button,
+.report-note button {
+  min-height: 48px;
+}
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.panel-title input {
+  max-width: 260px;
+}
+.table-wrap {
+  overflow: auto;
+}
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-wrap th,
+.table-wrap td {
+  padding: 13px 10px;
+  border-bottom: 1px solid #edf0f4;
+  text-align: right;
+  white-space: nowrap;
+}
+.table-wrap th {
+  color: var(--gh-muted);
+  font-size: 0.78rem;
+}
+.empty-state {
+  text-align: center !important;
+  color: var(--gh-muted);
+  padding: 30px !important;
+}
+.danger-link {
+  background: none !important;
+  color: #b91c1c !important;
+  padding: 5px !important;
+  box-shadow: none !important;
+}
+.status-pill {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #eef2f7;
+  font-size: 0.75rem;
+}
+.status-pill.success {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-pill.expense {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.chart-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 140px;
+  gap: 14px;
+  align-items: center;
+  margin: 16px 0;
+}
+.chart-row > div {
+  height: 12px;
+  background: #edf0f4;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.chart-row i {
+  display: block;
+  height: 100%;
+  background: #16a34a;
+  border-radius: 99px;
+}
+.chart-row.expense i {
+  background: #dc2626;
+}
+.report-note p {
+  line-height: 1.9;
+  color: var(--gh-muted);
+}
+@media (max-width: 1050px) {
+  .top-navigation {
+    display: none;
+  }
+  .accounting-page {
+    padding-inline: 4px;
+  }
+  .chart-row {
+    grid-template-columns: 70px 1fr;
+  }
+  .chart-row strong {
+    grid-column: 2;
+  }
+  .page-heading {
+    border-radius: 16px;
+  }
+  .panel-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .panel-title input {
+    max-width: none;
+  }
+}
+@media print {
+  header,
+  footer,
+  .report-note button,
+  .menu-toggle {
+    display: none !important;
+  }
+  .accounting-page {
+    max-width: none;
+  }
+  .panel,
+  .stat-card {
+    box-shadow: none;
+  }
+}

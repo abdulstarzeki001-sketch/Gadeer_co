@@ -172,12 +172,27 @@ function SiteShell({ children }: { children: ReactNode }) {
           </div>
         </Link>
         <nav style={{ position: "relative" }}>
-          <ul style={{ listStyle: "none", display: "flex", margin: 0, padding: 0 }}>
+          <ul className="top-navigation">
             <li>
               <Link to="/">الرئيسية</Link>
             </li>
             <li>
               <Link to="/wasl">اعمل وصل</Link>
+            </li>
+            <li>
+              <Link to="/customers">العملاء</Link>
+            </li>
+            <li>
+              <Link to="/receipts">السندات</Link>
+            </li>
+            <li>
+              <Link to="/expenses">المصروفات</Link>
+            </li>
+            <li>
+              <Link to="/accounts">الحسابات</Link>
+            </li>
+            <li>
+              <Link to="/reports">التقارير</Link>
             </li>
             {typeof window !== "undefined" && isLocallyAuthenticated() && (
               <li>
@@ -213,6 +228,21 @@ function SiteShell({ children }: { children: ReactNode }) {
               </Link>
               <Link to="/wasl" onClick={close} style={{ display: "block" }}>
                 📄 اعمل وصل
+              </Link>
+              <Link to="/customers" onClick={close}>
+                👥 العملاء
+              </Link>
+              <Link to="/receipts" onClick={close}>
+                🧾 السندات
+              </Link>
+              <Link to="/expenses" onClick={close}>
+                💰 المصروفات
+              </Link>
+              <Link to="/accounts" onClick={close}>
+                📊 الحسابات
+              </Link>
+              <Link to="/reports" onClick={close}>
+                📈 التقارير
               </Link>
             </div>
           )}

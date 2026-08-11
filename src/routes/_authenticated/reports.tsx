@@ -1,52 +1,56 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/_authenticated/reports")({
-  head: () => ({
-    meta: [
-      { title: "التقارير | لوحة التحكم" },
-      {
-        name: "description",
-        content: "تقارير الأداء والعمليات المالية المرتبطة بحساب المستخدم للشركة.",
-      },
-    ],
-  }),
-  component: ReportsPage,
-});
-
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  money,
+  type Customer,
+  type Expense,
+  type Receipt,
+  useLocalCollection,
+} from "@/lib/accounting-store";
+import { PageHead, Stat } from "./customers";
+export const Route = createFileRoute("/_authenticated/reports")({ component: ReportsPage });
 function ReportsPage() {
+  const { items: c } = useLocalCollection<Customer>("customers");
+  const { items: r } = useLocalCollection<Receipt>("receipts");
+  const { items: e } = useLocalCollection<Expense>("expenses");
+  const income = r.filter((x) => x.type === "قبض").reduce((s, x) => s + x.amount, 0);
+  const out =
+    r.filter((x) => x.type === "صرف").reduce((s, x) => s + x.amount, 0) +
+    e.reduce((s, x) => s + x.amount, 0);
+  const max = Math.max(income, out, 1);
   return (
-    <div style={{ padding: "1.5rem 1rem 3rem", maxWidth: 960, margin: "0 auto" }}>
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: 0, fontSize: "2rem" }}>التقارير</h1>
-        <p style={{ color: "var(--gh-muted)", marginTop: 8, lineHeight: 1.7 }}>
-          صفحة التقارير تعرض ملخص العمليات، الوصلات، وسلوك الحسابات ضمن النظام.
-        </p>
+    <div className="accounting-page">
+      <PageHead title="التقارير المالية" text="مؤشرات واضحة تساعدك على متابعة أداء الشركة." />
+      <div className="summary-grid">
+        <Stat label="العملاء" value={String(c.length)} />
+        <Stat label="الحركات" value={String(r.length + e.length)} />
+        <Stat label="صافي التدفق" value={money(income - out)} />
       </div>
-
-      <section
-        style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 18, background: "#fff" }}
-      >
-        <h2 style={{ margin: "0 0 10px", fontSize: "1.1rem" }}>لوحة مؤشرات التشغيل</h2>
-        <p style={{ margin: 0, color: "#475569" }}>
-          راجع مؤشرات أداء الحساب، عدد العملاء، الوصلات، والمصروفات في مكان واحد.
-        </p>
+      <section className="panel">
+        <h2>تحليل التدفق النقدي</h2>
+        <div className="chart-row">
+          <span>الإيرادات</span>
+          <div>
+            <i style={{ width: `${(income / max) * 100}%` }} />
+          </div>
+          <strong>{money(income)}</strong>
+        </div>
+        <div className="chart-row expense">
+          <span>المصروفات</span>
+          <div>
+            <i style={{ width: `${(out / max) * 100}%` }} />
+          </div>
+          <strong>{money(out)}</strong>
+        </div>
       </section>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 18 }}>
-        <Link
-          to="/"
-          style={{
-            display: "inline-flex",
-            padding: "10px 16px",
-            borderRadius: 10,
-            background: "#990707",
-            color: "#fff",
-            textDecoration: "none",
-          }}
-        >
-          العودة إلى لوحة التحكم
-        </Link>
-      </div>
+      <section className="panel report-note">
+        <h2>ملخص الإدارة</h2>
+        <p>
+          {income >= out
+            ? "الوضع المالي موجب. استمر في متابعة التحصيل وضبط المصروفات."
+            : "المصروفات أعلى من الإيرادات حالياً؛ راجع المصروفات المفتوحة وخطة التحصيل."}
+        </p>
+        <button onClick={() => window.print()}>طباعة التقرير</button>
+      </section>
     </div>
   );
 }
