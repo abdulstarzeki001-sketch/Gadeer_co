@@ -3,11 +3,13 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useNavigate,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { ChartNoAxesCombined, Home, Plus, ReceiptText, Users, type LucideIcon } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -77,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "شركة الغدير للنقل والتخليص الكمركي" },
       {
         name: "description",
@@ -142,18 +144,13 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-        router.invalidate();
-        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-      });
-      return () => sub.subscription.unsubscribe();
-    } catch (error) {
-      console.warn("Supabase auth disabled because environment variables are missing.", error);
-      return undefined;
-    }
-  }, [router, queryClient]);
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => data.subscription.unsubscribe();
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -166,11 +163,10 @@ function RootComponent() {
 }
 
 function SiteShell({ children }: { children: ReactNode }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const close = () => setMenuOpen(false);
+  const navigate = useNavigate();
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className="app-shell">
+      <header className="app-header">
         <Link
           to="/"
           className="brand"
@@ -185,55 +181,83 @@ function SiteShell({ children }: { children: ReactNode }) {
             <small>GHADEER LOGISTICS</small>
           </div>
         </Link>
-        <nav style={{ position: "relative" }}>
-          <ul style={{ listStyle: "none", display: "flex", margin: 0, padding: 0 }}>
+        <nav className="desktop-nav" aria-label="التنقل الرئيسي">
+          <ul className="top-navigation">
             <li>
-              <Link to="/">الرئيسية</Link>
+              <Link to="/" activeOptions={{ exact: true }}>
+                الرئيسية
+              </Link>
             </li>
             <li>
               <Link to="/wasl">اعمل وصل</Link>
             </li>
+            <li>
+              <Link to="/customers">العملاء</Link>
+            </li>
+            <li>
+              <Link to="/receipts">السندات</Link>
+            </li>
+            <li>
+              <Link to="/expenses">المصروفات</Link>
+            </li>
+            <li>
+              <Link to="/accounts">الحسابات</Link>
+            </li>
+            <li>
+              <Link to="/reports">التقارير</Link>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate({ to: "/auth" });
+                }}
+              >
+                خروج
+              </button>
+            </li>
           </ul>
-          <button
-            type="button"
-            className="menu-toggle"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen((v) => !v);
-            }}
-            aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-navigation"
-          >
-            ☰
-          </button>
-          {menuOpen && (
-            <div id="mobile-navigation" className="mobile-menu open" onClick={close}>
-              <Link to="/" onClick={close} style={{ display: "block" }}>
-                🏠 الرئيسية
-              </Link>
-              <Link to="/wasl" onClick={close} style={{ display: "block" }}>
-                📄 اعمل وصل
-              </Link>
-            </div>
-          )}
         </nav>
       </header>
-      <main style={{ flex: 1 }}>{children}</main>
-      <footer>
+      <main className="app-main">{children}</main>
+      <footer className="app-footer">
         📍 زاخو – إبراهيم الخليل &nbsp;•&nbsp; 📞 07504084359 &nbsp;•&nbsp; 📧 starzeki001@gmail.com
         <br />© 2026 شركة الغدير للنقل والتخليص الكمركي – جميع الحقوق محفوظة
       </footer>
-      <style>{`
-        nav ul li { list-style: none; }
-        .menu-toggle { display: none; }
-        .mobile-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; min-width: 220px; padding: 8px; z-index: 1000; }
-        .mobile-menu.open { display: block; }
-        @media (max-width: 768px) {
-          nav > ul { display: none !important; }
-          .menu-toggle { display: inline-flex; }
-        }
-      `}</style>
+      <nav className="bottom-navigation" aria-label="التنقل السفلي">
+        <MobileLink to="/" icon={Home} label="الرئيسية" />
+        <MobileLink to="/customers" icon={Users} label="العملاء" />
+        <MobileLink to="/wasl" icon={Plus} label="وصل" primary />
+        <MobileLink to="/receipts" icon={ReceiptText} label="السندات" />
+        <MobileLink to="/reports" icon={ChartNoAxesCombined} label="التقارير" />
+      </nav>
     </div>
+  );
+}
+
+function MobileLink({
+  to,
+  icon: Icon,
+  label,
+  primary = false,
+}: {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      activeOptions={{ exact: to === "/" }}
+      activeProps={{ className: "active", "aria-current": "page" }}
+      className={`bottom-navigation__item${primary ? " primary" : ""}`}
+    >
+      <span className="bottom-navigation__indicator" aria-hidden="true">
+        <Icon strokeWidth={2.2} />
+      </span>
+      <small>{label}</small>
+    </Link>
   );
 }

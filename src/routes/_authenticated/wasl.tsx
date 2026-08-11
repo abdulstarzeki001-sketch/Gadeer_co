@@ -178,7 +178,10 @@ function WaslPage() {
   };
 
   return (
-    <div style={{ padding: "1.6rem 1rem 3rem", maxWidth: 880, margin: "0 auto" }}>
+    <div
+      className="wasl-page"
+      style={{ padding: "1.6rem 1rem 3rem", maxWidth: 880, margin: "0 auto" }}
+    >
       <h1>إصدار الوثيقة المؤقتة</h1>
       <p
         style={{

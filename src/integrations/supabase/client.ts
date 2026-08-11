@@ -53,7 +53,7 @@ function createSupabaseClient() {
       ...(!SUPABASE_URL ? ["VITE_SUPABASE_URL"] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ["VITE_SUPABASE_PUBLISHABLE_KEY"] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Add them in Cloudflare Pages project settings.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Add them to the Cloudflare Worker build environment.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }

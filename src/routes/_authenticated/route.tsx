@@ -8,6 +8,12 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) {
       throw redirect({ to: "/auth" });
     }
+
+    const { data: isApproved, error: approvalError } = await supabase.rpc("is_approved_user");
+    if (approvalError || !isApproved) {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/auth" });
+    }
     return { user: data.user };
   },
   component: () => <Outlet />,

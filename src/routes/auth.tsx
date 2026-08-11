@@ -9,7 +9,6 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -26,21 +25,9 @@ function AuthPage() {
     setBusy(true);
     setMsg(null);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/wasl" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        setMsg(
-          "تم إنشاء الحساب. تحقق من بريدك الإلكتروني إن لزم الأمر، ثم انتظر موافقة المسؤول للوصول إلى البيانات.",
-        );
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/wasl" });
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "حدث خطأ");
     } finally {
@@ -49,8 +36,8 @@ function AuthPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1 style={{ textAlign: "center" }}>{mode === "signin" ? "تسجيل الدخول" : "إنشاء حساب"}</h1>
+    <div className="auth-page" style={{ maxWidth: 400, margin: "3rem auto", padding: "0 1rem" }}>
+      <h1 style={{ textAlign: "center" }}>تسجيل الدخول</h1>
       <form
         onSubmit={onSubmit}
         className="add-form"
@@ -58,7 +45,13 @@ function AuthPage() {
       >
         <label>
           البريد الإلكتروني
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            required
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label>
           كلمة المرور
@@ -66,6 +59,7 @@ function AuthPage() {
             type="password"
             required
             minLength={6}
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -87,14 +81,7 @@ function AuthPage() {
             cursor: "pointer",
           }}
         >
-          {busy ? "..." : mode === "signin" ? "دخول" : "تسجيل"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          style={{ background: "none", border: "none", color: "#990707", cursor: "pointer" }}
-        >
-          {mode === "signin" ? "ليس لديك حساب؟ سجّل" : "لديك حساب؟ سجّل الدخول"}
+          {busy ? "جارٍ التحقق..." : "دخول"}
         </button>
       </form>
     </div>

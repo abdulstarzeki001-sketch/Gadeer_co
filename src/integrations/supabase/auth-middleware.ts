@@ -94,6 +94,11 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: No user ID found in token");
     }
 
+    const { data: isApproved, error: approvalError } = await supabase.rpc("is_approved_user");
+    if (approvalError || !isApproved) {
+      throw new Error("Forbidden: User is not approved");
+    }
+
     return next({
       context: {
         supabase,

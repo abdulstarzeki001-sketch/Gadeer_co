@@ -371,6 +371,7 @@ export type Database = {
     };
     Functions: {
       generate_document_number: { Args: never; Returns: string };
+      is_approved_user: { Args: never; Returns: boolean };
     };
     Enums: {
       app_role: "admin" | "user";
