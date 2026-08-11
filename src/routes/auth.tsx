@@ -1,11 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  isLocallyAuthenticated,
-  LOCAL_AUTH_EMAIL,
-  LOCAL_AUTH_PASSWORD,
-  signInLocally,
-} from "@/lib/local-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -14,24 +9,28 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [password, setPassword] = useState(LOCAL_AUTH_PASSWORD);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isLocallyAuthenticated()) navigate({ to: "/wasl" });
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) navigate({ to: "/wasl" });
+    });
   }, [navigate]);
 
-  const onSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setBusy(true);
     setMsg(null);
-
-    const authenticated = signInLocally(LOCAL_AUTH_EMAIL, password);
-    if (authenticated) {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       navigate({ to: "/wasl" });
-    } else {
-      setMsg("كلمة المرور غير صحيحة.");
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "حدث خطأ");
+    } finally {
       setBusy(false);
     }
   };
@@ -46,25 +45,43 @@ function AuthPage() {
       >
         <label>
           البريد الإلكتروني
-          <input type="email" value={LOCAL_AUTH_EMAIL} readOnly autoComplete="username" />
+          <input
+            type="email"
+            required
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label>
           كلمة المرور
           <input
             type="password"
             required
+            minLength={6}
             autoComplete="current-password"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </label>
         {msg && (
-          <div role="alert" style={{ padding: 10, background: "#fef2f2", borderRadius: 8 }}>
+          <div style={{ padding: 10, background: "#f3f4f6", borderRadius: 8, fontSize: 14 }}>
             {msg}
           </div>
         )}
-        <button type="submit" disabled={busy}>
-          {busy ? "جارٍ الدخول..." : "دخول"}
+        <button
+          type="submit"
+          disabled={busy}
+          style={{
+            padding: "10px 16px",
+            background: "#990707",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+        >
+          {busy ? "جارٍ التحقق..." : "دخول"}
         </button>
       </form>
     </div>

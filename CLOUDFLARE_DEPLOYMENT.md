@@ -1,70 +1,51 @@
-# 🚀 دليل النشر على gadee.pages.dev
+# نشر Cloudflare Worker
 
-## نظرة عامة
-التطبيق مبني بـ TanStack Start وNitro ويُنشر إلى مشروع Cloudflare Pages باسم `gadee` مع Pages Functions لدعم SSR.
+هدف الإنتاج الوحيد لهذا المستودع هو Cloudflare Worker باسم `gadeer-co`:
 
----
-
-## 📋 خطوات الإعداد السريعة
-
-### 1️⃣ إنشاء حساب Cloudflare
-- اذهب إلى [cloudflare.com](https://www.cloudflare.com)
-- اضغط "Sign Up"
-
-### 2️⃣ الحصول على API Token
-1. في Cloudflare Dashboard → **My Profile** → **API Tokens**
-2. اضغط **Create Token** → **Create Custom Token**
-3. أضف الصلاحيات:
-   - ✅ `Account.Cloudflare Pages - Edit`
-4. انسخ الـ Token
-
-### 3️⃣ الحصول على Account ID
-- في Cloudflare Dashboard الصفحة الرئيسية
-- انسخ **Account ID** من الأسفل
-
-### 4️⃣ إضافة GitHub Secrets
-اذهب إلى: `https://github.com/abdulstarzeki001-sketch/Gadeer_co/settings/secrets/actions`
-
-أضف:
-```
-CLOUDFLARE_API_TOKEN = [Token من Cloudflare]
-CLOUDFLARE_ACCOUNT_ID = [Account ID من Cloudflare]
-VITE_SUPABASE_URL = [من مشروعك]
-VITE_SUPABASE_ANON_KEY = [من مشروعك]
-VITE_API_URL = https://your-api.example.com
+```text
+https://gadeer-co.abdulstarzeki001.workers.dev
 ```
 
-### 5️⃣ النشر
-شغّل GitHub Actions يدوياً من workflow المسمى **Deploy to gadee.pages.dev**، أو ادفع التغييرات إلى فرع `main`. يستخدم البناء `cloudflare-pages` وينشر مجلد `dist` إلى مشروع `gadee`.
+## GitHub Actions secrets
 
----
+أضف القيم التالية في إعدادات GitHub Actions:
 
-## 🚀 النشر التلقائي
-
-بعد الإعداد، سيتم النشر تلقائياً عند:
-- ✅ Push إلى `main`
-
-### رابطك الدائمي:
-```
-https://gadee.pages.dev
+```text
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+SUPABASE_URL
+SUPABASE_PUBLISHABLE_KEY
 ```
 
----
+يحتاج Cloudflare API token إلى صلاحية `Workers Scripts: Edit`. يجب أيضاً إضافة
+`SUPABASE_URL` و`SUPABASE_PUBLISHABLE_KEY` كمتغيرات Worker runtime من لوحة Cloudflare.
+لا تستخدم service-role أو secret key في الواجهة أو إعدادات `VITE_*`.
 
-## 📝 الأوامر
+## البناء والنشر
+
+ينشئ Nitro ملف Worker النهائي في `.output/server/wrangler.json`، ثم ينشر workflow
+هذا الملف بالأمر التالي:
 
 ```bash
-npm run dev          # تطوير محلي
-npm run build        # بناء
-npm run preview      # معاينة
-npm run deploy       # نشر يدوي
-npm run deploy:pages # نشر مباشر إلى gadee.pages.dev
+npm ci
+npm run build
+npx wrangler deploy --config .output/server/wrangler.json
 ```
 
----
+لا ينشر هذا المستودع إلى Cloudflare Pages، ولا يعتمد أي مشروع Pages باسم `gadee` أو
+`gadeer-com` أو `gadeer-co`.
 
-## ✅ تم!
+## تفعيل المستخدم المعتمد
 
-تطبيقك الآن **منشور على Cloudflare** مع نشر تلقائي! 🎉
+بعد تطبيق migrations، أضف UUID غير القابل للتغيير للمستخدم المعتمد من Supabase SQL
+Editor أو باستخدام service role في بيئة إدارية موثوقة:
 
-يعرض Wrangler رابط النشر بعد نجاح العملية، ويكون الرابط الرئيسي `https://gadee.pages.dev`.
+```sql
+INSERT INTO private.approved_users (user_id)
+VALUES ('<approved-auth-user-uuid>')
+ON CONFLICT (user_id) DO NOTHING;
+```
+
+لا تضف UUID أو كلمة مرور أو مفاتيح حقيقية إلى المستودع.

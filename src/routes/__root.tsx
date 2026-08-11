@@ -14,7 +14,7 @@ import { ChartNoAxesCombined, Home, Plus, ReceiptText, Users, type LucideIcon } 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { isLocallyAuthenticated, signOutLocally } from "@/lib/local-auth";
+import { supabase } from "@/integrations/supabase/client";
 const ghadeerLogo = { url: "/ghadeer-logo.png" };
 
 function NotFoundComponent() {
@@ -141,6 +141,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => data.subscription.unsubscribe();
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -196,19 +206,17 @@ function SiteShell({ children }: { children: ReactNode }) {
             <li>
               <Link to="/reports">التقارير</Link>
             </li>
-            {typeof window !== "undefined" && isLocallyAuthenticated() && (
-              <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    signOutLocally();
-                    navigate({ to: "/auth" });
-                  }}
-                >
-                  خروج
-                </button>
-              </li>
-            )}
+            <li>
+              <button
+                type="button"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate({ to: "/auth" });
+                }}
+              >
+                خروج
+              </button>
+            </li>
           </ul>
         </nav>
       </header>

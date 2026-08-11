@@ -15,9 +15,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json",
-    "deploy:pages": "NITRO_PRESET=cloudflare-pages npm run build && wrangler pages deploy dist --project-name gadee",
-    "deploy:preview": "npm run build && wrangler deploy --config .output/server/wrangler.json --name gadeer-co-staging"
+    "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
