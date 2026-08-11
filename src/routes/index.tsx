@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <div style={{ padding: "1.4rem 0 3rem" }}>
+    <div className="home-page" style={{ padding: "1.4rem 0 3rem" }}>
       <section
         className="hero"
         style={{ textAlign: "center", margin: "30px auto 24px", maxWidth: 720, padding: "0 16px" }}

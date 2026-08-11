@@ -55,10 +55,25 @@
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
     border-color: var(--color-border);
   }
+  html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    overflow-x: clip;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family:
@@ -66,6 +81,19 @@
       system-ui,
       -apple-system,
       sans-serif;
+  }
+  #root {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
   }
 }
 
@@ -163,7 +191,7 @@ body {
 }
 
 /* ---------- HEADER الفاخر ---------- */
-header {
+.app-header {
   background: linear-gradient(
     135deg,
     var(--gh-navy) 0%,
@@ -183,7 +211,7 @@ header {
 }
 
 /* خط ذهبي رفيع تحت الهيدر */
-header::after {
+.app-header::after {
   content: "";
   position: absolute;
   left: 0;
@@ -194,11 +222,11 @@ header::after {
   opacity: 0.6;
 }
 
-header .brand {
+.app-header .brand {
   gap: 12px !important;
 }
 
-header .brand img {
+.app-header .brand img {
   width: 46px !important;
   height: 46px !important;
   border-radius: 12px !important;
@@ -327,7 +355,7 @@ button.btn,
 
 /* أزرار شفافة في الهيدر (السلة...) */
 .btn.trash,
-header .btn.trash {
+.app-header .btn.trash {
   background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #fff !important;
@@ -807,11 +835,11 @@ footer br + * {
 
 /* ---------- موبايل ---------- */
 @media (max-width: 768px) {
-  header {
+  .app-header {
     padding: 10px 14px !important;
     gap: 8px !important;
   }
-  header .brand img {
+  .app-header .brand img {
     width: 40px !important;
     height: 40px !important;
   }
@@ -843,7 +871,7 @@ footer br + * {
     padding: 0 14px !important;
     font-size: 0.85rem !important;
   }
-  table {
+  .table-wrap table {
     min-width: 560px;
   }
 }
@@ -1107,5 +1135,342 @@ table {
   .panel,
   .stat-card {
     box-shadow: none;
+  }
+}
+
+/* Mobile application shell and overflow safety */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100dvh;
+}
+.app-header {
+  width: 100%;
+  min-width: 0;
+  padding-top: max(env(safe-area-inset-top), 10px) !important;
+  padding-inline: max(env(safe-area-inset-left), 16px) max(env(safe-area-inset-right), 16px) !important;
+}
+.app-header > *,
+.app-header .brand,
+.brand-name,
+.app-main,
+.app-main > *,
+.accounting-page,
+.panel,
+.data-form > *,
+.summary-grid > *,
+.dashboard-grid > * {
+  min-width: 0;
+}
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto !important;
+  padding-inline: clamp(12px, 4vw, 20px) !important;
+  overflow-wrap: anywhere;
+}
+.bottom-navigation {
+  display: none;
+}
+.table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.table-wrap table {
+  min-width: 0;
+}
+.modal-overlay {
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.modal,
+.dialog,
+.drawer {
+  width: min(100%, 520px);
+  max-width: 100%;
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-nav-height: 72px;
+    --gh-radius: 14px;
+    --gh-radius-lg: 16px;
+  }
+  body {
+    background-attachment: scroll !important;
+  }
+  .app-header {
+    position: sticky !important;
+    inset-block-start: 0;
+    min-height: 62px;
+    padding-block-end: 9px !important;
+    box-shadow: 0 4px 16px rgba(10, 26, 58, 0.14) !important;
+  }
+  .app-header .brand {
+    min-width: 0;
+    gap: 9px !important;
+  }
+  .app-header .brand img {
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px;
+    border-radius: 10px !important;
+  }
+  .brand-name {
+    min-width: 0;
+  }
+  .brand-name span {
+    font-size: 0.92rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand-name small {
+    font-size: 0.62rem !important;
+    white-space: nowrap;
+  }
+  .desktop-nav {
+    display: none;
+  }
+  .app-main {
+    margin-block: 0 !important;
+    padding-block: 12px
+      calc(var(--mobile-nav-height) + max(env(safe-area-inset-bottom), 8px) + 12px) !important;
+    padding-inline: clamp(12px, 4vw, 18px) !important;
+  }
+  .app-footer {
+    display: none;
+  }
+  .bottom-navigation {
+    position: fixed;
+    z-index: 1200;
+    inset-inline: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+    min-height: var(--mobile-nav-height);
+    padding: 6px max(env(safe-area-inset-right), 6px) max(env(safe-area-inset-bottom), 8px)
+      max(env(safe-area-inset-left), 6px);
+    border-block-start: 1px solid rgba(10, 26, 58, 0.09);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 -8px 24px rgba(10, 26, 58, 0.07);
+    backdrop-filter: blur(18px);
+  }
+  .bottom-navigation a {
+    display: flex;
+    min-width: 0;
+    min-height: 48px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 3px 1px;
+    color: var(--gh-muted);
+    text-decoration: none;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-navigation a span {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .bottom-navigation a small {
+    max-width: 100%;
+    font-size: clamp(0.58rem, 2.6vw, 0.68rem);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bottom-navigation a.active {
+    color: var(--gh-navy);
+    background: rgba(201, 161, 74, 0.12);
+  }
+  .bottom-navigation a.primary span {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-top: -16px;
+    color: #fff;
+    background: var(--gh-navy);
+    border-radius: 50%;
+    box-shadow: 0 6px 14px rgba(10, 26, 58, 0.22);
+  }
+
+  main h1 {
+    font-size: clamp(1.3rem, 6vw, 1.65rem) !important;
+    line-height: 1.35;
+  }
+  .hero {
+    width: 100%;
+    margin-block: 10px 18px !important;
+    padding-inline: 0 !important;
+  }
+  .hero h1 {
+    font-size: clamp(1.55rem, 7vw, 2rem) !important;
+  }
+  .section-title {
+    padding-inline: 0 !important;
+  }
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .dashboard-card {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 10px !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(10, 26, 58, 0.07) !important;
+  }
+  .dashboard-card .card-icon {
+    width: 44px !important;
+    height: 44px !important;
+    border: 0 !important;
+  }
+  .dashboard-card h3 {
+    font-size: 0.9rem !important;
+  }
+  .dashboard-card p {
+    font-size: 0.75rem !important;
+    line-height: 1.55;
+  }
+  .dashboard-card a {
+    min-height: 44px;
+  }
+
+  .accounting-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0 4px;
+  }
+  .home-page,
+  .wasl-page,
+  .auth-page {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: auto !important;
+    padding-inline: 0 !important;
+    padding-block: 4px 0 !important;
+  }
+  .auth-page {
+    max-width: 400px;
+    margin-block: 18px 0 !important;
+  }
+  .page-heading {
+    padding: 16px !important;
+    margin-bottom: 12px;
+    border: 0;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+  .page-heading h1 {
+    margin-block: 3px !important;
+  }
+  .page-heading p {
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .stat-card {
+    padding: 12px;
+    gap: 5px;
+    border: 0;
+    border-block-start: 2px solid var(--gh-gold);
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(10, 26, 58, 0.05);
+  }
+  .stat-card strong {
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+  .stat-card small {
+    font-size: 0.72rem;
+  }
+  .panel {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 3px 14px rgba(10, 26, 58, 0.06);
+  }
+  .panel h2 {
+    margin-bottom: 12px;
+  }
+  .data-form {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px !important;
+    margin-block: 3px !important;
+  }
+  button,
+  .btn,
+  a.btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  .data-form button {
+    width: 100%;
+  }
+  .table-wrap {
+    margin-inline: 0;
+    border-radius: 10px;
+  }
+  .table-wrap table {
+    min-width: 520px;
+  }
+  .table-wrap th,
+  .table-wrap td {
+    padding: 10px 8px;
+    font-size: 0.78rem;
+  }
+  section {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 350px) {
+  .app-main {
+    padding-inline: 10px !important;
+  }
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-grid {
+    gap: 8px !important;
+  }
+  .dashboard-card {
+    padding-inline: 8px !important;
+  }
+  .bottom-navigation a small {
+    font-size: 0.57rem;
   }
 }

@@ -37,7 +37,7 @@ function AuthPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "3rem auto", padding: "0 1rem" }}>
+    <div className="auth-page" style={{ maxWidth: 400, margin: "3rem auto", padding: "0 1rem" }}>
       <h1 style={{ textAlign: "center" }}>تسجيل الدخول</h1>
       <form
         onSubmit={onSubmit}
