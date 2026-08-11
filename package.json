@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json",
+    "deploy:pages": "NITRO_PRESET=cloudflare-pages npm run build && wrangler pages deploy dist --project-name gadee",
     "deploy:preview": "npm run build && wrangler deploy --config .output/server/wrangler.json --name gadeer-co-staging"
   },
   "dependencies": {

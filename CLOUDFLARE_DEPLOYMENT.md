@@ -1,7 +1,7 @@
-# 🚀 دليل النشر على Cloudflare Workers
+# 🚀 دليل النشر على gadee.pages.dev
 
 ## نظرة عامة
-التطبيق مبني بـ TanStack Start وNitro ويُنشر كـ **Cloudflare Worker** مع أصول ثابتة، وليس كمشروع Pages ثابت.
+التطبيق مبني بـ TanStack Start وNitro ويُنشر إلى مشروع Cloudflare Pages باسم `gadee` مع Pages Functions لدعم SSR.
 
 ---
 
@@ -15,7 +15,7 @@
 1. في Cloudflare Dashboard → **My Profile** → **API Tokens**
 2. اضغط **Create Token** → **Create Custom Token**
 3. أضف الصلاحيات:
-   - ✅ `Account.Workers Scripts - Edit`
+   - ✅ `Account.Cloudflare Pages - Edit`
 4. انسخ الـ Token
 
 ### 3️⃣ الحصول على Account ID
@@ -35,7 +35,7 @@ VITE_API_URL = https://your-api.example.com
 ```
 
 ### 5️⃣ النشر
-شغّل GitHub Actions يدوياً من workflow المسمى **Deploy to Cloudflare Workers**، أو ادفع التغييرات إلى فرع `main`. يقوم Nitro بإنشاء إعداد Worker الصحيح في `.output/server/wrangler.json` ثم ينشره Wrangler.
+شغّل GitHub Actions يدوياً من workflow المسمى **Deploy to gadee.pages.dev**، أو ادفع التغييرات إلى فرع `main`. يستخدم البناء `cloudflare-pages` وينشر مجلد `dist` إلى مشروع `gadee`.
 
 ---
 
@@ -46,7 +46,7 @@ VITE_API_URL = https://your-api.example.com
 
 ### رابطك الدائمي:
 ```
-https://gadeer-co.<cloudflare-subdomain>.workers.dev
+https://gadee.pages.dev
 ```
 
 ---
@@ -58,6 +58,7 @@ npm run dev          # تطوير محلي
 npm run build        # بناء
 npm run preview      # معاينة
 npm run deploy       # نشر يدوي
+npm run deploy:pages # نشر مباشر إلى gadee.pages.dev
 ```
 
 ---
@@ -66,4 +67,4 @@ npm run deploy       # نشر يدوي
 
 تطبيقك الآن **منشور على Cloudflare** مع نشر تلقائي! 🎉
 
-يعرض Wrangler رابط `workers.dev` الفعلي بعد نجاح النشر. يمكن بعد ذلك إضافة نطاق مخصص من إعدادات Worker في Cloudflare Dashboard.
+يعرض Wrangler رابط النشر بعد نجاح العملية، ويكون الرابط الرئيسي `https://gadee.pages.dev`.
