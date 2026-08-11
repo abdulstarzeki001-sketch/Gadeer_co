@@ -1200,7 +1200,7 @@ table {
 
 @media (max-width: 768px) {
   :root {
-    --mobile-nav-height: 72px;
+    --bottom-nav-height: 64px;
     --gh-radius: 14px;
     --gh-radius-lg: 16px;
   }
@@ -1242,8 +1242,7 @@ table {
   }
   .app-main {
     margin-block: 0 !important;
-    padding-block: 12px
-      calc(var(--mobile-nav-height) + max(env(safe-area-inset-bottom), 8px) + 12px) !important;
+    padding-block: 12px calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px) !important;
     padding-inline: clamp(12px, 4vw, 18px) !important;
   }
   .app-footer {
@@ -1251,61 +1250,151 @@ table {
   }
   .bottom-navigation {
     position: fixed;
-    z-index: 1200;
+    z-index: 2000;
     inset-inline: 0;
     bottom: 0;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     width: 100%;
     max-width: 100%;
-    min-height: var(--mobile-nav-height);
-    padding: 6px max(env(safe-area-inset-right), 6px) max(env(safe-area-inset-bottom), 8px)
+    min-height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+    padding: 5px max(env(safe-area-inset-right), 6px) max(env(safe-area-inset-bottom), 8px)
       max(env(safe-area-inset-left), 6px);
-    border-block-start: 1px solid rgba(10, 26, 58, 0.09);
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 -8px 24px rgba(10, 26, 58, 0.07);
-    backdrop-filter: blur(18px);
+    color: #475569;
+    border-block-start: 1px solid #d8dee8;
+    background-color: #ffffff;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.1);
+    isolation: isolate;
+    overscroll-behavior: contain;
+    transition: transform 180ms ease;
   }
-  .bottom-navigation a {
+  @supports (backdrop-filter: blur(16px)) {
+    .bottom-navigation {
+      background-color: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(16px) saturate(1.15);
+    }
+  }
+  .bottom-navigation__item {
     display: flex;
     min-width: 0;
-    min-height: 48px;
+    min-height: 52px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2px;
-    padding: 3px 1px;
-    color: var(--gh-muted);
+    padding: 3px 2px;
+    color: #475569;
     text-decoration: none;
     border-radius: 12px;
+    outline: none;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      transform 150ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .bottom-navigation a span {
-    font-size: 1.25rem;
-    line-height: 1;
+  .bottom-navigation__indicator {
+    display: grid;
+    width: 36px;
+    height: 30px;
+    place-items: center;
+    border-radius: 999px;
+    background: transparent;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      transform 180ms ease;
   }
-  .bottom-navigation a small {
+  .bottom-navigation__indicator svg {
+    width: 23px;
+    height: 23px;
+  }
+  .bottom-navigation__item small {
     max-width: 100%;
-    font-size: clamp(0.58rem, 2.6vw, 0.68rem);
-    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.15;
+    font-weight: 650;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .bottom-navigation a.active {
-    color: var(--gh-navy);
-    background: rgba(201, 161, 74, 0.12);
+  .bottom-navigation__item.active,
+  .bottom-navigation__item[aria-current="page"] {
+    color: #0a1a3a;
+    font-weight: 800;
   }
-  .bottom-navigation a.primary span {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    margin-top: -16px;
+  .bottom-navigation__item.active .bottom-navigation__indicator,
+  .bottom-navigation__item[aria-current="page"] .bottom-navigation__indicator {
+    color: #0a1a3a;
+    background: #f3e8c8;
+    transform: translateY(-1px);
+  }
+  .bottom-navigation__item.primary .bottom-navigation__indicator {
+    width: 40px;
+    height: 40px;
+    margin-block-start: -15px;
     color: #fff;
     background: var(--gh-navy);
-    border-radius: 50%;
-    box-shadow: 0 6px 14px rgba(10, 26, 58, 0.22);
+    border: 2px solid #fff;
+    border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(10, 26, 58, 0.28);
+  }
+  .bottom-navigation__item.primary.active .bottom-navigation__indicator {
+    color: #fff;
+    background: #8a6a1f;
+  }
+  .bottom-navigation__item:active {
+    transform: scale(0.96);
+    background: #f1f5f9;
+  }
+  .bottom-navigation__item:focus-visible {
+    outline: 2px solid #8a6a1f !important;
+    outline-offset: -2px;
+  }
+  @media (hover: hover) {
+    .bottom-navigation__item:hover {
+      color: #0a1a3a;
+      background: #f8fafc;
+    }
+  }
+  .dark .bottom-navigation {
+    color: #cbd5e1;
+    border-block-start-color: #334155;
+    background-color: #0f172a;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.32);
+  }
+  @supports (backdrop-filter: blur(16px)) {
+    .dark .bottom-navigation {
+      background-color: rgba(15, 23, 42, 0.98);
+    }
+  }
+  .dark .bottom-navigation__item {
+    color: #cbd5e1;
+  }
+  .dark .bottom-navigation__item.active,
+  .dark .bottom-navigation__item[aria-current="page"] {
+    color: #ffffff;
+  }
+  .dark .bottom-navigation__item.active .bottom-navigation__indicator,
+  .dark .bottom-navigation__item[aria-current="page"] .bottom-navigation__indicator {
+    color: #f8fafc;
+    background: #334155;
+  }
+  .dark .bottom-navigation__item.primary .bottom-navigation__indicator {
+    color: #0f172a;
+    border-color: #0f172a;
+    background: #e6c878;
+  }
+  .dark .bottom-navigation__item:active,
+  .dark .bottom-navigation__item:hover {
+    background: #1e293b;
+  }
+  [data-sonner-toaster] {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px) !important;
+  }
+  body:has(input:focus, textarea:focus, select:focus) .bottom-navigation {
+    pointer-events: none;
+    transform: translateY(110%);
   }
 
   main h1 {
@@ -1470,7 +1559,18 @@ table {
   .dashboard-card {
     padding-inline: 8px !important;
   }
-  .bottom-navigation a small {
-    font-size: 0.57rem;
+  .bottom-navigation__item small {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

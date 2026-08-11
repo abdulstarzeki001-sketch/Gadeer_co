@@ -9,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { ChartNoAxesCombined, Home, Plus, ReceiptText, Users, type LucideIcon } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -217,11 +218,11 @@ function SiteShell({ children }: { children: ReactNode }) {
         <br />© 2026 شركة الغدير للنقل والتخليص الكمركي – جميع الحقوق محفوظة
       </footer>
       <nav className="bottom-navigation" aria-label="التنقل السفلي">
-        <MobileLink to="/" icon="⌂" label="الرئيسية" />
-        <MobileLink to="/customers" icon="♙" label="العملاء" />
-        <MobileLink to="/wasl" icon="＋" label="وصل" primary />
-        <MobileLink to="/receipts" icon="▤" label="السندات" />
-        <MobileLink to="/reports" icon="⌁" label="التقارير" />
+        <MobileLink to="/" icon={Home} label="الرئيسية" />
+        <MobileLink to="/customers" icon={Users} label="العملاء" />
+        <MobileLink to="/wasl" icon={Plus} label="وصل" primary />
+        <MobileLink to="/receipts" icon={ReceiptText} label="السندات" />
+        <MobileLink to="/reports" icon={ChartNoAxesCombined} label="التقارير" />
       </nav>
     </div>
   );
@@ -229,12 +230,12 @@ function SiteShell({ children }: { children: ReactNode }) {
 
 function MobileLink({
   to,
-  icon,
+  icon: Icon,
   label,
   primary = false,
 }: {
   to: string;
-  icon: string;
+  icon: LucideIcon;
   label: string;
   primary?: boolean;
 }) {
@@ -242,10 +243,12 @@ function MobileLink({
     <Link
       to={to}
       activeOptions={{ exact: to === "/" }}
-      activeProps={{ className: "active" }}
-      className={primary ? "primary" : undefined}
+      activeProps={{ className: "active", "aria-current": "page" }}
+      className={`bottom-navigation__item${primary ? " primary" : ""}`}
     >
-      <span aria-hidden="true">{icon}</span>
+      <span className="bottom-navigation__indicator" aria-hidden="true">
+        <Icon strokeWidth={2.2} />
+      </span>
       <small>{label}</small>
     </Link>
   );
