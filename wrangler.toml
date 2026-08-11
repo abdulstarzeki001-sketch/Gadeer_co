@@ -1,12 +1,5 @@
 name = "gadeer-co"
-type = "javascript"
-account_id = ""  # سيتم ملأه من GitHub Secrets
-workers_dev = true
-
-[build]
-command = "npm run build"
-cwd = "./"
-watch_paths = ["src/**/*.ts", "src/**/*.tsx"]
-
-[build.upload]
-format = "service-worker"
+# Nitro reads this file while building and adds the generated Worker entrypoint,
+# static-assets binding, compatibility date, and nodejs_compat flag. Keep this
+# source config free of legacy Wrangler fields so they are not copied into the
+# generated .output/server/wrangler.json.
