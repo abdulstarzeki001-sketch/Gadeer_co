@@ -9,8 +9,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
+  const email = "star007@gmail.com";
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -26,21 +25,15 @@ function AuthPage() {
     setBusy(true);
     setMsg(null);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/wasl" });
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error?.code === "email_not_confirmed") {
         setMsg(
-          "تم إنشاء الحساب. تحقق من بريدك الإلكتروني إن لزم الأمر، ثم انتظر موافقة المسؤول للوصول إلى البيانات.",
+          "الحساب غير مفعّل بعد. افتح رسالة Supabase في بريدك واضغط رابط التفعيل، أو أعد إرسال الرابط أدناه.",
         );
+        return;
       }
+      if (error) throw error;
+      navigate({ to: "/wasl" });
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "حدث خطأ");
     } finally {
@@ -48,17 +41,35 @@ function AuthPage() {
     }
   };
 
+  const resendConfirmation = async () => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth` },
+      });
+      if (error) throw error;
+      setMsg("أرسلنا رابط تفعيل جديداً. افحص صندوق الوارد والرسائل غير المرغوب فيها.");
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "تعذر إرسال رابط التفعيل");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: 400, margin: "3rem auto", padding: "0 1rem" }}>
-      <h1 style={{ textAlign: "center" }}>{mode === "signin" ? "تسجيل الدخول" : "إنشاء حساب"}</h1>
+      <h1 style={{ textAlign: "center" }}>تسجيل الدخول</h1>
       <form
         onSubmit={onSubmit}
         className="add-form"
         style={{ display: "flex", flexDirection: "column", gap: 12 }}
       >
         <label>
-          البريد الإلكتروني
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          البريد الإلكتروني المعتمد
+          <input type="email" value={email} readOnly autoComplete="username" />
         </label>
         <label>
           كلمة المرور
@@ -66,6 +77,7 @@ function AuthPage() {
             type="password"
             required
             minLength={6}
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -87,14 +99,21 @@ function AuthPage() {
             cursor: "pointer",
           }}
         >
-          {busy ? "..." : mode === "signin" ? "دخول" : "تسجيل"}
+          {busy ? "جارٍ الدخول..." : "دخول"}
         </button>
         <button
           type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          style={{ background: "none", border: "none", color: "#990707", cursor: "pointer" }}
+          disabled={busy}
+          onClick={resendConfirmation}
+          style={{
+            padding: "8px 12px",
+            background: "none",
+            color: "#990707",
+            border: "none",
+            cursor: busy ? "not-allowed" : "pointer",
+          }}
         >
-          {mode === "signin" ? "ليس لديك حساب؟ سجّل" : "لديك حساب؟ سجّل الدخول"}
+          إعادة إرسال رابط التفعيل
         </button>
       </form>
     </div>
