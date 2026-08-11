@@ -43,17 +43,18 @@ function createSupabaseClient() {
   // Vite exposes client variables only when they are prefixed with VITE_.
   // The process.env fallback is guarded because Cloudflare Workers/Pages do not expose process in the browser runtime.
   const SUPABASE_URL = readEnv("VITE_SUPABASE_URL", "SUPABASE_URL");
-  const SUPABASE_PUBLISHABLE_KEY = readEnv(
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "SUPABASE_PUBLISHABLE_KEY",
-  );
+  const SUPABASE_PUBLISHABLE_KEY =
+    readEnv("VITE_SUPABASE_ANON_KEY", "SUPABASE_ANON_KEY") ||
+    readEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "SUPABASE_PUBLISHABLE_KEY");
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
       ...(!SUPABASE_URL ? ["VITE_SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["VITE_SUPABASE_PUBLISHABLE_KEY"] : []),
+      ...(!SUPABASE_PUBLISHABLE_KEY
+        ? ["VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY"]
+        : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Add them in Cloudflare Pages project settings.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Add them to the Cloudflare Worker build environment.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }

@@ -30,7 +30,7 @@
 CLOUDFLARE_API_TOKEN = [Token من Cloudflare]
 CLOUDFLARE_ACCOUNT_ID = [Account ID من Cloudflare]
 VITE_SUPABASE_URL = [من مشروعك]
-VITE_SUPABASE_PUBLISHABLE_KEY = [من مشروعك]
+VITE_SUPABASE_ANON_KEY = [من مشروعك]
 VITE_API_URL = https://your-api.example.com
 ```
 
