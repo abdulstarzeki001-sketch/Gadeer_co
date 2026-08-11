@@ -1,7 +1,7 @@
-# 🚀 دليل نشر Cloudflare Pages
+# 🚀 دليل النشر على Cloudflare Workers
 
 ## نظرة عامة
-تطبيقك **جاهز للنشر** على Cloudflare Pages مع نشر تلقائي من GitHub!
+التطبيق مبني بـ TanStack Start وNitro ويُنشر كـ **Cloudflare Worker** مع أصول ثابتة، وليس كمشروع Pages ثابت.
 
 ---
 
@@ -15,8 +15,7 @@
 1. في Cloudflare Dashboard → **My Profile** → **API Tokens**
 2. اضغط **Create Token** → **Create Custom Token**
 3. أضف الصلاحيات:
-   - ✅ `Account.Pages - Edit`
-   - ✅ `Account.Workers - Edit`
+   - ✅ `Account.Workers Scripts - Edit`
 4. انسخ الـ Token
 
 ### 3️⃣ الحصول على Account ID
@@ -31,19 +30,12 @@
 CLOUDFLARE_API_TOKEN = [Token من Cloudflare]
 CLOUDFLARE_ACCOUNT_ID = [Account ID من Cloudflare]
 VITE_SUPABASE_URL = [من مشروعك]
-VITE_SUPABASE_ANON_KEY = [من مشروعك]
+VITE_SUPABASE_PUBLISHABLE_KEY = [من مشروعك]
 VITE_API_URL = https://your-api.example.com
 ```
 
-### 5️⃣ إنشاء مشروع Cloudflare Pages
-1. في Cloudflare Dashboard → **Pages**
-2. اضغط **Create a project**
-3. اختر **Connect to Git**
-4. اختر `Gadeer_co`
-5. البناء والنشر:
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-6. اضغط **Deploy**
+### 5️⃣ النشر
+شغّل GitHub Actions يدوياً من workflow المسمى **Deploy to Cloudflare Workers**، أو ادفع التغييرات إلى فرع `main`. يقوم Nitro بإنشاء إعداد Worker الصحيح في `.output/server/wrangler.json` ثم ينشره Wrangler.
 
 ---
 
@@ -51,11 +43,10 @@ VITE_API_URL = https://your-api.example.com
 
 بعد الإعداد، سيتم النشر تلقائياً عند:
 - ✅ Push إلى `main`
-- ✅ فتح PR
 
 ### رابطك الدائمي:
 ```
-https://gadeer-co.pages.dev
+https://gadeer-co.<cloudflare-subdomain>.workers.dev
 ```
 
 ---
@@ -75,4 +66,4 @@ npm run deploy       # نشر يدوي
 
 تطبيقك الآن **منشور على Cloudflare** مع نشر تلقائي! 🎉
 
-الرابط الدائمي: **`https://gadeer-co.pages.dev`**
+يعرض Wrangler رابط `workers.dev` الفعلي بعد نجاح النشر. يمكن بعد ذلك إضافة نطاق مخصص من إعدادات Worker في Cloudflare Dashboard.
