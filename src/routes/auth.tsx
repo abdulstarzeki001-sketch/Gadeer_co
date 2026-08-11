@@ -1,6 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { isLocallyAuthenticated, LOCAL_AUTH_EMAIL, signInLocally } from "@/lib/local-auth";
+import {
+  isLocallyAuthenticated,
+  LOCAL_AUTH_EMAIL,
+  LOCAL_AUTH_PASSWORD,
+  signInLocally,
+} from "@/lib/local-auth";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -9,7 +14,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(LOCAL_AUTH_PASSWORD);
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -17,12 +22,12 @@ function AuthPage() {
     if (isLocallyAuthenticated()) navigate({ to: "/wasl" });
   }, [navigate]);
 
-  const onSubmit = async (event: React.FormEvent) => {
+  const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setMsg(null);
 
-    const authenticated = await signInLocally(LOCAL_AUTH_EMAIL, password);
+    const authenticated = signInLocally(LOCAL_AUTH_EMAIL, password);
     if (authenticated) {
       navigate({ to: "/wasl" });
     } else {
