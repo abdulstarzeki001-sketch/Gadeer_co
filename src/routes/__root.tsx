@@ -3,7 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useRouter,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,7 +12,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { isLocallyAuthenticated, signOutLocally } from "@/lib/local-auth";
 const ghadeerLogo = { url: "/ghadeer-logo.png" };
 
 function NotFoundComponent() {
@@ -139,21 +139,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    try {
-      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-        router.invalidate();
-        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-      });
-      return () => sub.subscription.unsubscribe();
-    } catch (error) {
-      console.warn("Supabase auth disabled because environment variables are missing.", error);
-      return undefined;
-    }
-  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -166,6 +151,7 @@ function RootComponent() {
 }
 
 function SiteShell({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const close = () => setMenuOpen(false);
   return (
@@ -193,6 +179,19 @@ function SiteShell({ children }: { children: ReactNode }) {
             <li>
               <Link to="/wasl">اعمل وصل</Link>
             </li>
+            {typeof window !== "undefined" && isLocallyAuthenticated() && (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    signOutLocally();
+                    navigate({ to: "/auth" });
+                  }}
+                >
+                  خروج
+                </button>
+              </li>
+            )}
           </ul>
           <button
             type="button"
