@@ -4,8 +4,14 @@ import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-function isNewSupabaseApiKey(value: string): boolean {
+function isOpaqueSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
+}
+
+function readServerEnv(runtimeName: string, viteName: string): string | undefined {
+  const runtimeEnv = process.env as Record<string, string | undefined>;
+  const viteEnv = import.meta.env as Record<string, string | undefined> | undefined;
+  return runtimeEnv[runtimeName] || viteEnv?.[viteName];
 }
 
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
@@ -20,7 +26,7 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
     // New Supabase API keys are opaque strings, not bearer JWTs.
     if (
-      isNewSupabaseApiKey(supabaseKey) &&
+      isOpaqueSupabaseApiKey(supabaseKey) &&
       headers.get("Authorization") === `Bearer ${supabaseKey}`
     ) {
       headers.delete("Authorization");
@@ -33,15 +39,23 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    // Prefer Cloudflare runtime bindings when present. If they are not configured,
+    // use the VITE_* publishable values embedded at build time. These are public
+    // Supabase credentials and do not bypass RLS.
+    const SUPABASE_URL = readServerEnv("SUPABASE_URL", "VITE_SUPABASE_URL");
+    const SUPABASE_PUBLISHABLE_KEY = readServerEnv(
+      "SUPABASE_PUBLISHABLE_KEY",
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+    );
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [
-        ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
+        ...(!SUPABASE_URL ? ["SUPABASE_URL/VITE_SUPABASE_URL"] : []),
+        ...(!SUPABASE_PUBLISHABLE_KEY
+          ? ["SUPABASE_PUBLISHABLE_KEY/VITE_SUPABASE_PUBLISHABLE_KEY"]
+          : []),
       ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
+      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}.`;
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }
@@ -71,9 +85,9 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: Invalid token");
     }
 
-    const supabase = createClient<Database>(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+    const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       global: {
-        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY!),
+        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
         headers: {
           Authorization: `Bearer ${token}`,
         },
