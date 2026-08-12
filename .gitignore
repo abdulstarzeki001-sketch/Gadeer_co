@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies / build output
 node_modules
 dist
 dist-ssr
@@ -16,9 +17,15 @@ dist-ssr
 .nitro
 *.local
 
+# Environment files
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
 # Wrangler / Cloudflare
 .wrangler/
-.dev.vars
 
 # Editor directories and files
 .vscode/*
