@@ -258,7 +258,7 @@ nav ul {
   gap: 6px !important;
 }
 
-nav a {
+.app-header nav a {
   color: rgba(255, 255, 255, 0.85) !important;
   padding: 8px 14px !important;
   border-radius: 10px !important;
@@ -268,7 +268,7 @@ nav a {
   position: relative;
 }
 
-nav a:hover {
+.app-header nav a:hover {
   color: #fff !important;
   background: rgba(255, 255, 255, 0.08) !important;
   transform: translateY(-1px);
