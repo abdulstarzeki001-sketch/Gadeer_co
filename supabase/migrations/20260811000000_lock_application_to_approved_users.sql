@@ -62,10 +62,19 @@ BEGIN
       EXECUTE format('DROP POLICY %I ON public.%I', v_policy_name, v_table_name);
     END LOOP;
 
-    EXECUTE format(
-      'CREATE POLICY approved_user_access ON public.%I FOR ALL TO authenticated USING (public.is_approved_user()) WITH CHECK (public.is_approved_user())',
-      v_table_name
-    );
+    -- Keep the row-level ownership boundaries established by earlier migrations;
+    -- approval is an additional gate, not a replacement for those boundaries.
+    IF v_table_name = 'companies' THEN
+      EXECUTE 'CREATE POLICY approved_user_access ON public.companies FOR ALL TO authenticated USING (public.is_approved_user() AND public.has_role(auth.uid(), ''admin''::app_role)) WITH CHECK (public.is_approved_user() AND public.has_role(auth.uid(), ''admin''::app_role))';
+    ELSIF v_table_name = 'user_roles' THEN
+      EXECUTE 'CREATE POLICY approved_user_access ON public.user_roles FOR ALL TO authenticated USING (public.is_approved_user() AND (user_id = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role))) WITH CHECK (public.is_approved_user() AND (user_id = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role)))';
+    ELSIF v_table_name = 'accounts' THEN
+      EXECUTE 'CREATE POLICY approved_user_access ON public.accounts FOR ALL TO authenticated USING (public.is_approved_user() AND (user_id = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role))) WITH CHECK (public.is_approved_user() AND (user_id = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role)))';
+    ELSIF v_table_name = 'document_items' THEN
+      EXECUTE 'CREATE POLICY approved_user_access ON public.document_items FOR ALL TO authenticated USING (public.is_approved_user() AND (public.has_role(auth.uid(), ''admin''::app_role) OR EXISTS (SELECT 1 FROM public.documents d WHERE d.id = document_items.document_id AND d.created_by = auth.uid()))) WITH CHECK (public.is_approved_user() AND (public.has_role(auth.uid(), ''admin''::app_role) OR EXISTS (SELECT 1 FROM public.documents d WHERE d.id = document_items.document_id AND d.created_by = auth.uid())))';
+    ELSE
+      EXECUTE format('CREATE POLICY approved_user_access ON public.%I FOR ALL TO authenticated USING (public.is_approved_user() AND (created_by = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role))) WITH CHECK (public.is_approved_user() AND (created_by = auth.uid() OR public.has_role(auth.uid(), ''admin''::app_role)))', v_table_name);
+    END IF;
   END LOOP;
 END
 $$;
