@@ -83,6 +83,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "شركة الغدير للنقل والتخليص الكمركي" },
+      { name: "theme-color", content: "#03112b" },
+      { name: "application-name", content: "الغدير" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "الغدير" },
       {
         name: "description",
         content: "منصة شركة الغدير لإدارة العملاء والوصولات والحسابات والعمليات اللوجستية.",
@@ -117,6 +122,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "/ghadeer-dark-theme.css",
       },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "apple-touch-icon", href: "/ghadeer-logo.png" },
+      { rel: "icon", href: "/ghadeer-logo.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -137,6 +145,18 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <style>{`
+          html[data-ghadeer-theme="dark"] :is(h1,h2,h3,h4,h5,h6,p,span,small,label,strong,a,button,th,td,legend) {
+            color: #fff !important;
+          }
+          html[data-ghadeer-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+          html[data-ghadeer-theme="dark"] select,
+          html[data-ghadeer-theme="dark"] textarea {
+            color: #fff !important;
+          }
+          html[data-ghadeer-theme="dark"] input::placeholder,
+          html[data-ghadeer-theme="dark"] textarea::placeholder {
+            color: rgba(255,255,255,.72) !important;
+          }
           @media (max-width: 768px) {
             .bottom-navigation {
               color: #eef4ff !important;
