@@ -76,7 +76,7 @@ function CollectionsPage() {
       trader_id: selected.id,
       company_id: companyId,
       amount: numericAmount,
-      type: "client_payment",
+      type: "تحصيل من عميل",
       description: note.trim() || `قبض نقدي من العميل ${selected.name}`,
       created_by: userData.user.id,
     });
@@ -84,11 +84,10 @@ function CollectionsPage() {
     if (error) {
       setMessage({ ok: false, text: error.message });
     } else {
-      setMessage({ ok: true, text: `تم قبض ${formatAmount(numericAmount)} وتنزيله من حساب ${selected.name}.` });
       setAmount("");
       setNote("");
       await loadData();
-      setMessage({ ok: true, text: `تم تسجيل القبض بنجاح وتنزيل المبلغ من حساب ${selected.name}.` });
+      setMessage({ ok: true, text: `تم تسجيل القبض بنجاح وتنزيل ${formatAmount(numericAmount)} من حساب ${selected.name}.` });
     }
     setSaving(false);
   }
@@ -114,6 +113,6 @@ function CollectionsPage() {
 
 function isDebtIncrease(type: string) {
   const n = (type || "").trim().toLowerCase();
-  return ["credit", "income", "payment", "receipt", "deposit", "قبض", "دائن", "وارد", "ايداع", "إيداع"].some((x) => n.includes(x)) && n !== "client_payment";
+  return ["credit", "income", "payment", "receipt", "deposit", "قبض", "دائن", "وارد", "ايداع", "إيداع"].some((x) => n.includes(x));
 }
 function formatAmount(value: number) { return new Intl.NumberFormat("ar-IQ", { maximumFractionDigits: 2 }).format(value || 0); }
