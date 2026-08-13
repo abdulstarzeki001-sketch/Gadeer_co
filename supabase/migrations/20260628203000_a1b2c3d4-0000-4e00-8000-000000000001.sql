@@ -15,7 +15,7 @@ ALTER TABLE public.accounts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "auth select accounts" ON public.accounts
   FOR SELECT TO authenticated
-  USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'::app_role));
+  USING (user_id = auth.uid() OR private.has_role(auth.uid(), 'admin'::app_role));
 
 CREATE POLICY "auth insert accounts" ON public.accounts
   FOR INSERT TO authenticated
@@ -23,9 +23,9 @@ CREATE POLICY "auth insert accounts" ON public.accounts
 
 CREATE POLICY "auth update accounts" ON public.accounts
   FOR UPDATE TO authenticated
-  USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'::app_role))
+  USING (user_id = auth.uid() OR private.has_role(auth.uid(), 'admin'::app_role))
   WITH CHECK (user_id = auth.uid());
 
 CREATE POLICY "auth delete accounts" ON public.accounts
   FOR DELETE TO authenticated
-  USING (user_id = auth.uid() OR public.has_role(auth.uid(), 'admin'::app_role));
+  USING (user_id = auth.uid() OR private.has_role(auth.uid(), 'admin'::app_role));
