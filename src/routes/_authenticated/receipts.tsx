@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Banknote, History } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/receipts")({
   head: () => ({
@@ -21,6 +22,29 @@ function ReceiptsPage() {
       </div>
 
       <div style={{ display: "grid", gap: 16 }}>
+        <section
+          style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 18, background: "#fff" }}
+        >
+          <h2 style={{ margin: "0 0 10px", fontSize: "1.1rem" }}>قبوض العملاء</h2>
+          <p style={{ margin: "0 0 14px", color: "#475569" }}>
+            سجّل أي مبلغ تستلمه من العميل ليتم تنزيله مباشرة من رصيده، أو راجع سجل جميع القبوض السابقة.
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Link
+              to="/collections"
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 14px", borderRadius: 12, background: "#c9a14a", color: "#07142f", fontWeight: 800, textDecoration: "none" }}
+            >
+              <Banknote size={18} /> قبض مبلغ من عميل
+            </Link>
+            <Link
+              to="/collections-history"
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 14px", borderRadius: 12, border: "1px solid #d1d5db", color: "#111827", fontWeight: 800, textDecoration: "none" }}
+            >
+              <History size={18} /> سجل القبوض
+            </Link>
+          </div>
+        </section>
+
         <section
           style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 18, background: "#fff" }}
         >
