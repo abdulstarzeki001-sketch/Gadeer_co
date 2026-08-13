@@ -8,7 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ChartNoAxesCombined, Home, Plus, ReceiptText, Users, type LucideIcon } from "lucide-react";
 
 import appCss from "../styles.css?url";
@@ -16,6 +16,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 const ghadeerLogo = { url: "/ghadeer-logo.png" };
+
+type GhadeerTheme = "dark" | "legacy";
 
 function NotFoundComponent() {
   return (
@@ -212,6 +214,29 @@ function RootComponent() {
 
 function SiteShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const [theme, setTheme] = useState<GhadeerTheme>("dark");
+
+  const applyTheme = (nextTheme: GhadeerTheme) => {
+    const darkThemeLink = document.querySelector<HTMLLinkElement>(
+      'link[href="/ghadeer-dark-theme.css"]',
+    );
+    if (darkThemeLink) darkThemeLink.disabled = nextTheme === "legacy";
+    document.documentElement.dataset.ghadeerTheme = nextTheme;
+  };
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("ghadeer-theme");
+    const initialTheme: GhadeerTheme = savedTheme === "legacy" ? "legacy" : "dark";
+    setTheme(initialTheme);
+    applyTheme(initialTheme);
+  }, []);
+
+  const changeTheme = (nextTheme: GhadeerTheme) => {
+    setTheme(nextTheme);
+    window.localStorage.setItem("ghadeer-theme", nextTheme);
+    applyTheme(nextTheme);
+  };
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -229,6 +254,45 @@ function SiteShell({ children }: { children: ReactNode }) {
             <small>GHADEER LOGISTICS</small>
           </div>
         </Link>
+        <div
+          aria-label="اختيار الثيم"
+          style={{ display: "flex", alignItems: "center", gap: 6, marginInline: "auto 12px" }}
+        >
+          <button
+            type="button"
+            onClick={() => changeTheme("dark")}
+            aria-pressed={theme === "dark"}
+            style={{
+              padding: "7px 10px",
+              borderRadius: 10,
+              border: "1px solid rgba(255,255,255,.28)",
+              background: theme === "dark" ? "#e6c878" : "rgba(255,255,255,.08)",
+              color: theme === "dark" ? "#0a1a3a" : "#fff",
+              fontFamily: "inherit",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            داكن
+          </button>
+          <button
+            type="button"
+            onClick={() => changeTheme("legacy")}
+            aria-pressed={theme === "legacy"}
+            style={{
+              padding: "7px 10px",
+              borderRadius: 10,
+              border: "1px solid rgba(255,255,255,.28)",
+              background: theme === "legacy" ? "#e6c878" : "rgba(255,255,255,.08)",
+              color: theme === "legacy" ? "#0a1a3a" : "#fff",
+              fontFamily: "inherit",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            قديم
+          </button>
+        </div>
         <nav className="desktop-nav" aria-label="التنقل الرئيسي">
           <ul className="top-navigation">
             <li>
