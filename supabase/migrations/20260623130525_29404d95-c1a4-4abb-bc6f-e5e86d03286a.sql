@@ -91,4 +91,5 @@ CREATE POLICY "admin delete tx" ON public.transactions
 
 -- 8. Remove SECURITY DEFINER functions exposed via the public API that are unused
 DROP FUNCTION IF EXISTS public.verify_document(text);
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
