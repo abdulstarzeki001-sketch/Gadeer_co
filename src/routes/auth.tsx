@@ -13,6 +13,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [resetBusy, setResetBusy] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -32,6 +33,26 @@ function AuthPage() {
       setMsg(err instanceof Error ? err.message : "حدث خطأ");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const onResetPassword = async () => {
+    if (!email) {
+      setMsg("اكتب البريد الإلكتروني أولاً");
+      return;
+    }
+
+    setResetBusy(true);
+    setMsg(null);
+    try {
+      const redirectTo = `${window.location.origin}/reset-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      setMsg("تم إرسال رابط تغيير كلمة المرور إلى بريدك الإلكتروني");
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "تعذر إرسال رابط تغيير كلمة المرور");
+    } finally {
+      setResetBusy(false);
     }
   };
 
@@ -82,6 +103,21 @@ function AuthPage() {
           }}
         >
           {busy ? "جارٍ التحقق..." : "دخول"}
+        </button>
+        <button
+          type="button"
+          onClick={onResetPassword}
+          disabled={resetBusy}
+          style={{
+            padding: "8px 12px",
+            background: "transparent",
+            color: "#111827",
+            border: "none",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+        >
+          {resetBusy ? "جارٍ الإرسال..." : "نسيت كلمة المرور؟"}
         </button>
       </form>
     </div>
