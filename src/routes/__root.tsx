@@ -130,6 +130,50 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="ar" dir="rtl">
       <head>
         <HeadContent />
+        <style>{`
+          @media (max-width: 768px) {
+            .bottom-navigation {
+              color: #eef4ff !important;
+              border-block-start: 1px solid rgba(255,255,255,.12) !important;
+              background: linear-gradient(135deg,#0a1a3a 0%,#122859 52%,#0a1a3a 100%) !important;
+              box-shadow: 0 -10px 28px rgba(5,13,32,.28) !important;
+            }
+            .bottom-navigation__item { color: rgba(255,255,255,.78) !important; }
+            .bottom-navigation__item.active,
+            .bottom-navigation__item[aria-current="page"] { color: #fff !important; }
+            .bottom-navigation__item.active .bottom-navigation__indicator,
+            .bottom-navigation__item[aria-current="page"] .bottom-navigation__indicator,
+            .bottom-navigation__item.primary .bottom-navigation__indicator {
+              color: #0a1a3a !important;
+              background: #e6c878 !important;
+            }
+            .bottom-navigation__item.primary .bottom-navigation__indicator {
+              border-color: #0a1a3a !important;
+              box-shadow: 0 8px 18px rgba(0,0,0,.3) !important;
+            }
+            .bottom-navigation__item:active,
+            .bottom-navigation__item:hover {
+              color: #fff !important;
+              background: rgba(255,255,255,.08) !important;
+            }
+          }
+          .receipt-selector-page { width:min(100%,920px); margin:0 auto; padding:clamp(18px,4vw,36px) 0 80px; }
+          .receipt-selector-heading { text-align:center; margin-bottom:24px; }
+          .receipt-selector-kicker { display:inline-flex; padding:7px 12px; border-radius:999px; background:#eef3ff; color:#122859; font-weight:800; font-size:.82rem; margin-bottom:10px; }
+          .receipt-selector-heading p { margin:-10px 0 0; color:#6b7388; }
+          .receipt-selector-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+          .receipt-type-card { min-width:0; min-height:260px; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; gap:20px; padding:clamp(22px,4vw,30px); border-radius:22px; text-decoration:none; border:1px solid #dfe5f0; box-shadow:0 14px 36px -20px rgba(10,26,58,.35); transition:transform 180ms ease,box-shadow 180ms ease,border-color 180ms ease; overflow:hidden; position:relative; }
+          .receipt-type-card--iraq { color:#fff; background:linear-gradient(145deg,#0a1a3a 0%,#18356f 100%); border-color:rgba(230,200,120,.45); }
+          .receipt-type-card--turkey { color:#fff; background:linear-gradient(145deg,#122859 0%,#244995 100%); border-color:rgba(230,200,120,.36); }
+          .receipt-type-card:hover { transform:translateY(-4px); border-color:#e6c878; box-shadow:0 24px 48px -20px rgba(10,26,58,.45); }
+          .receipt-type-icon { width:62px; height:62px; display:grid; place-items:center; border-radius:18px; background:#e6c878; color:#0a1a3a; box-shadow:0 10px 24px rgba(0,0,0,.2); }
+          .receipt-type-icon svg { width:31px; height:31px; }
+          .receipt-type-copy { display:grid; gap:8px; }
+          .receipt-type-copy strong { font-size:clamp(1.3rem,4vw,1.65rem); font-weight:900; }
+          .receipt-type-copy small { color:rgba(255,255,255,.8); font-size:.9rem; line-height:1.8; }
+          .receipt-type-action { display:inline-flex; padding:10px 14px; border-radius:12px; background:rgba(255,255,255,.1); color:#fff; font-weight:800; font-size:.88rem; }
+          @media (max-width:700px) { .receipt-selector-grid { grid-template-columns:1fr; } .receipt-type-card { min-height:220px; } }
+        `}</style>
       </head>
       <body>
         {children}
@@ -189,7 +233,7 @@ function SiteShell({ children }: { children: ReactNode }) {
               </Link>
             </li>
             <li>
-              <Link to="/wasl">اعمل وصل</Link>
+              <Link to="/wasl-select">اعمل وصل</Link>
             </li>
             <li>
               <Link to="/customers">العملاء</Link>
@@ -228,7 +272,7 @@ function SiteShell({ children }: { children: ReactNode }) {
       <nav className="bottom-navigation" aria-label="التنقل السفلي">
         <MobileLink to="/" icon={Home} label="الرئيسية" />
         <MobileLink to="/customers" icon={Users} label="العملاء" />
-        <MobileLink to="/wasl" icon={Plus} label="وصل" primary />
+        <MobileLink to="/wasl-select" icon={Plus} label="وصل" primary />
         <MobileLink to="/receipts" icon={ReceiptText} label="السندات" />
         <MobileLink to="/reports" icon={ChartNoAxesCombined} label="التقارير" />
       </nav>
