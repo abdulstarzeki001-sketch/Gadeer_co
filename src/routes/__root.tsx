@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { ChartNoAxesCombined, Home, Plus, ReceiptText, Users, type LucideIcon } from "lucide-react";
+import { ChartNoAxesCombined, Home, Moon, Plus, ReceiptText, Sun, Users, type LucideIcon } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -308,35 +308,43 @@ function SiteShell({ children }: { children: ReactNode }) {
             type="button"
             onClick={() => changeTheme("dark")}
             aria-pressed={theme === "dark"}
+            aria-label="الوضع الداكن"
+            title="الوضع الداكن"
             style={{
-              padding: "7px 10px",
-              borderRadius: 10,
+              width: 38,
+              height: 38,
+              display: "grid",
+              placeItems: "center",
+              padding: 0,
+              borderRadius: 12,
               border: "1px solid rgba(255,255,255,.28)",
               background: theme === "dark" ? "#e6c878" : "rgba(255,255,255,.08)",
               color: theme === "dark" ? "#0a1a3a" : "#fff",
-              fontFamily: "inherit",
-              fontWeight: 800,
               cursor: "pointer",
             }}
           >
-            داكن
+            <Moon size={19} strokeWidth={2.3} aria-hidden="true" />
           </button>
           <button
             type="button"
             onClick={() => changeTheme("legacy")}
             aria-pressed={theme === "legacy"}
+            aria-label="الوضع القديم"
+            title="الوضع القديم"
             style={{
-              padding: "7px 10px",
-              borderRadius: 10,
+              width: 38,
+              height: 38,
+              display: "grid",
+              placeItems: "center",
+              padding: 0,
+              borderRadius: 12,
               border: "1px solid rgba(255,255,255,.28)",
               background: theme === "legacy" ? "#e6c878" : "rgba(255,255,255,.08)",
               color: theme === "legacy" ? "#0a1a3a" : "#fff",
-              fontFamily: "inherit",
-              fontWeight: 800,
               cursor: "pointer",
             }}
           >
-            قديم
+            <Sun size={19} strokeWidth={2.3} aria-hidden="true" />
           </button>
         </div>
         <nav className="desktop-nav" aria-label="التنقل الرئيسي">
