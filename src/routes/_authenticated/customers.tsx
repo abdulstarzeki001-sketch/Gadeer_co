@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { ArrowRight, MapPin, Phone, Plus, RefreshCcw, User, Users } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Plus, RefreshCcw, Trash2, User, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/customers")({
@@ -30,6 +30,7 @@ function CustomersPage() {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -96,6 +97,29 @@ function CustomersPage() {
     setSaving(false);
   }
 
+  async function deleteCustomer(customer: Trader) {
+    const confirmed = window.confirm(
+      `هل تريد حذف العميل \"${customer.name}\"؟\n\nسيتم حذف العميل فقط، بينما تبقى الوصولات والحركات السابقة محفوظة في النظام.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(customer.id);
+    setError(null);
+    setSuccess(null);
+
+    const { error: deleteError } = await supabase.from("traders").delete().eq("id", customer.id);
+
+    if (deleteError) {
+      setError(`تعذر حذف العميل: ${deleteError.message}`);
+      setDeletingId(null);
+      return;
+    }
+
+    setCustomers((current) => current.filter((item) => item.id !== customer.id));
+    setSuccess(`تم حذف العميل ${customer.name} بنجاح.`);
+    setDeletingId(null);
+  }
+
   return (
     <div className="customers-page" dir="rtl">
       <style>{`
@@ -104,8 +128,9 @@ function CustomersPage() {
         .customers-grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px}.customers-card{border:1px solid var(--gh-line,#d9dfeb);border-radius:20px;padding:18px;background:var(--gh-panel,#fff);box-shadow:0 12px 30px rgba(15,23,42,.08)}
         .customers-card h2{display:flex;align-items:center;gap:8px;margin:0 0 16px;font-size:1.08rem}.customer-form{display:grid;gap:12px}.customer-field label{display:block;margin-bottom:6px;font-weight:800;font-size:.86rem}.customer-field input,.customer-field textarea{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--gh-line,#d9dfeb);border-radius:12px;background:var(--gh-panel2,#f8fafc);color:inherit}.customer-field textarea{min-height:92px;resize:vertical}
         .customer-save{display:flex;justify-content:center;align-items:center;gap:8px;padding:12px 16px;border:0;border-radius:13px;cursor:pointer;font-weight:900}.customer-save:disabled{opacity:.55;cursor:not-allowed}.customer-message{padding:10px 12px;border-radius:12px;font-size:.9rem}.customer-error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}.customer-success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-        .customers-list-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.customers-list-head h2{margin:0}.customer-refresh{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--gh-line,#d9dfeb);border-radius:10px;background:transparent;color:inherit;cursor:pointer}.customer-list{display:grid;gap:10px}.customer-item{padding:13px;border:1px solid var(--gh-line,#d9dfeb);border-radius:14px;background:var(--gh-panel2,#f8fafc)}.customer-item strong{display:block;margin-bottom:6px}.customer-meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--gh-muted,#667085);font-size:.86rem}.customer-meta span{display:inline-flex;align-items:center;gap:5px}.customer-notes{margin:8px 0 0;color:var(--gh-muted,#667085);font-size:.86rem}.customers-empty{text-align:center;padding:35px 10px;color:var(--gh-muted,#667085)}.customers-back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:inherit}
-        @media(max-width:760px){.customers-grid{grid-template-columns:1fr}.customers-head{align-items:flex-start;flex-direction:column}}
+        .customers-list-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.customers-list-head h2{margin:0}.customer-refresh{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--gh-line,#d9dfeb);border-radius:10px;background:transparent;color:inherit;cursor:pointer}.customer-list{display:grid;gap:10px}.customer-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px;border:1px solid var(--gh-line,#d9dfeb);border-radius:14px;background:var(--gh-panel2,#f8fafc)}.customer-item strong{display:block;margin-bottom:6px}.customer-meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--gh-muted,#667085);font-size:.86rem}.customer-meta span{display:inline-flex;align-items:center;gap:5px}.customer-notes{margin:8px 0 0;color:var(--gh-muted,#667085);font-size:.86rem}.customer-delete{width:42px;height:42px;display:grid;place-items:center;border-radius:12px!important;border:1px solid rgba(239,68,68,.3)!important;background:rgba(239,68,68,.08)!important;color:#ef4444!important;cursor:pointer}.customer-delete:disabled{opacity:.5;cursor:not-allowed}.customers-empty{text-align:center;padding:35px 10px;color:var(--gh-muted,#667085)}.customers-back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:inherit}
+        html[data-ghadeer-theme="dark"] .customer-delete{color:#ff8c96!important;background:rgba(255,80,95,.08)!important;border-color:rgba(255,80,95,.28)!important}
+        @media(max-width:760px){.customers-grid{grid-template-columns:1fr}.customers-head{align-items:flex-start;flex-direction:column}.customer-item{padding:12px 10px}}
       `}</style>
 
       <header className="customers-head">
@@ -129,7 +154,7 @@ function CustomersPage() {
 
         <section className="customers-card">
           <div className="customers-list-head"><h2><Users size={20}/> قائمة العملاء</h2><button type="button" className="customer-refresh" onClick={()=>void loadCustomers()} disabled={loading}><RefreshCcw size={15}/> تحديث</button></div>
-          {loading ? <div className="customers-empty">جارٍ تحميل العملاء...</div> : customers.length === 0 ? <div className="customers-empty">لا يوجد عملاء محفوظون بعد.</div> : <div className="customer-list">{customers.map((customer)=><article className="customer-item" key={customer.id}><strong><User size={15}/> {customer.name}</strong><div className="customer-meta">{customer.phone ? <span><Phone size={14}/>{customer.phone}</span> : null}{customer.address ? <span><MapPin size={14}/>{customer.address}</span> : null}</div>{customer.notes ? <p className="customer-notes">{customer.notes}</p> : null}</article>)}</div>}
+          {loading ? <div className="customers-empty">جارٍ تحميل العملاء...</div> : customers.length === 0 ? <div className="customers-empty">لا يوجد عملاء محفوظون بعد.</div> : <div className="customer-list">{customers.map((customer)=><article className="customer-item" key={customer.id}><div><strong><User size={15}/> {customer.name}</strong><div className="customer-meta">{customer.phone ? <span><Phone size={14}/>{customer.phone}</span> : null}{customer.address ? <span><MapPin size={14}/>{customer.address}</span> : null}</div>{customer.notes ? <p className="customer-notes">{customer.notes}</p> : null}</div><button type="button" className="customer-delete" aria-label={`حذف ${customer.name}`} title="حذف العميل" disabled={deletingId===customer.id} onClick={()=>void deleteCustomer(customer)}>{deletingId===customer.id ? "…" : <Trash2 size={18}/>}</button></article>)}</div>}
         </section>
       </div>
     </div>
