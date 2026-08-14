@@ -42,6 +42,7 @@ jobs:
           SUPABASE_URL: ${{ env.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ env.SUPABASE_PUBLISHABLE_KEY }}
 
+      # This branch is the active production source for the Ghadeer redesign.
       - name: Deploy to Cloudflare Worker
         run: npx wrangler deploy --config .output/server/wrangler.json
         env:
