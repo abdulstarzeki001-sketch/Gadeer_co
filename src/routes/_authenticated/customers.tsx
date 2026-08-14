@@ -99,7 +99,7 @@ function CustomersPage() {
 
   async function deleteCustomer(customer: Trader) {
     const confirmed = window.confirm(
-      `هل تريد حذف العميل \"${customer.name}\"؟\n\nسيتم حذف العميل فقط، بينما تبقى الوصولات والحركات السابقة محفوظة في النظام.`,
+      `هل تريد حذف العميل \"${customer.name}\"؟\n\nسيتم حذف بطاقة العميل فقط، وستبقى الوصولات والحركات السابقة محفوظة في النظام.`,
     );
     if (!confirmed) return;
 
@@ -107,8 +107,27 @@ function CustomersPage() {
     setError(null);
     setSuccess(null);
 
-    const { error: deleteError } = await supabase.from("traders").delete().eq("id", customer.id);
+    const { error: documentsError } = await supabase
+      .from("documents")
+      .update({ trader_id: null })
+      .eq("trader_id", customer.id);
+    if (documentsError) {
+      setError(`تعذر فصل وصولات العميل قبل الحذف: ${documentsError.message}`);
+      setDeletingId(null);
+      return;
+    }
 
+    const { error: transactionsError } = await supabase
+      .from("transactions")
+      .update({ trader_id: null })
+      .eq("trader_id", customer.id);
+    if (transactionsError) {
+      setError(`تعذر فصل حركات العميل قبل الحذف: ${transactionsError.message}`);
+      setDeletingId(null);
+      return;
+    }
+
+    const { error: deleteError } = await supabase.from("traders").delete().eq("id", customer.id);
     if (deleteError) {
       setError(`تعذر حذف العميل: ${deleteError.message}`);
       setDeletingId(null);
@@ -116,7 +135,7 @@ function CustomersPage() {
     }
 
     setCustomers((current) => current.filter((item) => item.id !== customer.id));
-    setSuccess(`تم حذف العميل ${customer.name} بنجاح.`);
+    setSuccess(`تم حذف العميل ${customer.name} بنجاح مع الاحتفاظ بالسجل السابق.`);
     setDeletingId(null);
   }
 
