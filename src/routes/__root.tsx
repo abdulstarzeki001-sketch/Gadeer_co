@@ -19,6 +19,28 @@ const ghadeerLogo = { url: "/ghadeer-logo.png" };
 
 type GhadeerTheme = "dark" | "legacy";
 
+const ENGLISH_NUMERALS_SCRIPT = `
+(() => {
+  const latinLocale = "ar-IQ-u-nu-latn";
+  const originalNumber = Number.prototype.toLocaleString;
+  const originalDate = Date.prototype.toLocaleString;
+  const originalDateOnly = Date.prototype.toLocaleDateString;
+  const originalTimeOnly = Date.prototype.toLocaleTimeString;
+  Number.prototype.toLocaleString = function (_locales, options) {
+    return originalNumber.call(this, latinLocale, options);
+  };
+  Date.prototype.toLocaleString = function (_locales, options) {
+    return originalDate.call(this, latinLocale, options);
+  };
+  Date.prototype.toLocaleDateString = function (_locales, options) {
+    return originalDateOnly.call(this, latinLocale, options);
+  };
+  Date.prototype.toLocaleTimeString = function (_locales, options) {
+    return originalTimeOnly.call(this, latinLocale, options);
+  };
+})();
+`;
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -141,10 +163,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar-IQ-u-nu-latn" dir="rtl">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: ENGLISH_NUMERALS_SCRIPT }} />
         <style>{`
+          html,body,#root,input,select,textarea,button,table {
+            font-variant-numeric: lining-nums tabular-nums;
+          }
           html[data-ghadeer-theme="dark"] :is(h1,h2,h3,h4,h5,h6,p,span,small,label,strong,a,button,th,td,legend) {
             color: #fff !important;
           }
@@ -315,39 +341,15 @@ function SiteShell({ children }: { children: ReactNode }) {
         </div>
         <nav className="desktop-nav" aria-label="التنقل الرئيسي">
           <ul className="top-navigation">
+            <li><Link to="/" activeOptions={{ exact: true }}>الرئيسية</Link></li>
+            <li><Link to="/wasl-select">اعمل وصل</Link></li>
+            <li><Link to="/customers">العملاء</Link></li>
+            <li><Link to="/receipts">السندات</Link></li>
+            <li><Link to="/expenses">المصروفات</Link></li>
+            <li><Link to="/accounts">الحسابات</Link></li>
+            <li><Link to="/reports">التقارير</Link></li>
             <li>
-              <Link to="/" activeOptions={{ exact: true }}>
-                الرئيسية
-              </Link>
-            </li>
-            <li>
-              <Link to="/wasl-select">اعمل وصل</Link>
-            </li>
-            <li>
-              <Link to="/customers">العملاء</Link>
-            </li>
-            <li>
-              <Link to="/receipts">السندات</Link>
-            </li>
-            <li>
-              <Link to="/expenses">المصروفات</Link>
-            </li>
-            <li>
-              <Link to="/accounts">الحسابات</Link>
-            </li>
-            <li>
-              <Link to="/reports">التقارير</Link>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={async () => {
-                  await supabase.auth.signOut();
-                  navigate({ to: "/auth" });
-                }}
-              >
-                خروج
-              </button>
+              <button type="button" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}>خروج</button>
             </li>
           </ul>
         </nav>
@@ -386,9 +388,7 @@ function MobileLink({
       activeProps={{ className: "active", "aria-current": "page" }}
       className={`bottom-navigation__item${primary ? " primary" : ""}`}
     >
-      <span className="bottom-navigation__indicator" aria-hidden="true">
-        <Icon strokeWidth={2.2} />
-      </span>
+      <span className="bottom-navigation__indicator" aria-hidden="true"><Icon strokeWidth={2.2} /></span>
       <small>{label}</small>
     </Link>
   );
