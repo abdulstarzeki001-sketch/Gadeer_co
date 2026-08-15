@@ -68,7 +68,6 @@ function TurkishLoadsPage() {
   const [form, setForm] = useState<TurkishLoadForm>(EMPTY);
   const [traders, setTraders] = useState<Trader[]>([]);
   const [traderId, setTraderId] = useState("");
-  const [customerSearch, setCustomerSearch] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
@@ -78,13 +77,6 @@ function TurkishLoadsPage() {
   const loadCount = Math.max(0, Number.parseInt(form.loadCount || "0", 10) || 0);
   const amountDue = unitAmount * loadCount;
   const selectedTrader = traders.find((trader) => trader.id === traderId) ?? null;
-  const filteredTraders = useMemo(() => {
-    const q = customerSearch.trim().toLowerCase();
-    if (!q) return traders;
-    return traders.filter((trader) =>
-      [trader.name, trader.phone ?? ""].some((value) => value.toLowerCase().includes(q)),
-    );
-  }, [customerSearch, traders]);
 
   const loadReceipts = useCallback(async () => {
     setLoading(true);
@@ -197,7 +189,6 @@ function TurkishLoadsPage() {
 
       setForm(EMPTY);
       setTraderId("");
-      setCustomerSearch("");
       setMessage({ text: `تم حفظ الوصل على حساب ${selectedTrader.name} وتنزيل PDF — المستحق ${formatMoney(amountDue)}`, ok: true });
       await loadReceipts();
     } catch (error) {
@@ -213,7 +204,7 @@ function TurkishLoadsPage() {
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 999, background: "#fff7ed", color: "#9a3412", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>🇹🇷 وصولات PDF</div>
         <h1 style={{ margin: 0, fontSize: "clamp(1.7rem, 5vw, 2.35rem)" }}>وصولات الحمولات التركية</h1>
-        <p style={{ color: "var(--gh-muted)", marginTop: 8, lineHeight: 1.8 }}>اختر العميل من جميع العملاء المحفوظين، ثم سجل الحمولة وسيتم ربطها مباشرة بحسابه.</p>
+        <p style={{ color: "var(--gh-muted)", marginTop: 8, lineHeight: 1.8 }}>اختر العميل مباشرة من جميع العملاء المحفوظين، ثم سجل الحمولة وسيتم ربطها بحسابه.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 18 }}>
@@ -223,14 +214,13 @@ function TurkishLoadsPage() {
       </div>
 
       <section style={{ border: "1px solid #e5e7eb", borderRadius: 18, background: "#fff", padding: "clamp(16px, 4vw, 24px)", boxShadow: "0 8px 28px rgba(15, 23, 42, 0.06)", marginBottom: 22 }}>
-        <div style={{ marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>إضافة وصل تركي جديد</h2><p style={{ margin: "6px 0 0", color: "#64748b", fontSize: 14 }}>كل العملاء يظهرون هنا، ويمكنك البحث بالاسم أو الهاتف.</p></div>
+        <div style={{ marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>إضافة وصل تركي جديد</h2><p style={{ margin: "6px 0 0", color: "#64748b", fontSize: 14 }}>كل العملاء يظهرون مباشرة في قائمة اسم العميل.</p></div>
         <form onSubmit={onSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
-            <Field label="بحث عن العميل"><input value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} placeholder="اكتب اسم العميل أو رقم الهاتف" /></Field>
-            <Field label={`اسم العميل (${filteredTraders.length})`}>
+            <Field label={`اسم العميل (${traders.length})`}>
               <select required value={traderId} onChange={(e) => setTraderId(e.target.value)}>
                 <option value="">-- اختر العميل --</option>
-                {filteredTraders.map((trader) => <option key={trader.id} value={trader.id}>{trader.name}{trader.phone ? ` - ${trader.phone}` : ""}</option>)}
+                {traders.map((trader) => <option key={trader.id} value={trader.id}>{trader.name}{trader.phone ? ` - ${trader.phone}` : ""}</option>)}
               </select>
             </Field>
             <Field label="اسم السائق"><input required value={form.driverName} onChange={(e) => set("driverName", e.target.value)} placeholder="مثال: أحمد محمد" /></Field>
