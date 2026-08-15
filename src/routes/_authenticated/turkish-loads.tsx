@@ -7,9 +7,14 @@ import { downloadBlob } from "@/lib/wasl-pdf";
 type TurkishLoadForm = {
   driverName: string;
   cargoType: string;
-  customerName: string;
   unitAmount: string;
   loadCount: string;
+};
+
+type Trader = {
+  id: string;
+  name: string;
+  phone: string | null;
 };
 
 type TurkishLoadReceipt = {
@@ -31,7 +36,6 @@ type ReceiptDetails = {
 const EMPTY: TurkishLoadForm = {
   driverName: "",
   cargoType: "",
-  customerName: "",
   unitAmount: "",
   loadCount: "1",
 };
@@ -62,6 +66,9 @@ function formatMoney(value: number) {
 
 function TurkishLoadsPage() {
   const [form, setForm] = useState<TurkishLoadForm>(EMPTY);
+  const [traders, setTraders] = useState<Trader[]>([]);
+  const [traderId, setTraderId] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
@@ -70,6 +77,14 @@ function TurkishLoadsPage() {
   const unitAmount = Number(form.unitAmount || 0);
   const loadCount = Math.max(0, Number.parseInt(form.loadCount || "0", 10) || 0);
   const amountDue = unitAmount * loadCount;
+  const selectedTrader = traders.find((trader) => trader.id === traderId) ?? null;
+  const filteredTraders = useMemo(() => {
+    const q = customerSearch.trim().toLowerCase();
+    if (!q) return traders;
+    return traders.filter((trader) =>
+      [trader.name, trader.phone ?? ""].some((value) => value.toLowerCase().includes(q)),
+    );
+  }, [customerSearch, traders]);
 
   const loadReceipts = useCallback(async () => {
     setLoading(true);
@@ -83,7 +98,14 @@ function TurkishLoadsPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { void loadReceipts(); }, [loadReceipts]);
+  useEffect(() => {
+    void Promise.all([
+      loadReceipts(),
+      supabase.from("traders").select("id,name,phone").order("name"),
+    ]).then(([, tradersResult]) => {
+      if (!tradersResult.error) setTraders((tradersResult.data ?? []) as Trader[]);
+    });
+  }, [loadReceipts]);
 
   const totals = useMemo(() => receipts.reduce(
     (acc, receipt) => {
@@ -117,8 +139,12 @@ function TurkishLoadsPage() {
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setMessage(null);
-    if (!form.driverName.trim() || !form.cargoType.trim() || !form.customerName.trim()) {
-      setMessage({ text: "أكمل اسم السائق ونوع الحمل واسم العميل/الشركة.", ok: false });
+    if (!selectedTrader) {
+      setMessage({ text: "اختر العميل من قائمة العملاء.", ok: false });
+      return;
+    }
+    if (!form.driverName.trim() || !form.cargoType.trim()) {
+      setMessage({ text: "أكمل اسم السائق ونوع الحمل.", ok: false });
       return;
     }
     if (unitAmount <= 0 || loadCount <= 0) {
@@ -138,7 +164,7 @@ function TurkishLoadsPage() {
       const receiptNumber = `TR-${Date.now()}`;
       const savedForm = { ...form };
       const description = JSON.stringify({
-        customerName: savedForm.customerName.trim(),
+        customerName: selectedTrader.name,
         cargoType: savedForm.cargoType.trim(),
         unitAmount,
         loadCount,
@@ -146,6 +172,7 @@ function TurkishLoadsPage() {
 
       const { error } = await supabase.from("transactions").insert({
         company_id: company.id,
+        trader_id: selectedTrader.id,
         document_number: receiptNumber,
         driver_name: savedForm.driverName.trim(),
         type: "turkish_load_receipt",
@@ -158,7 +185,7 @@ function TurkishLoadsPage() {
       const pdf = await generateLoadReceiptPdf({
         receiptNumber,
         loadType: "تركية",
-        customerName: savedForm.customerName.trim(),
+        customerName: selectedTrader.name,
         driverName: savedForm.driverName.trim(),
         cargoType: savedForm.cargoType.trim(),
         amount: amountDue,
@@ -169,7 +196,9 @@ function TurkishLoadsPage() {
       downloadBlob(pdf, `وصل-حمولة-تركية-${receiptNumber}.pdf`);
 
       setForm(EMPTY);
-      setMessage({ text: `تم حفظ الوصل وتنزيل PDF — المستحق ${formatMoney(amountDue)}`, ok: true });
+      setTraderId("");
+      setCustomerSearch("");
+      setMessage({ text: `تم حفظ الوصل على حساب ${selectedTrader.name} وتنزيل PDF — المستحق ${formatMoney(amountDue)}`, ok: true });
       await loadReceipts();
     } catch (error) {
       console.error(error);
@@ -184,7 +213,7 @@ function TurkishLoadsPage() {
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 999, background: "#fff7ed", color: "#9a3412", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>🇹🇷 وصولات PDF</div>
         <h1 style={{ margin: 0, fontSize: "clamp(1.7rem, 5vw, 2.35rem)" }}>وصولات الحمولات التركية</h1>
-        <p style={{ color: "var(--gh-muted)", marginTop: 8, lineHeight: 1.8 }}>سجل الحمولة واحفظها في النظام، وسيتم تنزيل وصل PDF تلقائيًا بعد الحفظ.</p>
+        <p style={{ color: "var(--gh-muted)", marginTop: 8, lineHeight: 1.8 }}>اختر العميل من جميع العملاء المحفوظين، ثم سجل الحمولة وسيتم ربطها مباشرة بحسابه.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 18 }}>
@@ -194,12 +223,18 @@ function TurkishLoadsPage() {
       </div>
 
       <section style={{ border: "1px solid #e5e7eb", borderRadius: 18, background: "#fff", padding: "clamp(16px, 4vw, 24px)", boxShadow: "0 8px 28px rgba(15, 23, 42, 0.06)", marginBottom: 22 }}>
-        <div style={{ marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>إضافة وصل تركي جديد</h2><p style={{ margin: "6px 0 0", color: "#64748b", fontSize: 14 }}>أدخل البيانات وسيتم إنشاء PDF جاهز للطباعة.</p></div>
+        <div style={{ marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>إضافة وصل تركي جديد</h2><p style={{ margin: "6px 0 0", color: "#64748b", fontSize: 14 }}>كل العملاء يظهرون هنا، ويمكنك البحث بالاسم أو الهاتف.</p></div>
         <form onSubmit={onSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+            <Field label="بحث عن العميل"><input value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} placeholder="اكتب اسم العميل أو رقم الهاتف" /></Field>
+            <Field label={`اسم العميل (${filteredTraders.length})`}>
+              <select required value={traderId} onChange={(e) => setTraderId(e.target.value)}>
+                <option value="">-- اختر العميل --</option>
+                {filteredTraders.map((trader) => <option key={trader.id} value={trader.id}>{trader.name}{trader.phone ? ` - ${trader.phone}` : ""}</option>)}
+              </select>
+            </Field>
             <Field label="اسم السائق"><input required value={form.driverName} onChange={(e) => set("driverName", e.target.value)} placeholder="مثال: أحمد محمد" /></Field>
             <Field label="نوع الحمل"><input required value={form.cargoType} onChange={(e) => set("cargoType", e.target.value)} placeholder="مثال: مواد غذائية / حديد / أثاث" /></Field>
-            <Field label="اسم العميل أو الشركة"><input required value={form.customerName} onChange={(e) => set("customerName", e.target.value)} placeholder="اسم العميل أو الشركة" /></Field>
             <Field label="مبلغ الحمولة الواحدة"><input required type="number" min="0" step="0.01" inputMode="decimal" value={form.unitAmount} onChange={(e) => set("unitAmount", e.target.value)} placeholder="0" /></Field>
             <Field label="عدد الحمولات"><input required type="number" min="1" step="1" inputMode="numeric" value={form.loadCount} onChange={(e) => set("loadCount", e.target.value)} /></Field>
           </div>
