@@ -50,11 +50,7 @@ function HomePage() {
           style={{
             fontSize: "2rem",
             margin: "0 0 10px",
-            background:
-              "linear-gradient(135deg, var(--gh-navy) 0%, var(--gh-navy-2) 70%, var(--gh-gold-dark) 100%)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            color: "#ffffff",
             letterSpacing: "-0.8px",
           }}
         >
