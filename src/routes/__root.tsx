@@ -17,7 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 const ghadeerLogo = { url: "/ghadeer-logo.png" };
 
-type GhadeerTheme = "dark" | "legacy";
+type GhadeerTheme = "ocean" | "pearl" | "midnight";
 
 const ENGLISH_NUMERALS_SCRIPT = `
 (() => {
@@ -89,8 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "stylesheet", href: "/ghadeer-dark-theme.css" },
-      { rel: "stylesheet", href: "/ghadeer-readable-theme.css" },
+      { rel: "stylesheet", href: "/ghadeer-modern-themes.css" },
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "apple-touch-icon", href: "/ghadeer-logo.png" },
       { rel: "icon", href: "/ghadeer-logo.png", type: "image/png" },
@@ -134,30 +133,37 @@ function RootComponent() {
 
 function SiteShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<GhadeerTheme>("dark");
-  const applyTheme = (nextTheme: GhadeerTheme) => {
-    const darkThemeLink = document.querySelector<HTMLLinkElement>('link[href="/ghadeer-dark-theme.css"]');
-    if (darkThemeLink) darkThemeLink.disabled = nextTheme === "legacy";
-    document.documentElement.dataset.ghadeerTheme = nextTheme;
-  };
+  const [theme, setTheme] = useState<GhadeerTheme>("ocean");
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("ghadeer-theme");
-    const initialTheme: GhadeerTheme = savedTheme === "legacy" ? "legacy" : "dark";
+    const initialTheme: GhadeerTheme =
+      savedTheme === "pearl" || savedTheme === "midnight" ? savedTheme : "ocean";
     setTheme(initialTheme);
-    applyTheme(initialTheme);
+    document.documentElement.dataset.ghadeerTheme = initialTheme;
+    document.documentElement.classList.toggle("dark", initialTheme === "midnight");
   }, []);
   const changeTheme = (nextTheme: GhadeerTheme) => {
     setTheme(nextTheme);
     window.localStorage.setItem("ghadeer-theme", nextTheme);
-    applyTheme(nextTheme);
+    document.documentElement.dataset.ghadeerTheme = nextTheme;
+    document.documentElement.classList.toggle("dark", nextTheme === "midnight");
   };
   return (
     <div className="app-shell">
       <header className="app-header">
         <Link to="/" className="brand" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}><img src={ghadeerLogo.url} alt="شعار الغدير" /><div className="brand-name" style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}><span>شركة الغدير</span><small>GHADEER LOGISTICS</small></div></Link>
-        <div aria-label="اختيار الثيم" style={{ display: "flex", alignItems: "center", gap: 6, marginInline: "auto 12px" }}>
-          <button type="button" onClick={() => changeTheme("dark")} aria-pressed={theme === "dark"} aria-label="الوضع الداكن" title="الوضع الداكن" style={{ width: 38, height: 38, display: "grid", placeItems: "center", padding: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,.28)", background: theme === "dark" ? "#e6c878" : "rgba(255,255,255,.08)", color: theme === "dark" ? "#0a1a3a" : "#fff", cursor: "pointer" }}><Moon size={19} strokeWidth={2.3} aria-hidden="true" /></button>
-          <button type="button" onClick={() => changeTheme("legacy")} aria-pressed={theme === "legacy"} aria-label="الوضع النهاري" title="الوضع النهاري" style={{ width: 38, height: 38, display: "grid", placeItems: "center", padding: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,.28)", background: theme === "legacy" ? "#e6c878" : "rgba(255,255,255,.08)", color: theme === "legacy" ? "#0a1a3a" : "#fff", cursor: "pointer" }}><Sun size={19} strokeWidth={2.3} aria-hidden="true" /></button>
+        <div aria-label="اختيار المظهر" className="gh-theme-picker" role="group">
+          {([
+            { id: "ocean", label: "المحيط", colors: "linear-gradient(135deg,#195d77 50%,#60bdb5 50%)" },
+            { id: "pearl", label: "اللؤلؤ", colors: "linear-gradient(135deg,#72546e 50%,#e2bba6 50%)" },
+            { id: "midnight", label: "منتصف الليل", colors: "linear-gradient(135deg,#132c42 50%,#dbbd82 50%)" },
+          ] as const).map((option) => (
+            <button key={option.id} type="button" className="gh-theme-option" onClick={() => changeTheme(option.id)}
+              aria-pressed={theme === option.id} aria-label={`ثيم ${option.label}`} title={option.label}>
+              <span className="gh-theme-swatch" style={{ background: option.colors }} aria-hidden="true" />
+              <span>{option.label}</span>
+            </button>
+          ))}
         </div>
         <nav className="desktop-nav" aria-label="التنقل الرئيسي"><ul className="top-navigation"><li><Link to="/" activeOptions={{ exact: true }}>الرئيسية</Link></li><li><Link to="/wasl-select">اعمل وصل</Link></li><li><Link to="/customers">العملاء</Link></li><li><Link to="/receipts">السندات</Link></li><li><Link to="/expenses">المصروفات</Link></li><li><Link to="/accounts">الحسابات</Link></li><li><Link to="/reports">التقارير</Link></li><li><button type="button" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}>خروج</button></li></ul></nav>
       </header>
