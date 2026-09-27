@@ -34,7 +34,7 @@ function validAmount(value: string, allowZero = true) {
 
 function csvCell(value: string | number) {
   // Spreadsheet programs interpret leading =, +, - and @ as formulas.
-  const safe = /^[\s\u0000-\u001f]*[=+\-@]/.test(String(value)) ? `'${value}` : String(value);
+  const safe = typeof value === "string" && /^[\s\u0000-\u001f]*[=+\-@]/.test(value) ? `'${value}` : String(value);
   return `"${safe.replace(/"/g, '""')}"`;
 }
 
