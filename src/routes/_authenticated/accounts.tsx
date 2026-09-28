@@ -329,7 +329,9 @@ function AccountsPage() {
         {loading?<div className="ledger-empty">جارٍ تحميل السجل...</div>:filteredHistory.length===0?<div className="ledger-empty">لا توجد معاملات مطابقة.</div>:<div className="ledger-table-wrap"><table className="ledger-table"><thead><tr><th>الرقم / التاريخ</th><th>العميل</th><th>الخدمة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الربح المتوقع</th></tr></thead><tbody>{visibleHistory.map((row)=><tr key={row.id}><td><strong>{row.number}</strong><br/><small>{new Date(row.date).toLocaleString("en-GB")}</small></td><td>{traderNames.get(row.traderId??"")??"عميل محذوف"}</td><td>{row.service}</td><td>{money(row.total)}</td><td>{money(row.paid)}</td><td>{money(row.total-row.paid)}</td><td>{money(row.profit)}</td></tr>)}</tbody></table></div>}
       </section>
 
-      <section className="manual-accounts">
+      {!loading && !search.trim() && filteredHistory.length > 15 ? <button type="button" className="history-more" onClick={()=>setShowAllHistory(v=>!v)}>{showAllHistory?"عرض آخر 15 حركة":`عرض جميع الحركات (${filteredHistory.length})`}</button>:null}
+
+      <details className="manual-accounts"><summary className="manual-toggle">الحسابات المستقلة (خيارات إضافية)</summary>
         <div className="manual-grid">
           <div className="accounting-card">
             <h2>إضافة حساب مالي مستقل</h2>
@@ -348,7 +350,7 @@ function AccountsPage() {
             {loading?<div>جارٍ التحميل...</div>:accounts.length===0?<div>لا توجد حسابات حتى الآن.</div>:<div className="account-list">{accounts.map((account)=><div className="account-item" key={account.id}><div className="account-head"><div><strong>{account.name}</strong><div>{account.currency} • {account.status}</div></div><strong>{money(account.balance)}</strong></div>{editingId===account.id?<div className="manual-form" style={{marginTop:10}}><input type="number" step="0.01" value={editBalance} onChange={(e)=>setEditBalance(e.target.value)}/><select value={editStatus} onChange={(e)=>setEditStatus(e.target.value)}><option value="active">نشط</option><option value="pending">قيد الانتظار</option><option value="closed">مغلق</option></select><textarea value={editDescription} onChange={(e)=>setEditDescription(e.target.value)}/><div className="account-actions"><button onClick={()=>void handleSaveEdit(account.id)}>حفظ</button><button onClick={()=>setEditingId(null)}>إلغاء</button></div></div>:<><div style={{marginTop:7}}>{account.description||"بدون ملاحظات"}</div><div className="account-actions"><button onClick={()=>handleEdit(account)}>تعديل</button><button onClick={()=>void handleDelete(account.id)}>حذف</button></div></>}</div>)}</div>}
           </div>
         </div>
-      </section>
+      </details>
     </div>
   );
 }
