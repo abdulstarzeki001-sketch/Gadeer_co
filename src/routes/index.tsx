@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [royal, setRoyal] = useState(false);
   useEffect(() => {
-    const update = () => setRoyal(document.documentElement.["pearl","midnight"].includes(document.documentElement.dataset.ghadeerTheme ?? ""));
+    const update = () => setRoyal(["pearl","midnight"].includes(document.documentElement.dataset.ghadeerTheme ?? ""));
     update();
     const observer = new MutationObserver(update);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-ghadeer-theme"] });
