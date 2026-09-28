@@ -154,8 +154,8 @@ function SiteShell({ children }: { children: ReactNode }) {
         <Link to="/" className="brand" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}><img src={ghadeerLogo.url} alt="شعار الغدير" /><div className="brand-name" style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}><span>شركة الغدير</span><small>GHADEER LOGISTICS</small></div></Link>
         <div aria-label="اختيار المظهر" className="gh-theme-picker" role="group">
           {([
-            { id: "ocean", label: "الزمرد", colors: "linear-gradient(135deg,#124f3c 50%,#bceac4 50%)" },
-            { id: "pearl", label: "الكهرمان", colors: "linear-gradient(135deg,#633a2a 50%,#f6d29e 50%)" },
+            { id: "ocean", label: "وردي توتي", colors: "linear-gradient(135deg,#6b1e45 50%,#e25d94 50%)" },
+            { id: "pearl", label: "وردي خوخي", colors: "linear-gradient(135deg,#a74461 50%,#ffd3d6 50%)" },
             { id: "midnight", label: "منتصف الليل", colors: "linear-gradient(135deg,#132c42 50%,#dbbd82 50%)" },
           ] as const).map((option) => (
             <button key={option.id} type="button" className="gh-theme-option" onClick={() => changeTheme(option.id)}

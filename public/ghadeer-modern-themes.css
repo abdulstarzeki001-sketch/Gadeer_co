@@ -12,25 +12,25 @@
 }
 html[data-ghadeer-theme="ocean"] {
   color-scheme:light;
-  --background:#f3f8f3;--foreground:#173b32;--card:#ffffff;--card-foreground:#173b32;
-  --popover:#ffffff;--popover-foreground:#173b32;--primary:#146b53;--primary-foreground:#ffffff;
-  --secondary:#e8f4ec;--secondary-foreground:#14523f;--muted:#edf5ef;--muted-foreground:#526f62;
-  --accent:#d9f1df;--accent-foreground:#164e38;--border:#d4e6d9;--input:#d4e6d9;--ring:#20835f;
-  --gh-navy:#124f3c;--gh-navy-2:#218060;--gh-navy-deep:#103b31;
-  --gh-gold:#53b477;--gh-gold-light:#bceac4;--gh-gold-dark:#1d704f;
-  --gh-cream:#f3f8f3;--gh-cream-2:#e6f2e9;--gh-ink:#173b32;
-  --gh-muted:#526f62;--gh-line:#d4e6d9;--gh-soft:#f0f7f1;
+  --background:#fff5f9;--foreground:#421b31;--card:#ffffff;--card-foreground:#421b31;
+  --popover:#ffffff;--popover-foreground:#421b31;--primary:#a9235b;--primary-foreground:#ffffff;
+  --secondary:#fce5ee;--secondary-foreground:#702347;--muted:#fdf0f5;--muted-foreground:#79536a;
+  --accent:#fbd5e5;--accent-foreground:#712345;--border:#f1d5e2;--input:#f1d5e2;--ring:#bc3971;
+  --gh-navy:#6b1e45;--gh-navy-2:#ba3e76;--gh-navy-deep:#461632;
+  --gh-gold:#e25d94;--gh-gold-light:#ffd0e2;--gh-gold-dark:#a9235b;
+  --gh-cream:#fff5f9;--gh-cream-2:#fce8f0;--gh-ink:#421b31;
+  --gh-muted:#79536a;--gh-line:#f1d5e2;--gh-soft:#fff1f6;
 }
 html[data-ghadeer-theme="pearl"] {
   color-scheme:light;
-  --background:#fdf8f0;--foreground:#442d23;--card:#fffdf9;--card-foreground:#442d23;
-  --popover:#fffdf9;--popover-foreground:#442d23;--primary:#99562e;--primary-foreground:#ffffff;
-  --secondary:#f7eadb;--secondary-foreground:#703f26;--muted:#f8efe3;--muted-foreground:#765d4e;
-  --accent:#f7ddbc;--accent-foreground:#713d22;--border:#ebd9c3;--input:#ebd9c3;--ring:#ae683c;
-  --gh-navy:#633a2a;--gh-navy-2:#a45d39;--gh-navy-deep:#452c25;
-  --gh-gold:#cd9050;--gh-gold-light:#f6d29e;--gh-gold-dark:#925225;
-  --gh-cream:#fdf8f0;--gh-cream-2:#f7ecdb;--gh-ink:#442d23;
-  --gh-muted:#765d4e;--gh-line:#ebd9c3;--gh-soft:#fbf2e5;
+  --background:#fff7f5;--foreground:#482732;--card:#fffdfc;--card-foreground:#482732;
+  --popover:#fffdfc;--popover-foreground:#482732;--primary:#a74461;--primary-foreground:#ffffff;
+  --secondary:#fce8e7;--secondary-foreground:#77384c;--muted:#fff0ed;--muted-foreground:#785863;
+  --accent:#ffdcd8;--accent-foreground:#7a354d;--border:#f2d9d7;--input:#f2d9d7;--ring:#c45370;
+  --gh-navy:#673044;--gh-navy-2:#b45c76;--gh-navy-deep:#452238;
+  --gh-gold:#ea8291;--gh-gold-light:#ffd3d6;--gh-gold-dark:#a74461;
+  --gh-cream:#fff7f5;--gh-cream-2:#fce9e7;--gh-ink:#482732;
+  --gh-muted:#785863;--gh-line:#f2d9d7;--gh-soft:#fff1ef;
 }
 html[data-ghadeer-theme="midnight"] {
   color-scheme:dark;
@@ -102,6 +102,16 @@ tfoot tr,tfoot td,.modal-actions {background:var(--muted)!important;color:var(--
 .gh-theme-option[aria-pressed="true"] {background:var(--gh-gold-light);border-color:var(--gh-gold-light);color:#192a36;}
 .gh-theme-swatch {width:13px;height:13px;flex-shrink:0;border:2px solid rgba(255,255,255,.75);border-radius:50%;}
 .gh-theme-option[aria-pressed="true"] .gh-theme-swatch {border-color:rgba(15,40,55,.35);}
+/* Carry the chosen pink palette into pages that define their own local colors. */
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .reports-page,
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .history-page {
+  --surface:var(--card);--surface2:var(--secondary);--text:var(--foreground);
+  --muted:var(--muted-foreground);--line:var(--border);--accent:var(--gh-gold-dark);
+  --blue:var(--primary);
+}
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .btn:not(.secondary) {
+  background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);
+}
 @media(max-width:1100px){.gh-theme-option span:last-child{display:none}.gh-theme-option{padding:8px;min-width:38px;justify-content:center}}
 @media(max-width:768px){.gh-theme-picker{gap:5px;margin-inline:auto 0}.gh-theme-option{min-width:35px;min-height:35px;padding:6px}.app-header{gap:8px!important}.brand-name small{display:none}}
 @media(max-width:390px){.gh-theme-option{min-width:32px;min-height:32px;padding:5px}.gh-theme-swatch{width:12px;height:12px}}
