@@ -1,3 +1,4 @@
+import { isDebtIncrease as isIncoming, customerBalance } from "@/lib/customer-ledger";
 import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -142,7 +143,7 @@ function ReportsPage() {
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .map((item) => {
         const incoming = isIncoming(item.type);
-        const direction = incoming ? "إدخال" : "إخراج";
+        const direction = incoming ? "مستحق" : "تنزيل";
         const amountText = `${incoming ? "+" : "-"}${formatAmount(item.amount)}`;
         return `<tr><td>${escapeHtml(formatDateTime(item.created_at))}</td><td>${escapeHtml(direction)}</td><td>${escapeHtml(item.document_number ?? "—")}</td><td>${escapeHtml(item.cargo_typedetails ?? item.description ?? "—")}</td><td>${escapeHtml(amountText)}</td></tr>`;
       })
@@ -157,8 +158,8 @@ function ReportsPage() {
         <tr><th>ملاحظات</th><td>${escapeHtml(selectedTrader.notes ?? "—")}</td></tr>
       </table>
       <div class="cards">
-        <div class="card"><span>إجمالي الداخل</span><b>${formatAmount(stats.incoming)}</b></div>
-        <div class="card"><span>إجمالي الخارج</span><b>${formatAmount(stats.outgoing)}</b></div>
+        <div class="card"><span>إجمالي المستحقات</span><b>${formatAmount(stats.incoming)}</b></div>
+        <div class="card"><span>إجمالي التنزيلات</span><b>${formatAmount(stats.outgoing)}</b></div>
         <div class="card"><span>الرصيد</span><b>${formatAmount(stats.balance)}</b></div>
       </div>
       <h2>الحركات</h2>
@@ -268,8 +269,8 @@ function ReportsPage() {
                 </section>
 
                 <section className="report-stats">
-                  <Stat cls="green" label="إجمالي الداخل" icon={<ArrowDownLeft size={18} />} value={formatAmount(stats.incoming)} note={`${formatInteger(stats.incomingCount)} حركة`} />
-                  <Stat cls="red" label="إجمالي الخارج" icon={<ArrowUpRight size={18} />} value={formatAmount(stats.outgoing)} note={`${formatInteger(stats.outgoingCount)} حركة`} />
+                  <Stat cls="green" label="إجمالي المستحقات" icon={<ArrowDownLeft size={18} />} value={formatAmount(stats.incoming)} note={`${formatInteger(stats.incomingCount)} حركة`} />
+                  <Stat cls="red" label="إجمالي التنزيلات" icon={<ArrowUpRight size={18} />} value={formatAmount(stats.outgoing)} note={`${formatInteger(stats.outgoingCount)} حركة`} />
                   <Stat cls="blue" label="الرصيد الحالي" icon={<WalletCards size={18} />} value={formatAmount(stats.balance)} note={hasDateFilter ? "حسب النطاق المختار" : "إجمالي كامل"} />
                   <Stat cls="gold" label="المتوسط" icon={<TrendingUp size={18} />} value={formatAmount(stats.average)} note={`من ${stats.documents ?? 0} مستند`} />
                 </section>
@@ -277,8 +278,8 @@ function ReportsPage() {
                 <section className="reports-panel account-overview">
                   <h3>ملخص الحساب الكلي</h3>
                   <div className="overview-grid">
-                    <Overview label="إجمالي الداخل" value={formatAmount(allTimeStats.incoming)} />
-                    <Overview label="إجمالي الخارج" value={formatAmount(allTimeStats.outgoing)} />
+                    <Overview label="إجمالي المستحقات" value={formatAmount(allTimeStats.incoming)} />
+                    <Overview label="إجمالي التنزيلات" value={formatAmount(allTimeStats.outgoing)} />
                     <Overview label="الرصيد النهائي" value={formatAmount(allTimeStats.balance)} />
                     <Overview label="أول حركة" value={allTimeStats.firstDate ? formatDate(allTimeStats.firstDate) : "—"} />
                   </div>
@@ -363,7 +364,7 @@ function buildStats(items: Transaction[]): ReportStats {
     if (item.document_number) documents.add(item.document_number);
   }
 
-  const balance = incoming - outgoing;
+  const balance = customerBalance(items);
   const average = items.length ? balance / items.length : 0;
   const firstDate = items.length ? items[items.length - 1]?.created_at ?? null : null;
   const lastDate = items.length ? items[0]?.created_at ?? null : null;
@@ -392,16 +393,8 @@ function Overview({ label, value }: { label: string; value: string }) {
   );
 }
 
-function isIncoming(type: string) {
-  const normalized = (type || "").trim().toLowerCase();
-  return ["credit", "income", "payment", "receipt", "deposit", "قبض", "دائن", "وارد", "ايداع", "إيداع"].some((token) => normalized.includes(token));
-}
-
 function humanizeType(type: string) {
-  const normalized = (type || "").trim().toLowerCase();
-  if (["credit", "income", "payment", "receipt", "deposit", "قبض", "دائن", "وارد", "ايداع", "إيداع"].some((token) => normalized.includes(token))) return "داخل";
-  if (["debit", "expense", "withdraw", "charge", "مدفوع", "مصروف", "خصم", "سحب"].some((token) => normalized.includes(token))) return "خارج";
-  return type || "غير محدد";
+  return isIncoming(type) ? "مستحق على العميل" : "تنزيل من الحساب";
 }
 
 function formatAmount(value: number) {

@@ -1,3 +1,4 @@
+import { customerBalance } from "@/lib/customer-ledger";
 import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -50,7 +51,7 @@ function CollectionsPage() {
 
   const selected = traders.find((t) => t.id === selectedId) ?? null;
   const selectedTransactions = transactions.filter((t) => t.trader_id === selectedId);
-  const balance = selectedTransactions.reduce((sum, t) => sum + (isDebtIncrease(t.type) ? Number(t.amount) || 0 : -(Number(t.amount) || 0)), 0);
+  const balance = customerBalance(selectedTransactions);
   const numericAmount = Number(amount) || 0;
   const afterBalance = balance - numericAmount;
 
@@ -58,7 +59,7 @@ function CollectionsPage() {
     event.preventDefault();
     setMessage(null);
     if (!selected) return setMessage({ ok: false, text: "اختر العميل أولاً." });
-    if (numericAmount <= 0) return setMessage({ ok: false, text: "أدخل مبلغ قبض صحيح." });
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) return setMessage({ ok: false, text: "أدخل مبلغ قبض صحيح." });
 
     const companyId = selectedTransactions.find((t) => t.company_id)?.company_id;
     if (!companyId) {
@@ -117,8 +118,4 @@ function CollectionsPage() {
   </>;
 }
 
-function isDebtIncrease(type: string) {
-  const n = (type || "").trim().toLowerCase();
-  return ["credit", "income", "payment", "receipt", "deposit", "قبض", "دائن", "وارد", "ايداع", "إيداع"].some((x) => n.includes(x));
-}
 function formatAmount(value: number) { return new Intl.NumberFormat("ar-IQ", { maximumFractionDigits: 2 }).format(value || 0); }

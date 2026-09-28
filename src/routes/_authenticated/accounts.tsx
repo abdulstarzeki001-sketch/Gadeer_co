@@ -1,3 +1,4 @@
+import { isDebtIncrease, ledgerAmount } from "@/lib/customer-ledger";
 import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/accounts")({
 type Trader = { id: string; name: string; phone: string | null };
 type Account = { id: string; user_id: string; name: string; balance: number; currency: string; status: string; description: string | null; created_at: string; updated_at: string };
 type Transaction = { id: string; trader_id: string | null; document_number: string | null; type: string; amount: number; description: string | null; created_at: string };
-type OperationRecord = { id: string; number: string; traderId: string | null; date: string; service: string; total: number; paid: number; cost: number; note: string; paymentMethod: string };
+type OperationRecord = { id: string; number: string; traderId: string | null; date: string; service: string; total: number; paid: number; cost: number; profit: number; note: string; paymentMethod: string };
 
 function parseOperation(description: string | null): Record<string, unknown> | null {
   if (!description) return null;
@@ -110,7 +111,7 @@ function AccountsPage() {
       supabase.from("accounts").select("*").order("created_at", { ascending: false }),
       activeCustomers(supabase).order("name"),
       supabase.from("companies").select("id").limit(1).maybeSingle(),
-      activeTransactions(supabase).like("document_number", "ACC-%").order("created_at", { ascending: false }).limit(500),
+      activeTransactions(supabase).order("created_at", { ascending: false }).limit(500),
     ]);
 
     if (accountsResult.error) setError(accountsResult.error.message);
@@ -239,16 +240,22 @@ function AccountsPage() {
     { label: "صافي الربح", value: money(profit), icon: TrendingUp, cls: profit >= 0 ? "green" : "red" },
   ], [total, paidAmount, remaining, profit]);
 
-  const history = useMemo<OperationRecord[]>(() => transactions.filter((row) => row.type === "charge").flatMap((row) => {
+  const history = useMemo<OperationRecord[]>(() => transactions.flatMap((row) => {
     const details = parseOperation(row.description);
-    if (!details || details.entryKind !== "invoice") return [];
+    // Keep initial payments inside their invoice row; later collections get their own row.
+    if (row.type === "receipt" && details?.entryKind === "payment" && transactions.some((invoice) => invoice.type === "charge" && invoice.document_number === row.document_number && invoice.trader_id === row.trader_id && parseOperation(invoice.description)?.entryKind === "invoice")) return [];
     const number = row.document_number ?? row.id;
-    const payment = transactions.find((item) => item.type === "receipt" && item.document_number === number && item.trader_id === row.trader_id && parseOperation(item.description)?.entryKind === "payment");
+    const invoice = row.type === "charge" && details?.entryKind === "invoice";
+    const paid = invoice ? transactions.filter((item) => item.type === "receipt" && item.document_number === number && item.trader_id === row.trader_id && parseOperation(item.description)?.entryKind === "payment").reduce((sum, item) => sum + ledgerAmount(item.amount), 0) : 0;
+    const increase = isDebtIncrease(row.type);
     return [{ id: row.id, number, traderId: row.trader_id, date: row.created_at,
-      service: String(details.service ?? row.description ?? "—"), total: Number(row.amount) || 0,
-      paid: Number(payment?.amount ?? details.paidAmount ?? 0) || 0,
-      cost: Number(details.costTotal ?? 0) || 0, note: String(details.note ?? ""),
-      paymentMethod: String(details.paymentMethod ?? "—") }];
+      service: invoice ? String(details.service ?? "فاتورة") : increase ? "مستحق على العميل" : "قبض / تنزيل من الحساب",
+      total: increase ? ledgerAmount(row.amount) : 0,
+      paid: increase ? paid : ledgerAmount(row.amount),
+      cost: invoice ? Number(details.costTotal ?? 0) || 0 : 0,
+      profit: invoice ? ledgerAmount(row.amount) - (Number(details.costTotal ?? 0) || 0) : 0,
+      note: invoice ? String(details.note ?? "") : row.description ?? "",
+      paymentMethod: String(details?.paymentMethod ?? "—") }];
   }), [transactions]);
   const traderNames = useMemo(() => new Map(traders.map((trader) => [trader.id, trader.name])), [traders]);
   const filteredHistory = useMemo(() => history.filter((row) => {
@@ -256,11 +263,11 @@ function AccountsPage() {
     const query = search.trim().toLocaleLowerCase();
     return !query || [row.number, row.service, row.note, traderNames.get(row.traderId ?? "") ?? ""].some((field) => field.toLocaleLowerCase().includes(query));
   }), [history, historyTraderId, search, traderNames]);
-  const historyTotals = useMemo(() => filteredHistory.reduce((sum, row) => ({ invoiced: sum.invoiced + row.total, paid: sum.paid + row.paid, cost: sum.cost + row.cost }), { invoiced: 0, paid: 0, cost: 0 }), [filteredHistory]);
+  const historyTotals = useMemo(() => filteredHistory.reduce((sum, row) => ({ invoiced: sum.invoiced + row.total, paid: sum.paid + row.paid, cost: sum.cost + row.cost, profit: sum.profit + row.profit }), { invoiced: 0, paid: 0, cost: 0, profit: 0 }), [filteredHistory]);
 
   function exportHistory() {
     const columns = ["رقم العملية", "التاريخ", "العميل", "الخدمة", "الإجمالي IQD", "المدفوع IQD", "المتبقي IQD", "التكلفة IQD", "الربح IQD", "طريقة الدفع", "ملاحظات"];
-    const rows = filteredHistory.map((row) => [row.number, new Date(row.date).toLocaleString("en-GB"), traderNames.get(row.traderId ?? "") ?? "عميل محذوف", row.service, row.total, row.paid, row.total - row.paid, row.cost, row.total - row.cost, row.paymentMethod, row.note]);
+    const rows = filteredHistory.map((row) => [row.number, new Date(row.date).toLocaleString("en-GB"), traderNames.get(row.traderId ?? "") ?? "عميل محذوف", row.service, row.total, row.paid, row.total - row.paid, row.cost, row.profit, row.paymentMethod, row.note]);
     const csv = "\uFEFF" + [columns, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const anchor = document.createElement("a"); anchor.href = url; anchor.download = `ghadeer-accounts-${new Date().toISOString().slice(0, 10)}.csv`; anchor.click();
@@ -313,11 +320,11 @@ function AccountsPage() {
       </div>
 
       <section className="accounting-card ledger" aria-label="سجل المعاملات المحاسبية">
-        <div className="ledger-head"><div><h2><FileText size={20}/> سجل المعاملات</h2><p>آخر 500 حركة محاسبية. الأرقام أدناه تخص النتائج المعروضة بعد البحث فقط، وبالدينار العراقي.</p></div></div>
+        <div className="ledger-head"><div><h2><FileText size={20}/> سجل المعاملات</h2><p>آخر 500 حركة، تشمل المستحقات والقبوض اللاحقة من العملاء. الأرقام أدناه تخص النتائج المعروضة بعد البحث فقط، وبالدينار العراقي.</p></div></div>
         <div className="ledger-tools"><Search size={18} aria-hidden="true"/><input aria-label="بحث في المعاملات" value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="ابحث برقم العملية أو العميل أو الخدمة"/><select aria-label="تصفية حسب العميل" value={historyTraderId} onChange={(e)=>setHistoryTraderId(e.target.value)}><option value="">كل العملاء</option>{traders.map((trader)=><option key={trader.id} value={trader.id}>{trader.name}</option>)}</select><button type="button" onClick={()=>void loadPage()} disabled={loading}><RefreshCcw size={16}/> تحديث</button><button type="button" onClick={exportHistory} disabled={!filteredHistory.length}><Download size={16}/> تصدير CSV</button></div>
         {historyError?<div className="account-message account-error" role="alert">{historyError}</div>:null}
-        <div className="ledger-kpis"><div><span>إجمالي الفواتير</span><strong>{money(historyTotals.invoiced)} IQD</strong></div><div><span>المقبوض</span><strong>{money(historyTotals.paid)} IQD</strong></div><div><span>المتبقي</span><strong>{money(historyTotals.invoiced-historyTotals.paid)} IQD</strong></div><div><span>الربح المتوقع قبل المصروفات</span><strong>{money(historyTotals.invoiced-historyTotals.cost)} IQD</strong></div></div>
-        {loading?<div className="ledger-empty">جارٍ تحميل السجل...</div>:filteredHistory.length===0?<div className="ledger-empty">لا توجد معاملات مطابقة.</div>:<div className="ledger-table-wrap"><table className="ledger-table"><thead><tr><th>الرقم / التاريخ</th><th>العميل</th><th>الخدمة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الربح المتوقع</th></tr></thead><tbody>{filteredHistory.map((row)=><tr key={row.id}><td><strong>{row.number}</strong><br/><small>{new Date(row.date).toLocaleString("en-GB")}</small></td><td>{traderNames.get(row.traderId??"")??"عميل محذوف"}</td><td>{row.service}</td><td>{money(row.total)}</td><td>{money(row.paid)}</td><td>{money(row.total-row.paid)}</td><td>{money(row.total-row.cost)}</td></tr>)}</tbody></table></div>}
+        <div className="ledger-kpis"><div><span>إجمالي المستحقات</span><strong>{money(historyTotals.invoiced)} IQD</strong></div><div><span>المقبوض</span><strong>{money(historyTotals.paid)} IQD</strong></div><div><span>المتبقي</span><strong>{money(historyTotals.invoiced-historyTotals.paid)} IQD</strong></div><div><span>الربح المتوقع للفواتير المحاسبية</span><strong>{money(historyTotals.profit)} IQD</strong></div></div>
+        {loading?<div className="ledger-empty">جارٍ تحميل السجل...</div>:filteredHistory.length===0?<div className="ledger-empty">لا توجد معاملات مطابقة.</div>:<div className="ledger-table-wrap"><table className="ledger-table"><thead><tr><th>الرقم / التاريخ</th><th>العميل</th><th>الخدمة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الربح المتوقع</th></tr></thead><tbody>{filteredHistory.map((row)=><tr key={row.id}><td><strong>{row.number}</strong><br/><small>{new Date(row.date).toLocaleString("en-GB")}</small></td><td>{traderNames.get(row.traderId??"")??"عميل محذوف"}</td><td>{row.service}</td><td>{money(row.total)}</td><td>{money(row.paid)}</td><td>{money(row.total-row.paid)}</td><td>{money(row.profit)}</td></tr>)}</tbody></table></div>}
       </section>
 
       <section className="manual-accounts">
