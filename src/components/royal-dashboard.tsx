@@ -85,6 +85,18 @@ export function RoyalDashboard() {
     return buckets;
   },[movements]);
   const max=Math.max(1,...months.flatMap(month=>[month.due,month.received]));
+  const topCustomers=useMemo(()=>{
+    const totals=new Map<string,number>();
+    for(const item of movements){
+      if(!item.trader_id)continue;
+      const delta=(isDebtIncrease(item.type)?1:-1)*ledgerAmount(item.amount);
+      totals.set(item.trader_id,(totals.get(item.trader_id)??0)+delta);
+    }
+    return [...totals.entries()].filter(([id])=>names.has(id)).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,balance])=>({id,name:names.get(id)!,balance}));
+  },[movements,names]);
+  const collectionRate=totals.due>0?Math.min(100,Math.max(0,totals.received/totals.due*100)):0;
+  const thisMonth=months[months.length-1];
+  const monthMovements=movements.filter(item=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Baghdad",year:"numeric",month:"2-digit"}).format(new Date(item.created_at)).startsWith(thisMonth.key)).length;
   const unavailable=loading||Boolean(error)||!signedIn;
   const kpis=[
     {title:"الرصيد الإجمالي",value:money(totals.balance),icon:Wallet,note:"المستحقات ناقص القبوض",currency:true},
@@ -92,21 +104,51 @@ export function RoyalDashboard() {
     {title:"التنزيلات",value:money(totals.received),icon:ArrowDownToLine,note:"إجمالي المبالغ المقبوضة",currency:true},
     {title:"عدد العملاء",value:String(customers.length),icon:Users,note:"العملاء النشطون",currency:false},
   ];
-  return <div className="royal-dashboard" dir="rtl">
+  return <div className="royal-dashboard royal-reference" dir="rtl">
     <div className="royal-toolbar">
       <label className="royal-search"><Search size={20}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="البحث عن عميل، رقم وصل أو حركة..." aria-label="البحث في الحركات الحديثة"/></label>
       <button type="button" className="royal-refresh" onClick={()=>setRefresh(value=>value+1)} disabled={loading}><RefreshCcw size={17}/> تحديث البيانات</button>
     </div>
     <section className="royal-banner">
-      <div><span className="royal-eyebrow">GHADEER TRANSPORT</span><h1>مرحباً بعودتك</h1><p>إليك أهم مؤشرات أعمالك</p></div>
+      <div><span className="royal-eyebrow">GHADEER · TRANSPORT & LOGISTICS</span><h1>GHADEER</h1><p>شركة الغدير للنقل والتخليص الكمركي</p></div>
       <div className="royal-date"><CalendarDays size={25}/><span>{day(new Date().toISOString())}<small>شركة الغدير للنقل</small></span></div>
     </section>
     {!signedIn&&<div className="royal-notice">سجّل الدخول لعرض حسابات الشركة. <Link to="/auth">تسجيل الدخول</Link></div>}
     {error&&<div className="royal-notice" role="alert">{error}</div>}
-    <section className="royal-kpis" aria-label="مؤشرات الحساب" aria-busy={loading}>
-      {kpis.map(({title,value,icon:Icon,note,currency})=><article className="royal-card royal-kpi" key={title}><span className="royal-icon"><Icon size={27}/></span><div><span className="royal-label">{title}</span><strong dir="ltr">{unavailable?"—":(currency?"$ ":"")+value}</strong><small>{loading?"جارٍ التحميل...":note}</small></div><div className="royal-kpi-rule"/></article>)}
+    <section className="royal-kpis royal-summary-strip" aria-label="مؤشرات الحساب" aria-busy={loading}>
+      {[
+        {title:"إجمالي العملاء",value:String(customers.length),icon:Users},
+        {title:"إجمالي الوصولات",value:String(movements.filter(item=>isDebtIncrease(item.type)).length),icon:FileText},
+        {title:"الحركات لهذا الشهر",value:String(monthMovements),icon:BarChart3},
+        {title:"المستحقات",value:"$ "+money(totals.due),icon:Wallet},
+      ].map(({title,value,icon:Icon})=><article className="royal-card royal-kpi" key={title}><span className="royal-icon"><Icon size={25}/></span><div><span className="royal-label">{title}</span><strong dir="ltr">{unavailable?"—":value}</strong></div></article>)}
     </section>
+    <div className="royal-financial-row">
+      <section className="royal-card royal-balance-card">
+        <span className="royal-eyebrow">الرصيد الإجمالي</span>
+        <strong className="royal-balance-value" dir="ltr">{unavailable?"—":"$ "+money(totals.balance)}</strong>
+        <div className="royal-balance-caption"><RefreshCcw size={14}/> آخر تحديث · {day(new Date().toISOString())}</div>
+        <div className="royal-balance-bottom">
+          <div><ArrowDownToLine size={22}/><span>التنزيلات</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.received)}</strong></div>
+          <div><Wallet size={22}/><span>المستحقات</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.due)}</strong></div>
+          <div><BarChart3 size={22}/><span>عدد الحركات</span><strong>{unavailable?"—":movements.length}</strong></div>
+        </div>
+      </section>
+      <section className="royal-card royal-collection-card">
+        <h2>نسبة التحصيل</h2>
+        <div className="royal-donut" style={{"--royal-progress":(unavailable?0:collectionRate)+"%"} as React.CSSProperties}><div><strong>{unavailable?"—":collectionRate.toFixed(0)+"%"}</strong><small>نسبة التحصيل</small></div></div>
+        <div className="royal-collection-legend">
+          <div><span>المحصل</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.received)}</strong></div>
+          <div><span>المستحقات</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.due)}</strong></div>
+          <div><span>المتبقي</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.balance)}</strong></div>
+        </div>
+      </section>
+    </div>
     <nav className="royal-actions" aria-label="الوصول السريع">{actions.map(({to,title,note,icon:Icon})=><Link key={to} to={to} className="royal-card royal-action"><Icon size={32}/><div><strong>{title}</strong><small>{note}</small></div><span className="royal-arrow"><ChevronLeft size={20}/></span></Link>)}</nav>
+    <section className="royal-card royal-top-customers">
+      <div className="royal-section-head"><h2>أهم العملاء حسب الرصيد</h2><Link to="/customers">عرض الكل <ChevronLeft size={15}/></Link></div>
+      {unavailable?<p>{loading?"جارٍ التحميل...":"البيانات غير متاحة"}</p>:topCustomers.length?topCustomers.map((customer,index)=><div className="royal-customer-row" key={customer.id}><span className="royal-customer-avatar">{customer.name.slice(0,1)}</span><span>{customer.name}</span><strong dir="ltr">$ {money(customer.balance)}</strong></div>):<p>لا توجد أرصدة للعملاء بعد.</p>}
+    </section>
     <div className="royal-details">
       <section className="royal-card royal-movements"><div className="royal-section-head"><h2>أحدث الحركات</h2><Link to="/reports">عرض الكل <ChevronLeft size={15}/></Link></div>
         <div className="royal-table-wrap"><table><thead><tr><th>التاريخ</th><th>نوع العملية</th><th>العميل</th><th>المبلغ</th></tr></thead><tbody>
