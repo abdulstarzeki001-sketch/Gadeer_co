@@ -155,7 +155,7 @@ function SiteShell({ children }: { children: ReactNode }) {
         <div aria-label="اختيار المظهر" className="gh-theme-picker" role="group">
           {([
             { id: "ocean", label: "فحمي ذهبي", colors: "linear-gradient(135deg,#111216 50%,#e8bb55 50%)" },
-            { id: "pearl", label: "ليلي برتقالي", colors: "linear-gradient(135deg,#101923 50%,#fb9445 50%)" },
+            { id: "pearl", label: "أزرق بترولي", colors: "linear-gradient(135deg,#102D4C 50%,#FFCA70 50%)" },
             { id: "midnight", label: "منتصف الليل", colors: "linear-gradient(135deg,#132c42 50%,#dbbd82 50%)" },
           ] as const).map((option) => (
             <button key={option.id} type="button" className="gh-theme-option" onClick={() => changeTheme(option.id)}
