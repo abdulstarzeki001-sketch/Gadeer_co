@@ -95,8 +95,10 @@ export async function downloadCustomerStatement(input: Input) {
       for (const img of Array.from(sheet.querySelectorAll("img"))) {
         try { await img.decode(); } catch { throw new Error("تعذر تحميل شعار الغدير. أعد المحاولة بعد التأكد من الاتصال."); }
       }
-      const canvas = await html2canvas(sheet, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
+      const canvas = await html2canvas(sheet, { scale: 2, backgroundColor: "#FFFBF5", useCORS: true, logging: false });
       if (index) pdf.addPage();
+      pdf.setFillColor(255, 251, 245);
+      pdf.rect(0, 0, 210, 297, "F");
       pdf.addImage(canvas.toDataURL("image/png"), "PNG", 8, 8, 194, 194 * canvas.height / canvas.width, undefined, "FAST");
       canvas.width = 0;
       canvas.height = 0;
@@ -106,17 +108,17 @@ export async function downloadCustomerStatement(input: Input) {
 }
 
 const styles = `
-.gh-statement{box-sizing:border-box;width:794px;height:1120px;padding:24px 26px 45px;background:#fff;color:#202630;font:13px/1.7 Arial,Tahoma,sans-serif;position:relative}
-.gh-statement *{box-sizing:border-box}.gh-statement header{display:flex;align-items:center;gap:18px;border-bottom:3px solid #b98b38;padding:0 0 15px}
+.gh-statement{--navy:#252A34;--gold:#B9944F;--ivory:#FFFBF5;--white:#FFFFFF;--border:#E4E0DA;--text:#30343B;box-sizing:border-box;width:794px;height:1120px;padding:24px 26px 45px;background:var(--ivory);color:var(--text);font:13px/1.7 Arial,Tahoma,sans-serif;position:relative}
+.gh-statement *{box-sizing:border-box}.gh-statement header{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--gold);padding:0 0 15px}
 .gh-statement header img{width:78px;height:78px;object-fit:contain}.gh-statement header>div:nth-child(2){flex:1}
-.gh-statement h1{margin:0;color:#202630;font-size:26px}.gh-statement h2{margin:4px 0 0;font-size:16px;color:#454545}
-.gh-statement .issued{font-size:12px;text-align:center;white-space:nowrap}.gh-statement .period{font-size:11px;color:#666;margin:8px 0 14px}
-.gh-statement .statement-summary{display:flex;gap:12px;margin:0 0 20px}.gh-statement .statement-summary>div{flex:1;border:1px solid #d5c29e;border-top:3px solid #b98b38;border-radius:9px;background:#fbf8f1;padding:12px}
-.gh-statement .statement-summary span{display:block;font-size:12px;color:#59534b}.gh-statement .statement-summary strong{display:block;font-size:20px;margin-top:5px;color:#202630;text-align:right}
-.gh-statement h3{margin:17px 0 9px;font-size:17px;color:#202630;border-bottom:1px solid #d5c29e;padding-bottom:6px}
-.gh-statement table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0}.gh-statement th{background:#202630;color:#f7e3bb;font-size:12px;text-align:right;padding:9px 7px;border:1px solid #454a53}
-.gh-statement td{padding:8px 7px;border:1px solid #e4e0d8;font-size:12px;vertical-align:top;overflow-wrap:anywhere;white-space:pre-wrap;text-align:right}
-.gh-statement tr:nth-child(even) td{background:#faf8f4}.gh-statement .money{font-weight:bold;font-size:12px;white-space:normal}
-.gh-statement .section-total{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;background:#f4eee1;border:1px solid #d5c29e;margin:8px 0 18px}
-.gh-statement footer{position:absolute;bottom:15px;right:26px;left:26px;border-top:1px solid #d5c29e;padding-top:6px;text-align:center;font-size:11px;color:#666}
+.gh-statement h1{margin:0;color:var(--navy);font-size:26px}.gh-statement h2{margin:4px 0 0;font-size:16px;color:var(--text)}
+.gh-statement .issued{font-size:12px;text-align:center;white-space:nowrap}.gh-statement .period{font-size:11px;color:var(--text);margin:8px 0 14px}
+.gh-statement .statement-summary{display:flex;gap:12px;margin:0 0 20px}.gh-statement .statement-summary>div{flex:1;border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:9px;background:var(--white);padding:12px}
+.gh-statement .statement-summary span{display:block;font-size:12px;color:var(--text)}.gh-statement .statement-summary strong{display:block;font-size:20px;margin-top:5px;color:var(--navy);text-align:right}
+.gh-statement h3{margin:17px 0 9px;font-size:17px;color:var(--navy);border-bottom:1px solid var(--border);padding-bottom:6px}
+.gh-statement table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0}.gh-statement th{background:var(--navy);color:var(--white);font-size:12px;text-align:right;padding:9px 7px;border:1px solid var(--navy);border-bottom:2px solid var(--gold)}
+.gh-statement td{background:var(--white);color:var(--text);padding:8px 7px;border:1px solid var(--border);font-size:12px;vertical-align:top;overflow-wrap:anywhere;white-space:pre-wrap;text-align:right}
+.gh-statement tr:nth-child(even) td{background:var(--ivory)}.gh-statement .money{font-weight:bold;font-size:12px;white-space:normal}
+.gh-statement .section-total{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--ivory);border:1px solid var(--border);margin:8px 0 18px}
+.gh-statement footer{position:absolute;bottom:15px;right:26px;left:26px;border-top:1px solid var(--border);padding-top:6px;text-align:center;font-size:11px;color:var(--text)}
 `;
