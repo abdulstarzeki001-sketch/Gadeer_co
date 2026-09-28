@@ -42,19 +42,21 @@ html[data-ghadeer-theme="pearl"] {
   --gh-shadow-sm:none;--gh-shadow-md:none;--gh-shadow-lg:none;
 }
 html[data-ghadeer-theme="midnight"] {
-  color-scheme:dark;
-  --background:#0b1724;--foreground:#ebf3fa;--card:#132738;--card-foreground:#ebf3fa;
-  --popover:#192c3d;--popover-foreground:#ebf3fa;--primary:#d5b578;--primary-foreground:#172738;
-  --secondary:#20384a;--secondary-foreground:#e3f1fa;--muted:#1c3243;--muted-foreground:#abbeca;
-  --accent:#2a4957;--accent-foreground:#e5f5f5;--border:#304759;--input:#304759;--ring:#dbbf87;
-  --gh-navy:#0d1b2b;--gh-navy-2:#203c53;--gh-navy-deep:#08121d;
-  --gh-gold:#d5b578;--gh-gold-light:#f3d9a1;--gh-gold-dark:#9f7c42;
-  --gh-cream:#0b1724;--gh-cream-2:#142637;--gh-ink:#edf5fc;
-  --gh-muted:#abc0ce;--gh-line:#304759;--gh-soft:#182d3e;
-  --gh-shadow-sm:0 5px 16px rgba(0,0,0,.15);
-  --gh-shadow-md:0 16px 35px rgba(0,0,0,.25);
-  --gh-shadow-lg:0 27px 60px rgba(0,0,0,.35);
+ color-scheme:dark;
+ --background:#08090B;--foreground:#F7F3E9;--card:#111416;--card-foreground:#F7F3E9;
+ --popover:#151819;--popover-foreground:#F7F3E9;--primary:#E7BD76;--primary-foreground:#17120A;
+ --secondary:#1B1C1B;--secondary-foreground:#F7F3E9;--muted:#191C1E;--muted-foreground:#B8B6AF;
+ --accent:#312719;--accent-foreground:#F4D9A6;--border:#63533B;--input:#63533B;--ring:#E7BD76;
+ --destructive:#EE7C80;--destructive-foreground:#08090B;
+ --gh-navy:#101315;--gh-navy-2:#23221D;--gh-navy-deep:#060708;
+ --gh-gold:#E7BD76;--gh-gold-light:#F6DDAA;--gh-gold-dark:#C49A53;
+ --gh-cream:#08090B;--gh-cream-2:#191C1E;--gh-ink:#F7F3E9;
+ --gh-muted:#B8B6AF;--gh-line:#63533B;--gh-soft:#191C1E;
+ --gh-panel:#111416;--gh-panel2:#191C1E;--gh-text:#F7F3E9;
+ --gh-success:#79CE9C;--gh-danger:#EE7C80;--gh-warn:#E7BD76;
+ --gh-shadow-sm:0 8px 24px #0007;--gh-shadow-md:0 12px 32px #0009;--gh-shadow-lg:0 24px 60px #000B;
 }
+
 html,body {background:var(--background)!important;color:var(--foreground)!important;}
 body {background-image:radial-gradient(circle at 92% -15%,color-mix(in srgb,var(--gh-gold) 12%,transparent),transparent 42%)!important;background-attachment:fixed!important;}
 .app-header {
@@ -250,3 +252,127 @@ html[data-ghadeer-theme="ocean"] .app-main :is(.report-stat.green strong,.operat
 html[data-ghadeer-theme="ocean"] .app-main :is(tbody td,thead th){border-width:1px!important}
 html[data-ghadeer-theme="ocean"] .app-main tbody tr:hover td{background:#203249!important}
 html[data-ghadeer-theme="ocean"] .app-main :is(.account-item,.operation-stat,.overview-item,.ledger-kpis>div){background:#17263A!important}
+/* Third-theme component palette. */
+html[data-ghadeer-theme="midnight"] body{background:#08090B!important;background-image:none!important}
+html[data-ghadeer-theme="midnight"] .app-shell{color:#F7F3E9}
+html[data-ghadeer-theme="midnight"] :is(.app-header,.bottom-navigation){background:#101315!important;border-color:#63533B!important;box-shadow:none!important}
+html[data-ghadeer-theme="midnight"] .app-header::after{background:#63533B!important}
+html[data-ghadeer-theme="midnight"] .app-header .brand img{background:#191C1E!important}
+html[data-ghadeer-theme="midnight"] :is(.brand-name span,.brand-name small,.top-navigation a,.top-navigation button){color:#F7F3E9!important}
+html[data-ghadeer-theme="midnight"] :is(.top-navigation a:hover,.top-navigation a[aria-current="page"]){background:#111416!important;color:#E7BD76!important}
+html[data-ghadeer-theme="midnight"] .gh-theme-option{background:#191C1E;color:#F7F3E9;border-color:#63533B}
+html[data-ghadeer-theme="midnight"] .gh-theme-option:hover{background:#111416}
+html[data-ghadeer-theme="midnight"] .gh-theme-option[aria-pressed="true"]{background:#E7BD76;color:#08090B;border-color:#E7BD76}
+html[data-ghadeer-theme="midnight"] .gh-theme-swatch{border-color:#F7F3E9}
+html[data-ghadeer-theme="midnight"] .gh-theme-option[aria-pressed="true"] .gh-theme-swatch{border-color:#08090B}
+html[data-ghadeer-theme="midnight"] :is(.reports-page,.history-page,.collection-page){
+  --surface:#111416;--surface2:#191C1E;--text:#F7F3E9;--muted:#F7F3E9;--line:#63533B;--accent:#E7BD76;--blue:#63533B;--shadow:none;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(.hero,.accounting-hero,.reports-hero,.collection-head,.history-head,.page-heading){
+  background:#101315!important;color:#F7F3E9!important;border-color:#63533B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(.accounting-card,.panel,.dialog,.modal,.modal-box,.modal-content,.item,.row,.receipt-type-card,.report-stat,.balance-card,.history-stat,.reports-panel,.collection-panel,.history-panel,.account-item,.operation-stat,.overview-item,.ledger-kpis>div,section[style*="background"],div[style*="background"],article[style*="background"]){
+  background:#111416!important;color:#F7F3E9!important;border-color:#63533B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(p,small,label,strong,h1,h2,h3,h4,[style*="color"],.receipt-type-copy strong,.receipt-type-copy small,.cost-box,.ledger-empty,.trader-meta,.customer-meta){
+  color:#F7F3E9!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  background:#191C1E!important;color:#F7F3E9!important;border-color:#63533B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(input,select,textarea):focus{border-color:#E7BD76!important;outline-color:#E7BD76}
+html[data-ghadeer-theme="midnight"] .app-main :is(input,textarea)::placeholder{color:#F7F3E9!important;opacity:1}
+html[data-ghadeer-theme="midnight"] .app-main :is(button,.btn,.operation-submit,.collection-submit,.add-btn){
+  background:#E7BD76!important;color:#08090B!important;border-color:#E7BD76!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(button,.btn) :is(span,strong,small){color:inherit!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(.trader-item,.client-pick,.pill,.btn.secondary){
+  background:#191C1E!important;color:#F7F3E9!important;border-color:#63533B!important;
+}
+html[data-ghadeer-theme="midnight"] .app-main :is(.trader-item.active,.client-pick.active){background:#111416!important;border-color:#E7BD76!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(.receipt-type-icon,.receipt-type-action,.receipt-selector-kicker,.badge,.reports-badge){color:#E7BD76!important;border-color:#63533B!important;background:#101315!important}
+html[data-ghadeer-theme="midnight"] .app-main table{background:#111416!important;border-color:#63533B!important;box-shadow:none!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(thead tr,thead th,.modal-head){background:#101315!important;color:#F7F3E9!important;border-color:#63533B!important}
+html[data-ghadeer-theme="midnight"] .app-main tbody td{background:#111416!important;color:#F7F3E9!important;border-color:#63533B!important}
+html[data-ghadeer-theme="midnight"] .app-main tbody tr:nth-child(even) td{background:#191C1E!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(tfoot tr,tfoot td,.modal-actions){background:#101315!important;color:#F7F3E9!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(.positive,.history-amount,.operation-stat.green strong,.balance-card.after strong,.report-stat.green strong,.account-success,.collection-message.ok,.notice:not(.error)){color:#79CE9C!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(.negative,.operation-stat.red strong,.report-stat.red strong,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg.error){color:#EE7C80!important}
+html[data-ghadeer-theme="midnight"] .app-main :is(.account-success,.collection-message.ok,.notice,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg){background:#101315!important;border-color:#63533B!important}
+html[data-ghadeer-theme="midnight"] .bottom-navigation__item.primary .bottom-navigation__indicator{background:#E7BD76!important;color:#08090B!important;border-color:#63533B!important}
+
+/* Royal transport layout is mounted only for theme three. */
+html[data-ghadeer-theme="midnight"] body{background:#08090B!important}
+html[data-ghadeer-theme="midnight"] .app-header{min-height:84px;background:linear-gradient(110deg,#070809,#141716,#070809)!important;border-bottom:1px solid #B28B4E!important}
+html[data-ghadeer-theme="midnight"] .brand-name span{color:#F6DDAA!important}
+html[data-ghadeer-theme="midnight"] .app-header .brand img{background:#111416!important;border:1px solid #63533B}
+html[data-ghadeer-theme="midnight"] .app-main{max-width:1560px}
+html[data-ghadeer-theme="midnight"] .app-footer{border-color:#63533B;color:#B8B6AF}
+.royal-sidebar{display:none}
+.royal-dashboard{padding:0 0 20px;min-width:0}
+.royal-toolbar{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+.royal-search{display:flex;align-items:center;gap:12px;border:1px solid #63533B;border-radius:15px;padding:0 16px;flex:1;background:#0B0D0F;color:#B8B6AF}
+html[data-ghadeer-theme="midnight"] .royal-search input{border:0!important;background:transparent!important;box-shadow:none!important;outline:none;min-height:48px;width:100%;padding:8px 0}
+html[data-ghadeer-theme="midnight"] .royal-refresh{display:flex;align-items:center;gap:8px;background:#191C1E!important;color:#F6DDAA!important;border:1px solid #63533B;border-radius:12px;padding:12px;cursor:pointer}
+.royal-refresh:disabled{opacity:.5}
+.royal-banner{min-height:205px;position:relative;border:1px solid #B28B4E;border-radius:21px;overflow:hidden;background:linear-gradient(90deg,#08090BAA,transparent 80%),url('/royal-transport-hero.webp') center 57%/cover;display:flex;align-items:flex-end;justify-content:space-between;padding:28px;direction:ltr;margin-bottom:22px;box-shadow:0 12px 45px #0009}
+.royal-banner>div{direction:rtl;text-align:right}
+.royal-banner h1{font-size:clamp(1.7rem,3vw,2.7rem);margin:4px 0 8px!important}
+html[data-ghadeer-theme="midnight"] .royal-banner h1{color:#F6DDAA!important;text-shadow:0 3px 20px #000}
+html[data-ghadeer-theme="midnight"] .royal-banner p{color:#F7F3E9!important;margin:0;text-shadow:0 2px 8px #000}
+.royal-eyebrow{font-size:11px;letter-spacing:3px;color:#E7BD76}
+.royal-date{display:flex;align-items:center;gap:12px;background:#08090BDD;border:1px solid #B28B4E;border-radius:15px;padding:13px 17px;color:#F6DDAA;font-size:13px}
+.royal-date small{display:block;margin-top:5px;color:#B8B6AF}
+.royal-kpis,.royal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:22px}
+.royal-card{background:linear-gradient(140deg,#1E1C16 0%,#111416 28%,#080A0C 100%);border:1px solid #786244;border-radius:20px;box-shadow:inset 1px 0 0 #F6DDAA55,0 7px 26px #0007;min-width:0;position:relative}
+.royal-kpi{display:flex;gap:15px;padding:22px 18px;align-items:flex-start;overflow:hidden;min-height:155px}
+.royal-kpi>div{min-width:0;flex:1}.royal-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:54px;border:1px solid #C49A53;border-radius:14px;color:#E7BD76;background:linear-gradient(150deg,#312719,#090B0C);box-shadow:-3px 0 13px #E7BD7622}
+.royal-label{font-size:13px;color:#B8B6AF}
+html[data-ghadeer-theme="midnight"] .royal-kpi strong{display:block;font-size:clamp(1.25rem,1.8vw,2rem);margin:10px 0 7px;color:#F6DDAA!important;overflow-wrap:anywhere}
+.royal-kpi small{font-size:10px;color:#B8B6AF}
+.royal-kpi-rule{position:absolute;bottom:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,#E7BD76,transparent)}
+.royal-action{display:flex;align-items:center;gap:16px;padding:22px 17px;text-decoration:none;color:#E7BD76;transition:transform .2s,box-shadow .2s}
+.royal-action>div{flex:1;min-width:0}.royal-action strong{display:block;font-size:16px}.royal-action small{display:block;color:#B8B6AF;font-size:10px;margin-top:5px}
+.royal-arrow{border:1px solid #63533B;border-radius:50%;width:33px;height:33px;display:grid;place-items:center;flex-shrink:0}
+.royal-action:hover{transform:translateY(-2px);box-shadow:inset 2px 0 0 #F6DDAA,0 0 22px #E7BD7633}
+.royal-action:focus-visible,.royal-sidebar a:focus-visible{outline:2px solid #F6DDAA;outline-offset:4px}
+.royal-details{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px}
+.royal-movements,.royal-chart{padding:22px;box-shadow:inset 2px 0 0 #E7BD76,0 0 20px #E7BD761A}
+.royal-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.royal-section-head h2{font-size:19px;margin:0}.royal-section-head a{display:flex;align-items:center;color:#E7BD76;text-decoration:none;font-size:12px}
+.royal-table-wrap{overflow-x:auto}
+html[data-ghadeer-theme="midnight"] .royal-movements table{width:100%;min-width:470px;border-collapse:collapse;background:transparent!important;box-shadow:none!important}
+html[data-ghadeer-theme="midnight"] .royal-movements :is(th,td){padding:12px 8px;text-align:right;font-size:12px;border:0!important;border-bottom:1px solid #3B3428!important}
+html[data-ghadeer-theme="midnight"] .royal-movements th{background:#202426!important;color:#D7D4CB!important;font-weight:500}
+html[data-ghadeer-theme="midnight"] .royal-movements tbody td{background:#0D1011!important}
+html[data-ghadeer-theme="midnight"] .royal-movements tbody tr:nth-child(even) td{background:#121516!important}
+.royal-movements td small{display:block;max-width:180px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10px;color:#B8B6AF;margin-top:6px}
+.royal-status{display:inline-flex;border:1px solid #63533B;border-radius:7px;padding:3px 8px;font-size:10px}
+.royal-status.paid{color:#79CE9C;background:#112319;border-color:#274735}.royal-status.due{color:#F6DDAA;background:#2A2215}
+.royal-chart-subtitle{font-size:11px;color:#B8B6AF;margin:0 0 18px}.royal-legend{display:flex;gap:20px;font-size:11px;color:#B8B6AF}
+.royal-legend span{display:flex;align-items:center;gap:6px}.royal-legend i{width:9px;height:9px;background:#E7BD76;border-radius:50%}.royal-legend span+span i{background:#81978D}
+.royal-bars{height:240px;display:flex;direction:ltr;gap:12px;padding-top:20px;align-items:flex-end;background:repeating-linear-gradient(to top,transparent 0,transparent 47px,#FFFFFF10 48px)}
+.royal-month{flex:1;min-width:0;text-align:center}.royal-bar-pair{height:185px;display:flex;gap:4px;align-items:flex-end;justify-content:center}.royal-bar-pair span{width:19px;background:linear-gradient(#F6DDAA,#B28B4E);border-radius:3px 3px 0 0}.royal-bar-pair span+span{background:linear-gradient(#B7C2B8,#495952)}.royal-month small{font-size:10px;white-space:nowrap;color:#B8B6AF;display:block;margin-top:14px}
+.royal-chart-data{margin-top:20px;font-size:11px;color:#B8B6AF}.royal-chart-data summary{cursor:pointer}.royal-chart-data table{width:100%;margin-top:10px}.royal-chart-data td,.royal-chart-data th{padding:5px}
+.royal-chart-empty{height:240px;display:grid;place-items:center;color:#B8B6AF}.royal-notice{padding:15px;border:1px solid #63533B;margin-bottom:20px;border-radius:12px;color:#F6DDAA}.royal-notice a{color:#E7BD76}
+@media(min-width:1150px){
+ html[data-ghadeer-theme="midnight"] .app-shell{padding-left:250px}
+ html[data-ghadeer-theme="midnight"] .app-header{position:fixed;inset:0 0 auto 0;z-index:100;direction:ltr}
+ html[data-ghadeer-theme="midnight"] .app-header .brand{min-width:225px}
+ html[data-ghadeer-theme="midnight"] .app-header .brand-name{direction:rtl}
+ html[data-ghadeer-theme="midnight"] .app-header .gh-theme-picker{margin-left:auto;margin-right:12px;direction:rtl}
+ html[data-ghadeer-theme="midnight"] .desktop-nav{display:none}
+ html[data-ghadeer-theme="midnight"] .app-main{padding-top:110px}
+ .royal-sidebar{display:flex;flex-direction:column;position:fixed;left:0;top:84px;bottom:0;width:250px;border-right:1px solid #B28B4E;background:#08090B;z-index:90;overflow-y:auto}
+ .royal-sidebar nav{padding:20px 14px;display:grid;gap:8px}.royal-sidebar nav a{display:flex;direction:ltr;align-items:center;gap:18px;padding:15px 20px;min-height:55px;text-decoration:none;color:#C7C6C1;border:1px solid transparent;border-radius:13px}
+ .royal-sidebar nav a span{flex:1;text-align:right;direction:rtl}.royal-sidebar nav a:hover{background:#1C1A15;color:#F6DDAA}
+ .royal-sidebar nav a.royal-side-active{color:#FFF1D5;border-color:#E7BD76;background:linear-gradient(100deg,#41301C,#171511 65%,#8C682E);box-shadow:inset 3px 0 0 #FFF1D5,0 0 16px #E7BD7640}
+ .royal-sidebar-art{min-height:300px;flex:1;position:relative;background:linear-gradient(180deg,#08090B,transparent 28%,#08090B 98%),url('/royal-transport-hero.webp') 76% center/auto 100%;display:flex;align-items:flex-end;justify-content:center;padding:30px 15px}
+ .royal-sidebar-art div{text-align:center;display:grid;gap:7px;text-shadow:0 2px 10px #000}.royal-sidebar-art strong{font-family:Georgia,serif;font-size:28px;letter-spacing:2px;color:#E7BD76}.royal-sidebar-art span{font-size:10px;letter-spacing:6px;color:#F6DDAA}.royal-sidebar-art small{font-size:11px;color:#B8B6AF;margin-top:12px}
+}
+@media(max-width:1400px){.royal-kpis,.royal-actions{gap:12px}.royal-kpi{gap:10px;padding:18px 12px}.royal-icon{flex-basis:40px;width:40px;height:46px}.royal-action{gap:10px;padding:18px 12px}.royal-action>svg{width:24px}.royal-action strong{font-size:14px}}
+@media(max-width:1000px){.royal-details{grid-template-columns:1fr}.royal-kpis,.royal-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.royal-kpi strong{font-size:24px!important}.royal-banner{min-height:220px}}
+@media(max-width:600px){.royal-toolbar{gap:8px;flex-wrap:wrap}.royal-search{flex-basis:100%}.royal-refresh{margin-inline-start:auto}.royal-banner{padding:20px;min-height:250px;align-items:flex-end;background-position:65% center}.royal-banner>div:first-child{max-width:70%}.royal-date{position:absolute;top:12px;right:12px;padding:8px;font-size:11px}.royal-date small{display:none}.royal-eyebrow{font-size:8px;letter-spacing:2px}.royal-kpi{flex-direction:column;min-height:180px}.royal-kpi strong{font-size:20px!important}.royal-kpi small{font-size:9px}.royal-movements,.royal-chart{padding:16px 12px}.royal-action{flex-wrap:wrap}.royal-action>div{flex-basis:60%}.royal-arrow{display:none}.royal-section-head h2{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.royal-action{transition:none;transform:none!important}}
+
+.royal-kpis,.royal-actions,.royal-details{direction:ltr}.royal-kpi,.royal-action,.royal-details>section{direction:rtl}

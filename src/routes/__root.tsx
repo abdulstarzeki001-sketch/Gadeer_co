@@ -156,7 +156,7 @@ function SiteShell({ children }: { children: ReactNode }) {
           {([
             { id: "ocean", label: "كحلي هادئ", colors: "linear-gradient(135deg,#0B1220 50%,#D8B878 50%)" },
             { id: "pearl", label: "أزرق بترولي", colors: "linear-gradient(135deg,#102D4C 50%,#FFCA70 50%)" },
-            { id: "midnight", label: "منتصف الليل", colors: "linear-gradient(135deg,#132c42 50%,#dbbd82 50%)" },
+            { id: "midnight", label: "أسود ملكي", colors: "linear-gradient(135deg,#090A0C 50%,#E7BD76 50%)" },
           ] as const).map((option) => (
             <button key={option.id} type="button" className="gh-theme-option" onClick={() => changeTheme(option.id)}
               aria-pressed={theme === option.id} aria-label={`ثيم ${option.label}`} title={option.label}>
@@ -167,6 +167,7 @@ function SiteShell({ children }: { children: ReactNode }) {
         </div>
         <nav className="desktop-nav" aria-label="التنقل الرئيسي"><ul className="top-navigation"><li><Link to="/" activeOptions={{ exact: true }}>الرئيسية</Link></li><li><Link to="/wasl-select">اعمل وصل</Link></li><li><Link to="/customers">العملاء</Link></li><li><Link to="/receipts">السندات</Link></li><li><Link to="/expenses">المصروفات</Link></li><li><Link to="/accounts">الحسابات</Link></li><li><Link to="/reports">التقارير</Link></li><li><button type="button" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}>خروج</button></li></ul></nav>
       </header>
+      {theme === "midnight" && <RoyalSidebar />}
       <main className="app-main">{children}</main>
       <footer className="app-footer">📍 زاخو – إبراهيم الخليل &nbsp;•&nbsp; 📞 07504084359 &nbsp;•&nbsp; 📧 starzeki001@gmail.com<br />© 2026 شركة الغدير للنقل والتخليص الكمركي – جميع الحقوق محفوظة</footer>
       <nav className="bottom-navigation" aria-label="التنقل السفلي"><MobileLink to="/" icon={Home} label="الرئيسية" /><MobileLink to="/customers" icon={Users} label="العملاء" /><MobileLink to="/wasl-select" icon={Plus} label="وصل" primary /><MobileLink to="/receipts" icon={ReceiptText} label="السندات" /><MobileLink to="/reports" icon={ChartNoAxesCombined} label="التقارير" /></nav>
@@ -176,4 +177,20 @@ function SiteShell({ children }: { children: ReactNode }) {
 
 function MobileLink({ to, icon: Icon, label, primary = false }: { to: string; icon: LucideIcon; label: string; primary?: boolean }) {
   return <Link to={to} activeOptions={{ exact: to === "/" }} activeProps={{ className: "active", "aria-current": "page" }} className={`bottom-navigation__item${primary ? " primary" : ""}`}><span className="bottom-navigation__indicator" aria-hidden="true"><Icon strokeWidth={2.2} /></span><small>{label}</small></Link>;
+}
+
+function RoyalSidebar() {
+  const links = [
+    { to: "/", title: "الرئيسية", icon: Home },
+    { to: "/customers", title: "العملاء", icon: Users },
+    { to: "/wasl-select", title: "إنشاء وصل", icon: Plus },
+    { to: "/receipts", title: "الوصولات", icon: ReceiptText },
+    { to: "/accounts", title: "كشف الحساب", icon: ChartNoAxesCombined },
+    { to: "/reports", title: "التقارير", icon: ChartNoAxesCombined },
+    { to: "/expenses", title: "المصروفات", icon: ReceiptText },
+  ] as const;
+  return <aside className="royal-sidebar" aria-label="القائمة الجانبية">
+    <nav>{links.map(({to,title,icon:Icon})=><Link key={to} to={to} activeOptions={{exact:to==="/"}} activeProps={{className:"royal-side-active"}}><Icon size={22}/><span>{title}</span></Link>)}</nav>
+    <div className="royal-sidebar-art"><div><strong>GHADEER</strong><span>TRANSPORT</span><small>شركة الغدير للنقل</small></div></div>
+  </aside>;
 }

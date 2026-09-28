@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { RoyalDashboard } from "@/components/royal-dashboard";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -11,6 +13,15 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const [royal, setRoyal] = useState(false);
+  useEffect(() => {
+    const update = () => setRoyal(document.documentElement.dataset.ghadeerTheme === "midnight");
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-ghadeer-theme"] });
+    return () => observer.disconnect();
+  }, []);
+  if (royal) return <RoyalDashboard />;
   return (
     <div className="home-page" style={{ padding: "1.4rem 0 3rem" }}>
       <style>{`
