@@ -1,3 +1,4 @@
+import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CalendarDays, RefreshCcw, Search, UserRound, WalletCards } from "lucide-react";
@@ -35,10 +36,8 @@ function CollectionsHistoryPage() {
     setLoading(true);
     setError(null);
     const [{ data: traderData, error: traderError }, { data: collectionData, error: collectionError }] = await Promise.all([
-      supabase.from("traders").select("id,name,phone").order("name"),
-      supabase
-        .from("transactions")
-        .select("id,trader_id,amount,description,document_number,created_at,type")
+      activeCustomers(supabase).order("name"),
+      activeTransactions(supabase)
         .eq("type", "تحصيل من عميل")
         .order("created_at", { ascending: false }),
     ]);

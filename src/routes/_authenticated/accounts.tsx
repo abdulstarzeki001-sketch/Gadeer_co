@@ -1,3 +1,4 @@
+import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Calculator, CreditCard, Download, FileText, ReceiptText, RefreshCcw, Search, TrendingUp, UserRound, WalletCards } from "lucide-react";
@@ -107,9 +108,9 @@ function AccountsPage() {
 
     const [accountsResult, tradersResult, companyResult, transactionsResult] = await Promise.all([
       supabase.from("accounts").select("*").order("created_at", { ascending: false }),
-      supabase.from("traders").select("id,name,phone").order("name"),
+      activeCustomers(supabase).order("name"),
       supabase.from("companies").select("id").limit(1).maybeSingle(),
-      supabase.from("transactions").select("id,trader_id,document_number,type,amount,description,created_at").like("document_number", "ACC-%").order("created_at", { ascending: false }).limit(500),
+      activeTransactions(supabase).like("document_number", "ACC-%").order("created_at", { ascending: false }).limit(500),
     ]);
 
     if (accountsResult.error) setError(accountsResult.error.message);
@@ -139,6 +140,7 @@ function AccountsPage() {
 
     setSavingOperation(true);
     try {
+      await requireActiveCustomer(supabase, selectedTrader.id);
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData.user) throw new Error("انتهت جلسة الدخول.");
 

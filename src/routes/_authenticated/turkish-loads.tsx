@@ -1,3 +1,4 @@
+import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,9 +81,7 @@ function TurkishLoadsPage() {
 
   const loadReceipts = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("transactions")
-      .select("id, document_number, driver_name, amount, description, created_at")
+    const { data, error } = await activeTransactions(supabase)
       .eq("type", "turkish_load_receipt")
       .order("created_at", { ascending: false })
       .limit(30);
@@ -93,7 +92,7 @@ function TurkishLoadsPage() {
   useEffect(() => {
     void Promise.all([
       loadReceipts(),
-      supabase.from("traders").select("id,name,phone").order("name"),
+      activeCustomers(supabase).order("name"),
     ]).then(([, tradersResult]) => {
       if (!tradersResult.error) setTraders((tradersResult.data ?? []) as Trader[]);
     });
@@ -146,6 +145,7 @@ function TurkishLoadsPage() {
 
     setBusy(true);
     try {
+      await requireActiveCustomer(supabase, selectedTrader.id);
       const { data: company, error: companyError } = await supabase
         .from("companies").select("id").eq("company_name", "حمولات تركية").maybeSingle();
       if (companyError || !company) throw companyError ?? new Error("تعذر العثور على سجل الحمولات التركية");

@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowDownLeft,
@@ -81,8 +82,8 @@ function ReportsPage() {
 
     const [{ data: tradersData, error: tradersError }, { data: transactionsData, error: transactionsError }] =
       await Promise.all([
-        supabase.from("traders").select("id,name,phone,address,notes,created_at").order("name"),
-        supabase.from("transactions").select("id,trader_id,company_id,document_id,document_number,amount,type,description,cargo_typedetails,created_at,driver_name").order("created_at", { ascending: false }),
+        activeCustomers(supabase).order("name"),
+        activeTransactions(supabase).order("created_at", { ascending: false }),
       ]);
 
     if (tradersError) setError(tradersError.message);
@@ -190,6 +191,7 @@ function ReportsPage() {
             <h1>كشف الحساب</h1>
             <p>اختر العميل لعرض الحساب التفصيلي الكامل، مع إمكانية طباعة نسخة PDF مباشرة.</p>
           </div>
+          <Link to="/customers" search={{ view: "trash" }} className="pill">سلة محذوفات العملاء</Link>
           <button type="button" className="pill" onClick={() => void loadReportData()}>
             <RefreshCcw size={16} /> تحديث
           </button>

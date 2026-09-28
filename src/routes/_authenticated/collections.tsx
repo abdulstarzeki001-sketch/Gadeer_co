@@ -1,3 +1,4 @@
+import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Banknote, CheckCircle2, History, Search, UserRound, WalletCards } from "lucide-react";
@@ -28,8 +29,8 @@ function CollectionsPage() {
     setLoading(true);
     setMessage(null);
     const [{ data: tradersData, error: tradersError }, { data: txData, error: txError }] = await Promise.all([
-      supabase.from("traders").select("id,name,phone,address").order("name"),
-      supabase.from("transactions").select("id,trader_id,company_id,amount,type,created_at").order("created_at", { ascending: false }),
+      activeCustomers(supabase).order("name"),
+      activeTransactions(supabase).order("created_at", { ascending: false }),
     ]);
     if (tradersError || txError) {
       setMessage({ ok: false, text: tradersError?.message || txError?.message || "تعذر تحميل بيانات العملاء." });
@@ -65,6 +66,11 @@ function CollectionsPage() {
     }
 
     setSaving(true);
+    try { await requireActiveCustomer(supabase, selected.id); }
+    catch (caught) {
+      setMessage({ ok: false, text: caught instanceof Error ? caught.message : "تعذر التحقق من العميل." });
+      setSaving(false); return;
+    }
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
       setMessage({ ok: false, text: "تعذر التحقق من المستخدم الحالي." });

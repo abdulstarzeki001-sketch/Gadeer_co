@@ -1,3 +1,4 @@
+import { requireActiveCustomer, activeCustomers } from "@/lib/customer-trash";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import companiesJson from "@/data/companies.json";
@@ -96,7 +97,7 @@ function WaslPage() {
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      supabase.from("traders").select("id,name,phone").order("name"),
+      activeCustomers(supabase).order("name"),
       supabase.from("companies").select("id").limit(1).maybeSingle(),
     ]).then(([tradersResult, companyResult]) => {
       if (cancelled) return;
@@ -138,6 +139,7 @@ function WaslPage() {
     setStatus({ msg: "جاري حفظ الوصل وإنشاء PDF...", ok: true });
 
     try {
+      await requireActiveCustomer(supabase, selectedTrader.id);
       const { data: authData, error: authError } = await supabase.auth.getUser();
       if (authError || !authData.user) throw new Error("تعذر التحقق من المستخدم الحالي");
 
