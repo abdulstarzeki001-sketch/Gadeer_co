@@ -12,17 +12,19 @@
 }
 html[data-ghadeer-theme="ocean"] {
   color-scheme:dark;
-  --background:#111216;--foreground:#f6f1e5;--card:#1d2026;--card-foreground:#f6f1e5;
-  --popover:#22252c;--popover-foreground:#f6f1e5;--primary:#e8bb55;--primary-foreground:#291d09;
-  --secondary:#302d27;--secondary-foreground:#fbe6b7;--muted:#282a2e;--muted-foreground:#c5bcb0;
-  --accent:#443826;--accent-foreground:#ffe0a0;--border:#4b4235;--input:#514738;--ring:#f0c66c;
-  --gh-navy:#24221e;--gh-navy-2:#51432b;--gh-navy-deep:#0c0d10;
-  --gh-gold:#e8bb55;--gh-gold-light:#ffe0a0;--gh-gold-dark:#d6a23c;
-  --gh-cream:#111216;--gh-cream-2:#282a2e;--gh-ink:#f6f1e5;
-  --gh-muted:#c5bcb0;--gh-line:#4b4235;--gh-soft:#292923;
-  --gh-panel:#1d2026;--gh-panel2:#282a2e;--gh-text:#f6f1e5;
-  --gh-success:#57c99c;--gh-danger:#ff7880;--gh-warn:#efb65e;
-  --gh-shadow-sm:0 5px 18px rgba(0,0,0,.2);--gh-shadow-md:0 16px 36px rgba(0,0,0,.3);--gh-shadow-lg:0 27px 60px rgba(0,0,0,.4);
+  --bg:#0B1220;--gold:#D8B878;
+  --background:#0B1220;--foreground:#F5F7FA;--card:#17263A;--card-foreground:#F5F7FA;
+  --popover:#17263A;--popover-foreground:#F5F7FA;--primary:#D8B878;--primary-foreground:#0B1220;
+  --secondary:#1B2C42;--secondary-foreground:#F5F7FA;--muted:#9BAEC5;--muted-foreground:#9BAEC5;
+  --accent:#1B2C42;--accent-foreground:#F5F7FA;--border:#34465B;--input:#34465B;--ring:#D8B878;
+  --success:#70C7B5;--destructive:#FF647C;--destructive-foreground:#0B1220;
+  --gh-navy:#17263A;--gh-navy-2:#1B2C42;--gh-navy-deep:#0B1220;
+  --gh-gold:#D8B878;--gh-gold-light:#D8B878;--gh-gold-dark:#D8B878;
+  --gh-cream:#0B1220;--gh-cream-2:#1B2C42;--gh-ink:#F5F7FA;
+  --gh-muted:#9BAEC5;--gh-line:#34465B;--gh-soft:#1B2C42;
+  --gh-panel:#17263A;--gh-panel2:#1B2C42;--gh-text:#F5F7FA;
+  --gh-success:#70C7B5;--gh-danger:#FF647C;--gh-warn:#FF647C;
+  --gh-shadow-sm:0 5px 18px #0B122033;--gh-shadow-md:0 16px 36px #0B12204D;--gh-shadow-lg:0 27px 60px #0B122066;
 }
 html[data-ghadeer-theme="pearl"] {
   color-scheme:dark;
@@ -187,3 +189,64 @@ html[data-ghadeer-theme="pearl"] .app-main :is(.positive,.history-amount,.operat
 html[data-ghadeer-theme="pearl"] .app-main :is(.negative,.operation-stat.red strong,.report-stat.red strong,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg.error){color:#FF647C!important}
 html[data-ghadeer-theme="pearl"] .app-main :is(.account-success,.collection-message.ok,.notice,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg){background:#173E68!important;border-color:#367FA5!important}
 html[data-ghadeer-theme="pearl"] .bottom-navigation__item.primary .bottom-navigation__indicator{background:#FFCA70!important;color:#102D4C!important;border-color:#367FA5!important}
+/* Theme 1: restrained gold accents, navy surfaces and subtle ledger striping. */
+html[data-ghadeer-theme="ocean"] body{background:#0B1220!important;background-image:none!important}
+html[data-ghadeer-theme="ocean"] .app-shell{color:#F5F7FA}
+html[data-ghadeer-theme="ocean"] :is(.app-header,.bottom-navigation){background:#0F1C2D!important;border-color:#34465B!important;box-shadow:none!important}
+html[data-ghadeer-theme="ocean"] .app-header::after{background:#34465B!important}
+html[data-ghadeer-theme="ocean"] .app-header .brand img{background:#1B2C42!important}
+html[data-ghadeer-theme="ocean"] :is(.brand-name span,.brand-name small,.top-navigation a,.top-navigation button){color:#F5F7FA!important}
+html[data-ghadeer-theme="ocean"] :is(.top-navigation a:hover,.top-navigation a[aria-current="page"]){background:#17263A!important;color:#D8B878!important}
+html[data-ghadeer-theme="ocean"] .gh-theme-option{background:#1B2C42;color:#F5F7FA;border-color:#34465B}
+html[data-ghadeer-theme="ocean"] .gh-theme-option:hover{background:#17263A}
+html[data-ghadeer-theme="ocean"] .gh-theme-option[aria-pressed="true"]{background:#D8B878;color:#0B1220;border-color:#D8B878}
+html[data-ghadeer-theme="ocean"] .gh-theme-swatch{border-color:#F5F7FA}
+html[data-ghadeer-theme="ocean"] .gh-theme-option[aria-pressed="true"] .gh-theme-swatch{border-color:#0B1220}
+html[data-ghadeer-theme="ocean"] :is(.reports-page,.history-page,.collection-page){
+  --surface:#17263A;--surface2:#1B2C42;--text:#F5F7FA;--muted:#F5F7FA;--line:#34465B;--accent:#D8B878;--blue:#34465B;--shadow:none;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(.hero,.accounting-hero,.reports-hero,.collection-head,.history-head,.page-heading){
+  background:#0F1C2D!important;color:#F5F7FA!important;border-color:#34465B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(.accounting-card,.panel,.dialog,.modal,.modal-box,.modal-content,.item,.row,.receipt-type-card,.report-stat,.balance-card,.history-stat,.reports-panel,.collection-panel,.history-panel,.account-item,.operation-stat,.overview-item,.ledger-kpis>div,section[style*="background"],div[style*="background"],article[style*="background"]){
+  background:#17263A!important;color:#F5F7FA!important;border-color:#34465B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(p,small,label,strong,h1,h2,h3,h4,[style*="color"],.receipt-type-copy strong,.receipt-type-copy small,.cost-box,.ledger-empty,.trader-meta,.customer-meta){
+  color:#F5F7FA!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  background:#1B2C42!important;color:#F5F7FA!important;border-color:#34465B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(input,select,textarea):focus{border-color:#D8B878!important;outline-color:#D8B878}
+html[data-ghadeer-theme="ocean"] .app-main :is(input,textarea)::placeholder{color:#F5F7FA!important;opacity:1}
+html[data-ghadeer-theme="ocean"] .app-main :is(button,.btn,.operation-submit,.collection-submit,.add-btn){
+  background:#1B2C42!important;color:#F5F7FA!important;border-color:#34465B!important;box-shadow:none!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(button,.btn) :is(span,strong,small){color:inherit!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.trader-item,.client-pick,.pill,.btn.secondary){
+  background:#1B2C42!important;color:#F5F7FA!important;border-color:#34465B!important;
+}
+html[data-ghadeer-theme="ocean"] .app-main :is(.trader-item.active,.client-pick.active){background:#17263A!important;border-color:#D8B878!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.receipt-type-icon,.receipt-type-action,.receipt-selector-kicker,.badge,.reports-badge){color:#D8B878!important;border-color:#34465B!important;background:#0F1C2D!important}
+html[data-ghadeer-theme="ocean"] .app-main table{background:#17263A!important;border-color:#34465B!important;box-shadow:none!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(thead tr,thead th,.modal-head){background:#0F1C2D!important;color:#F5F7FA!important;border-color:#34465B!important}
+html[data-ghadeer-theme="ocean"] .app-main tbody td{background:#17263A!important;color:#F5F7FA!important;border-color:#34465B!important}
+html[data-ghadeer-theme="ocean"] .app-main tbody tr:nth-child(even) td{background:#1B2C42!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(tfoot tr,tfoot td,.modal-actions){background:#0F1C2D!important;color:#F5F7FA!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.positive,.history-amount,.operation-stat.green strong,.balance-card.after strong,.report-stat.green strong,.account-success,.collection-message.ok,.notice:not(.error)){color:#70C7B5!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.negative,.operation-stat.red strong,.report-stat.red strong,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg.error){color:#FF647C!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.account-success,.collection-message.ok,.notice,.account-error,.collection-message.bad,.history-error,.report-error,.error,.msg){background:#0F1C2D!important;border-color:#34465B!important}
+html[data-ghadeer-theme="ocean"] .bottom-navigation__item.primary .bottom-navigation__indicator{background:#D8B878!important;color:#0B1220!important;border-color:#34465B!important}
+
+html[data-ghadeer-theme="ocean"] .app-main :is(button[type="submit"],.operation-submit,.collection-submit,.add-btn,.btn.add,.btn.back){background:#D8B878!important;color:#0B1220!important;border-color:#D8B878!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.muted,.customer-meta,.trader-meta,.ledger-empty,.cost-box,small,p,label){color:#9BAEC5!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.receipt-type-copy small,.dashboard-card p,.client-card small,.report-stat label,.overview-item span){color:#9BAEC5!important}
+html[data-ghadeer-theme="ocean"] :is(.brand-name small,.top-navigation a:hover,.top-navigation a[aria-current="page"]){color:#F5F7FA!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.receipt-type-action,.receipt-selector-kicker,.badge,.reports-badge){color:#F5F7FA!important;background:#1B2C42!important;border-color:#34465B!important}
+html[data-ghadeer-theme="ocean"] .app-main .dashboard-card{border:1px solid #34465B!important}
+html[data-ghadeer-theme="ocean"] .app-main .dashboard-card a{color:#F5F7FA!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.receipt-type-icon,.card-icon svg,.report-stat.gold strong,.history-stat.gold strong,.operation-stat.gold strong){color:#D8B878!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.report-stat.green strong,.operation-stat.green strong,.history-amount,.positive,.balance-card.after strong){color:#70C7B5!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(tbody td,thead th){border-width:1px!important}
+html[data-ghadeer-theme="ocean"] .app-main tbody tr:hover td{background:#203249!important}
+html[data-ghadeer-theme="ocean"] .app-main :is(.account-item,.operation-stat,.overview-item,.ledger-kpis>div){background:#17263A!important}
