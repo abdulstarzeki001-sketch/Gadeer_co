@@ -17,7 +17,8 @@ import {
   WalletCards,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { amount, escapeHtml, printPdf } from "@/lib/print-pdf";
+import { downloadCustomerStatement } from "@/lib/customer-statement-pdf";
+import { collectionDescription, type StatementDocument } from "@/lib/customer-statement";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -73,6 +74,7 @@ function ReportsPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { void loadReportData(); }, []);
@@ -80,22 +82,26 @@ function ReportsPage() {
   async function loadReportData() {
     setLoading(true);
     setError(null);
-
-    const [{ data: tradersData, error: tradersError }, { data: transactionsData, error: transactionsError }] =
-      await Promise.all([
-        activeCustomers(supabase).order("name"),
-        activeTransactions(supabase).order("created_at", { ascending: false }),
-      ]);
-
-    if (tradersError) setError(tradersError.message);
-    if (transactionsError) setError(transactionsError.message);
-
-    setTraders((tradersData ?? []) as Trader[]);
-    setTransactions((transactionsData ?? []) as Transaction[]);
-    if (!selectedTraderId && (tradersData ?? []).length) {
-      setSelectedTraderId((tradersData ?? [])[0]!.id);
-    }
-    setLoading(false);
+    try {
+      const { data: tradersData, error: tradersError } = await activeCustomers(supabase).order("name");
+      if (tradersError) throw tradersError;
+      const rows: Transaction[] = [];
+      // Fetch every page, so the PDF totals never silently stop at the API row limit.
+      for (let offset = 0; ; offset += 500) {
+        const { data, error: txError } = await activeTransactions(supabase)
+          .order("created_at", { ascending: false }).order("id")
+          .range(offset, offset + 499);
+        if (txError) throw txError;
+        rows.push(...((data ?? []) as Transaction[]));
+        if ((data ?? []).length < 500) break;
+      }
+      setTraders((tradersData ?? []) as Trader[]);
+      setTransactions(rows);
+      setSelectedTraderId(current => current || tradersData?.[0]?.id || "");
+    } catch (caught) {
+      setTransactions([]);
+      setError(caught instanceof Error ? caught.message : "تعذر تحميل كشف الحساب بالكامل. أعد المحاولة.");
+    } finally { setLoading(false); }
   }
 
   const filteredTraders = useMemo(() => {
@@ -135,41 +141,25 @@ function ReportsPage() {
     setDateTo("");
   };
 
-  const exportCurrentCustomerPdf = () => {
-    if (!selectedTrader) return;
-
-    const rows = traderTransactions
-      .slice()
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .map((item) => {
-        const incoming = isIncoming(item.type);
-        const direction = incoming ? "مستحق" : "تنزيل";
-        const amountText = `${incoming ? "+" : "-"}${formatAmount(item.amount)}`;
-        return `<tr><td>${escapeHtml(formatDateTime(item.created_at))}</td><td>${escapeHtml(direction)}</td><td>${escapeHtml(item.document_number ?? "—")}</td><td>${escapeHtml(item.cargo_typedetails ?? item.description ?? "—")}</td><td>${escapeHtml(amountText)}</td></tr>`;
-      })
-      .join("");
-
-    const body = `
-      <h2>بيانات العميل</h2>
-      <table>
-        <tr><th>اسم العميل</th><td>${escapeHtml(selectedTrader.name)}</td></tr>
-        <tr><th>الهاتف</th><td>${escapeHtml(selectedTrader.phone ?? "—")}</td></tr>
-        <tr><th>العنوان</th><td>${escapeHtml(selectedTrader.address ?? "—")}</td></tr>
-        <tr><th>ملاحظات</th><td>${escapeHtml(selectedTrader.notes ?? "—")}</td></tr>
-      </table>
-      <div class="cards">
-        <div class="card"><span>إجمالي المستحقات</span><b>${formatAmount(stats.incoming)}</b></div>
-        <div class="card"><span>إجمالي التنزيلات</span><b>${formatAmount(stats.outgoing)}</b></div>
-        <div class="card"><span>الرصيد</span><b>${formatAmount(stats.balance)}</b></div>
-      </div>
-      <h2>الحركات</h2>
-      <table>
-        <thead><tr><th>التاريخ</th><th>النوع</th><th>الرقم</th><th>الوصف</th><th>المبلغ</th></tr></thead>
-        <tbody>${rows || "<tr><td colspan='5'>لا توجد حركات في هذا النطاق.</td></tr>"}</tbody>
-      </table>
-    `;
-
-    printPdf(`كشف حساب العميل - ${selectedTrader.name}`, body);
+  const exportCurrentCustomerPdf = async () => {
+    if (!selectedTrader || loading || exporting || error) return;
+    setExporting(true);
+    const customer = selectedTrader.name;
+    const items = [...traderTransactions];
+    try {
+      const documentIds = [...new Set(items.map(item => item.document_id).filter((id): id is string => Boolean(id)))];
+      const documents: StatementDocument[] = [];
+      for (let offset = 0; offset < documentIds.length; offset += 100) {
+        const { data, error: documentError } = await supabase.from("documents")
+          .select("id,company_name,company_name_project,driver_name,vehicle_number,cargo_typedetails")
+          .in("id", documentIds.slice(offset, offset + 100));
+        if (documentError) throw documentError;
+        documents.push(...(data ?? []));
+      }
+      await downloadCustomerStatement({ customer, items, documents, from: dateFrom, to: dateTo });
+    } catch (caught) {
+      window.alert(caught instanceof Error ? caught.message : "تعذر إنشاء كشف الحساب. حاول مجدداً.");
+    } finally { setExporting(false); }
   };
 
   return (
@@ -253,8 +243,8 @@ function ReportsPage() {
                     </div>
 
                     <div className="customer-actions">
-                      <button type="button" className="pill" onClick={exportCurrentCustomerPdf}>
-                        <FileText size={16} /> طباعة PDF
+                      <button type="button" className="pill" disabled={exporting || loading || Boolean(error)} onClick={() => void exportCurrentCustomerPdf()}>
+                        <FileText size={16} /> {exporting ? "جارٍ إنشاء الكشف..." : "تنزيل كشف PDF بالدولار"}
                       </button>
                     </div>
                   </div>
@@ -321,7 +311,7 @@ function ReportsPage() {
                                   <td>{formatDateTime(transaction.created_at)}</td>
                                   <td>{humanizeType(transaction.type)}</td>
                                   <td>{transaction.document_number ?? "—"}</td>
-                                  <td>{transaction.cargo_typedetails ?? transaction.description ?? "—"}</td>
+                                  <td>{transaction.cargo_typedetails ?? collectionDescription(transaction.description)}</td>
                                   <td className={incoming ? "positive" : "negative"}>
                                     {incoming ? "+" : "-"}
                                     {formatAmount(transaction.amount)}

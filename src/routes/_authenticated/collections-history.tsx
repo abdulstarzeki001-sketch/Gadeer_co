@@ -1,3 +1,4 @@
+import { collectionDescription } from "@/lib/customer-statement";
 import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -90,7 +91,7 @@ function CollectionsHistoryPage() {
           <div className="history-field"><label>إلى تاريخ</label><input type="date" value={dateTo} onChange={(e)=>setDateTo(e.target.value)}/></div>
           <button type="button" className="history-refresh" onClick={()=>void loadData()}><RefreshCcw size={16}/> تحديث</button>
         </div>
-        {loading ? <div className="history-empty">جارٍ تحميل سجل القبوض...</div> : filtered.length === 0 ? <div className="history-empty">لا توجد عمليات قبض مطابقة.</div> : <div className="history-table-wrap"><table className="history-table"><thead><tr><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الملاحظة</th><th>رقم الوثيقة</th></tr></thead><tbody>{filtered.map((collection)=>{const trader=collection.trader_id?traderMap.get(collection.trader_id):null;return <tr key={collection.id}><td><div className="history-client"><span className="history-client-icon"><UserRound size={17}/></span><span>{trader?.name||"عميل غير معروف"}</span></div></td><td><CalendarDays size={14} style={{display:"inline",marginInlineEnd:5}}/>{formatDateTime(collection.created_at)}</td><td className="history-amount">{formatAmount(collection.amount)}</td><td>{collection.description||"—"}</td><td>{collection.document_number||"—"}</td></tr>})}</tbody></table></div>}
+        {loading ? <div className="history-empty">جارٍ تحميل سجل القبوض...</div> : filtered.length === 0 ? <div className="history-empty">لا توجد عمليات قبض مطابقة.</div> : <div className="history-table-wrap"><table className="history-table"><thead><tr><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الملاحظة</th><th>رقم الوثيقة</th></tr></thead><tbody>{filtered.map((collection)=>{const trader=collection.trader_id?traderMap.get(collection.trader_id):null;return <tr key={collection.id}><td><div className="history-client"><span className="history-client-icon"><UserRound size={17}/></span><span>{trader?.name||"عميل غير معروف"}</span></div></td><td><CalendarDays size={14} style={{display:"inline",marginInlineEnd:5}}/>{formatDateTime(collection.created_at)}</td><td className="history-amount">{formatAmount(collection.amount)}</td><td>{collectionDescription(collection.description)}</td><td>{collection.document_number||"—"}</td></tr>})}</tbody></table></div>}
         <div style={{marginTop:14}}><Link to="/reports" style={{display:"inline-flex",alignItems:"center",gap:7,textDecoration:"none",color:"var(--text)"}}><WalletCards size={17}/> فتح تقارير حسابات العملاء</Link></div>
       </section>
     </div>

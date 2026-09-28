@@ -10,12 +10,13 @@
   },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "npm run test:statement && vite build && tsc --noEmit",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json"
+    "deploy": "npm run build && wrangler deploy --config .output/server/wrangler.json",
+    "test:statement": "node --experimental-strip-types --test tests/customer-statement.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
