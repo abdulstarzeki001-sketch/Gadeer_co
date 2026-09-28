@@ -9,9 +9,7 @@ type RefCompany = {
   Number: number;
   Brand: string;
   CompanyNameProject: string;
-  GovernorateName: string;
   LicenseTextSpecialization?: string;
-  TypeIndustryProduction?: string;
 };
 
 type Trader = {
@@ -25,12 +23,9 @@ type IraqiLoadForm = {
   driverName: string;
   vehicleNumber: string;
   vehicleProvince: string;
-  weight: string;
   destination: string;
   companyName: string;
-  provinceName: string;
   cargoType: string;
-  licensedProducts: string;
 };
 
 const COMPANIES = (companiesJson as RefCompany[]).filter((company) => company.CompanyNameProject);
@@ -46,12 +41,9 @@ const EMPTY: IraqiLoadForm = {
   driverName: "",
   vehicleNumber: "",
   vehicleProvince: "",
-  weight: "",
   destination: "",
   companyName: "",
-  provinceName: "",
   cargoType: "",
-  licensedProducts: "",
 };
 
 export const Route = createFileRoute("/_authenticated/wasl")({
@@ -118,9 +110,7 @@ function WaslPage() {
     setForm((previous) => ({
       ...previous,
       companyName: company.CompanyNameProject || "",
-      provinceName: company.GovernorateName || "",
       cargoType: company.LicenseTextSpecialization || previous.cargoType,
-      licensedProducts: company.TypeIndustryProduction || "",
     }));
     setCompanyQuery(`${company.Number} - ${company.CompanyNameProject}`);
     setCompanyOpen(false);
@@ -166,10 +156,7 @@ function WaslPage() {
           checkpoint_name_control: form.entryPoint,
           registration_governorate: form.vehicleProvince,
           cargo_typedetails: form.cargoType,
-          weight_quantity: form.weight,
           destination_governorate: form.destination,
-          governorate_name: form.provinceName,
-          type_industry_production: form.licensedProducts,
           document_value: amount,
           trader_id: traderId,
           created_by: authData.user.id,
@@ -203,7 +190,7 @@ function WaslPage() {
         loadType: "عراقية",
         customerName: selectedTrader.name,
         driverName: form.driverName,
-        cargoType: form.cargoType || form.licensedProducts || "حمولة عراقية",
+        cargoType: form.cargoType || "حمولة عراقية",
         amount,
         vehicleNumber: form.vehicleNumber,
         destination: form.destination,
@@ -264,7 +251,6 @@ function WaslPage() {
             <Field label="اسم السائق"><input required value={form.driverName} onChange={(event) => set("driverName", event.target.value)} /></Field>
             <Field label="رقم العجلة"><input required value={form.vehicleNumber} onChange={(event) => set("vehicleNumber", event.target.value)} /></Field>
             <Field label="محافظة تسجيل العجلة"><ProvinceSelect value={form.vehicleProvince} onChange={(value) => set("vehicleProvince", value)} /></Field>
-            <Field label="الوزن / الكمية (طن)"><input required value={form.weight} onChange={(event) => set("weight", event.target.value)} /></Field>
             <Field label="محافظة الوجهة النهائية"><ProvinceSelect value={form.destination} onChange={(value) => set("destination", value)} /></Field>
 
             <div ref={wrapRef} style={{ position: "relative", marginBottom: 10 }}>
@@ -293,8 +279,6 @@ function WaslPage() {
 
             <Field label="اسم الشركة / المشروع"><input required value={form.companyName} onChange={(event) => set("companyName", event.target.value)} /></Field>
             <Field label="نوع / تفاصيل الحمولة"><input required value={form.cargoType} onChange={(event) => set("cargoType", event.target.value)} /></Field>
-            <Field label="اسم المحافظة"><ProvinceSelect value={form.provinceName} onChange={(value) => set("provinceName", value)} /></Field>
-            <Field label="المواد / المنتجات"><input value={form.licensedProducts} onChange={(event) => set("licensedProducts", event.target.value)} /></Field>
           </Section>
 
           {status && (

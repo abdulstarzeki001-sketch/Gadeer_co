@@ -12,17 +12,14 @@ export type WaslForm = {
   driverName: string;
   vehicleNumber: string;
   vehicleProvince: string;
-  weight: string;
   destination: string;
   companyName: string;
-  provinceName: string;
   trademark: string;
   cargoType: string;
   licenseAuthority: string;
   licenseNumber: string;
   licenseDate: string;
   licenseDescription: string;
-  licensedProducts: string;
 };
 
 function esc(v: unknown): string {
@@ -40,9 +37,7 @@ function buildHtml(form: WaslForm, qrDataUrl: string): string {
     ["رقم العجلة", form.vehicleNumber],
     ["محافظة تسجيل العجلة", form.vehicleProvince],
     ["نوع / تفاصيل الحمولة", form.cargoType],
-    ["الوزن / الكمية", form.weight ? form.weight + " طن" : ""],
     ["الوجهة النهائية / المحافظة", form.destination],
-    ["اسم المحافظة", form.provinceName],
     ["اسم الشركة / المشروع", form.companyName],
     ["الجهة المانحة للإجازة / الموافقة", form.licenseAuthority],
     ["رقم الإجازة / الموافقة", form.licenseNumber],
@@ -52,10 +47,6 @@ function buildHtml(form: WaslForm, qrDataUrl: string): string {
   ];
 
   const rowsHtml = rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("");
-
-  const productRow = `<tr><td>${
-    esc(form.licensedProducts) || "لا توجد مواد مضافة"
-  }</td><td>${form.weight ? esc(form.weight) + " طن" : "—"}</td></tr>`;
 
   const logoImg = A.LOGO_BASE64
     ? `<img src="${A.LOGO_BASE64}" alt="شعار" class="center-logo" />`
@@ -123,7 +114,6 @@ function buildHtml(form: WaslForm, qrDataUrl: string): string {
     `<div class="subject-row"><strong>الموضوع /</strong><span class="subject-box">الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة</span></div>` +
     `<table class="info-table"><colgroup><col class="col-right" /><col class="col-left" /></colgroup><tbody>` +
     `<tr><th colspan="2">المعلومات الشخصية</th></tr>${rowsHtml}` +
-    `<tr><th colspan="2">المواد / المنتجات المرخّصة</th></tr>${productRow}` +
     `</tbody></table>` +
     `</div>` +
     `<div class="qr-wrap">${qrBlock}</div>` +
