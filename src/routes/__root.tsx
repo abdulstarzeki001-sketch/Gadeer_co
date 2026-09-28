@@ -140,13 +140,13 @@ function SiteShell({ children }: { children: ReactNode }) {
       savedTheme === "pearl" || savedTheme === "midnight" ? savedTheme : "ocean";
     setTheme(initialTheme);
     document.documentElement.dataset.ghadeerTheme = initialTheme;
-    document.documentElement.classList.toggle("dark", initialTheme === "midnight");
+    document.documentElement.classList.add("dark");
   }, []);
   const changeTheme = (nextTheme: GhadeerTheme) => {
     setTheme(nextTheme);
     window.localStorage.setItem("ghadeer-theme", nextTheme);
     document.documentElement.dataset.ghadeerTheme = nextTheme;
-    document.documentElement.classList.toggle("dark", nextTheme === "midnight");
+    document.documentElement.classList.add("dark");
   };
   return (
     <div className="app-shell">
@@ -154,8 +154,8 @@ function SiteShell({ children }: { children: ReactNode }) {
         <Link to="/" className="brand" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}><img src={ghadeerLogo.url} alt="شعار الغدير" /><div className="brand-name" style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}><span>شركة الغدير</span><small>GHADEER LOGISTICS</small></div></Link>
         <div aria-label="اختيار المظهر" className="gh-theme-picker" role="group">
           {([
-            { id: "ocean", label: "وردي توتي", colors: "linear-gradient(135deg,#6b1e45 50%,#e25d94 50%)" },
-            { id: "pearl", label: "وردي خوخي", colors: "linear-gradient(135deg,#a74461 50%,#ffd3d6 50%)" },
+            { id: "ocean", label: "فحمي ذهبي", colors: "linear-gradient(135deg,#111216 50%,#e8bb55 50%)" },
+            { id: "pearl", label: "ليلي برتقالي", colors: "linear-gradient(135deg,#101923 50%,#fb9445 50%)" },
             { id: "midnight", label: "منتصف الليل", colors: "linear-gradient(135deg,#132c42 50%,#dbbd82 50%)" },
           ] as const).map((option) => (
             <button key={option.id} type="button" className="gh-theme-option" onClick={() => changeTheme(option.id)}

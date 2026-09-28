@@ -11,26 +11,32 @@
   --gh-shadow-lg:0 27px 60px rgba(18,45,64,.16);
 }
 html[data-ghadeer-theme="ocean"] {
-  color-scheme:light;
-  --background:#fff5f9;--foreground:#421b31;--card:#ffffff;--card-foreground:#421b31;
-  --popover:#ffffff;--popover-foreground:#421b31;--primary:#a9235b;--primary-foreground:#ffffff;
-  --secondary:#fce5ee;--secondary-foreground:#702347;--muted:#fdf0f5;--muted-foreground:#79536a;
-  --accent:#fbd5e5;--accent-foreground:#712345;--border:#f1d5e2;--input:#f1d5e2;--ring:#bc3971;
-  --gh-navy:#6b1e45;--gh-navy-2:#ba3e76;--gh-navy-deep:#461632;
-  --gh-gold:#e25d94;--gh-gold-light:#ffd0e2;--gh-gold-dark:#a9235b;
-  --gh-cream:#fff5f9;--gh-cream-2:#fce8f0;--gh-ink:#421b31;
-  --gh-muted:#79536a;--gh-line:#f1d5e2;--gh-soft:#fff1f6;
+  color-scheme:dark;
+  --background:#111216;--foreground:#f6f1e5;--card:#1d2026;--card-foreground:#f6f1e5;
+  --popover:#22252c;--popover-foreground:#f6f1e5;--primary:#e8bb55;--primary-foreground:#291d09;
+  --secondary:#302d27;--secondary-foreground:#fbe6b7;--muted:#282a2e;--muted-foreground:#c5bcb0;
+  --accent:#443826;--accent-foreground:#ffe0a0;--border:#4b4235;--input:#514738;--ring:#f0c66c;
+  --gh-navy:#24221e;--gh-navy-2:#51432b;--gh-navy-deep:#0c0d10;
+  --gh-gold:#e8bb55;--gh-gold-light:#ffe0a0;--gh-gold-dark:#d6a23c;
+  --gh-cream:#111216;--gh-cream-2:#282a2e;--gh-ink:#f6f1e5;
+  --gh-muted:#c5bcb0;--gh-line:#4b4235;--gh-soft:#292923;
+  --gh-panel:#1d2026;--gh-panel2:#282a2e;--gh-text:#f6f1e5;
+  --gh-success:#57c99c;--gh-danger:#ff7880;--gh-warn:#efb65e;
+  --gh-shadow-sm:0 5px 18px rgba(0,0,0,.2);--gh-shadow-md:0 16px 36px rgba(0,0,0,.3);--gh-shadow-lg:0 27px 60px rgba(0,0,0,.4);
 }
 html[data-ghadeer-theme="pearl"] {
-  color-scheme:light;
-  --background:#fff7f5;--foreground:#482732;--card:#fffdfc;--card-foreground:#482732;
-  --popover:#fffdfc;--popover-foreground:#482732;--primary:#a74461;--primary-foreground:#ffffff;
-  --secondary:#fce8e7;--secondary-foreground:#77384c;--muted:#fff0ed;--muted-foreground:#785863;
-  --accent:#ffdcd8;--accent-foreground:#7a354d;--border:#f2d9d7;--input:#f2d9d7;--ring:#c45370;
-  --gh-navy:#673044;--gh-navy-2:#b45c76;--gh-navy-deep:#452238;
-  --gh-gold:#ea8291;--gh-gold-light:#ffd3d6;--gh-gold-dark:#a74461;
-  --gh-cream:#fff7f5;--gh-cream-2:#fce9e7;--gh-ink:#482732;
-  --gh-muted:#785863;--gh-line:#f2d9d7;--gh-soft:#fff1ef;
+  color-scheme:dark;
+  --background:#101923;--foreground:#f5f3ef;--card:#1c2935;--card-foreground:#f5f3ef;
+  --popover:#22313e;--popover-foreground:#f5f3ef;--primary:#fb9445;--primary-foreground:#291807;
+  --secondary:#303743;--secondary-foreground:#ffe2c6;--muted:#27333f;--muted-foreground:#bdc5cc;
+  --accent:#493a31;--accent-foreground:#ffd6af;--border:#3f4c56;--input:#4b535b;--ring:#ffa765;
+  --gh-navy:#182431;--gh-navy-2:#364451;--gh-navy-deep:#0b131c;
+  --gh-gold:#fb9445;--gh-gold-light:#ffd1a3;--gh-gold-dark:#e0782d;
+  --gh-cream:#101923;--gh-cream-2:#27333f;--gh-ink:#f5f3ef;
+  --gh-muted:#bdc5cc;--gh-line:#3f4c56;--gh-soft:#26313a;
+  --gh-panel:#1c2935;--gh-panel2:#27333f;--gh-text:#f5f3ef;
+  --gh-success:#59cba3;--gh-danger:#ff8184;--gh-warn:#ffa765;
+  --gh-shadow-sm:0 5px 18px rgba(0,0,0,.18);--gh-shadow-md:0 16px 36px rgba(0,0,0,.28);--gh-shadow-lg:0 27px 60px rgba(0,0,0,.4);
 }
 html[data-ghadeer-theme="midnight"] {
   color-scheme:dark;
@@ -102,7 +108,7 @@ tfoot tr,tfoot td,.modal-actions {background:var(--muted)!important;color:var(--
 .gh-theme-option[aria-pressed="true"] {background:var(--gh-gold-light);border-color:var(--gh-gold-light);color:#192a36;}
 .gh-theme-swatch {width:13px;height:13px;flex-shrink:0;border:2px solid rgba(255,255,255,.75);border-radius:50%;}
 .gh-theme-option[aria-pressed="true"] .gh-theme-swatch {border-color:rgba(15,40,55,.35);}
-/* Carry the chosen pink palette into pages that define their own local colors. */
+/* Carry the selected palette into pages that define their own local colors. */
 html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .reports-page,
 html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .history-page {
   --surface:var(--card);--surface2:var(--secondary);--text:var(--foreground);
@@ -111,6 +117,21 @@ html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .history-page
 }
 html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .btn:not(.secondary) {
   background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);
+}
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .panel,
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .dialog {
+  background:var(--card)!important;color:var(--foreground)!important;border-color:var(--border)!important;
+}
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .item,
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .app-main .row {
+  background:var(--muted);border-color:var(--border)!important;color:var(--foreground);
+}
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .dashboard-card {
+  border-top:2px solid var(--gh-gold)!important;
+  box-shadow:var(--gh-shadow-md)!important;
+}
+html:is([data-ghadeer-theme="ocean"],[data-ghadeer-theme="pearl"]) .dashboard-card a {
+  color:var(--primary)!important;
 }
 @media(max-width:1100px){.gh-theme-option span:last-child{display:none}.gh-theme-option{padding:8px;min-width:38px;justify-content:center}}
 @media(max-width:768px){.gh-theme-picker{gap:5px;margin-inline:auto 0}.gh-theme-option{min-width:35px;min-height:35px;padding:6px}.app-header{gap:8px!important}.brand-name small{display:none}}
