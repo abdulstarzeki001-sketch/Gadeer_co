@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { Users, FileText, Wallet, ArrowDownToLine, Package, BarChart3, ChevronLeft, CalendarDays, Search, RefreshCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -96,14 +96,8 @@ export function RoyalDashboard() {
   },[movements,names]);
   const collectionRate=totals.due>0?Math.min(100,Math.max(0,totals.received/totals.due*100)):0;
   const thisMonth=months[months.length-1];
-  const monthMovements=movements.filter(item=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Baghdad",year:"numeric",month:"2-digit"}).format(new Date(item.created_at)).startsWith(thisMonth.key)).length;
+  const monthMovements=movements.filter(item=>(()=>{const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Baghdad",year:"numeric",month:"2-digit"}).formatToParts(new Date(item.created_at));return parts.find(p=>p.type==="year")!.value+"-"+parts.find(p=>p.type==="month")!.value===thisMonth.key;})()).length;
   const unavailable=loading||Boolean(error)||!signedIn;
-  const kpis=[
-    {title:"الرصيد الإجمالي",value:money(totals.balance),icon:Wallet,note:"المستحقات ناقص القبوض",currency:true},
-    {title:"المستحقات",value:money(totals.due),icon:Package,note:"إجمالي الحركات المستحقة",currency:true},
-    {title:"التنزيلات",value:money(totals.received),icon:ArrowDownToLine,note:"إجمالي المبالغ المقبوضة",currency:true},
-    {title:"عدد العملاء",value:String(customers.length),icon:Users,note:"العملاء النشطون",currency:false},
-  ];
   return <div className="royal-dashboard royal-reference" dir="rtl">
     <div className="royal-toolbar">
       <label className="royal-search"><Search size={20}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="البحث عن عميل، رقم وصل أو حركة..." aria-label="البحث في الحركات الحديثة"/></label>
@@ -136,7 +130,7 @@ export function RoyalDashboard() {
       </section>
       <section className="royal-card royal-collection-card">
         <h2>نسبة التحصيل</h2>
-        <div className="royal-donut" style={{"--royal-progress":(unavailable?0:collectionRate)+"%"} as React.CSSProperties}><div><strong>{unavailable?"—":collectionRate.toFixed(0)+"%"}</strong><small>نسبة التحصيل</small></div></div>
+        <div className="royal-donut" style={{"--royal-progress":(unavailable?0:collectionRate)+"%"} as CSSProperties}><div><strong>{unavailable?"—":collectionRate.toFixed(0)+"%"}</strong><small>نسبة التحصيل</small></div></div>
         <div className="royal-collection-legend">
           <div><span>المحصل</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.received)}</strong></div>
           <div><span>المستحقات</span><strong dir="ltr">{unavailable?"—":"$ "+money(totals.due)}</strong></div>
