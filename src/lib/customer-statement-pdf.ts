@@ -23,21 +23,30 @@ export async function downloadCustomerStatement(input: Input) {
   const period = input.from || input.to ? 'الفترة: ' + escapeHtml(input.from || "البداية") + ' — ' + escapeHtml(input.to || "حتى الآن") : "جميع الحركات";
   let page: HTMLDivElement;
   let content: HTMLDivElement;
-  const newPage = () => {
+  const newPage = (showHeader = false) => {
     page = document.createElement("div");
     page.className = "gh-statement";
     page.dir = "rtl";
-    page.innerHTML = header + '<div class="period">' + period + ' · العملة: الدولار الأمريكي USD</div><div class="statement-content"></div><footer></footer>';
+    page.innerHTML = (showHeader ? header + '<div class="period">' + period + ' · العملة: الدولار الأمريكي USD</div>' : '') + '<div class="statement-content"></div><footer></footer>';
     root.appendChild(page);
     content = page.querySelector<HTMLDivElement>(".statement-content")!;
     pages.push(page);
   };
   const fits = () => content.getBoundingClientRect().bottom <= page.getBoundingClientRect().top + 1040;
-  const appendBlock = (html: string) => {
+  const appendBlock = (html: string, continuationTitle?: string) => {
     const block = document.createElement("div");
     block.innerHTML = html;
     content.appendChild(block);
-    if (!fits()) { block.remove(); newPage(); content.appendChild(block); }
+    if (!fits()) {
+      block.remove();
+      newPage();
+      if (continuationTitle) {
+        const heading = document.createElement("h3");
+        heading.textContent = continuationTitle + " — تابع";
+        content.appendChild(heading);
+      }
+      content.appendChild(block);
+    }
     if (!fits()) throw new Error("النص طويل جداً لصفحة الكشف؛ اختصر الوصف وحاول مجدداً.");
   };
   const section = (title: string, columns: string[], widths: number[], rows: string[], total: number) => {
@@ -59,16 +68,16 @@ export async function downloadCustomerStatement(input: Input) {
         const continued = tbody!.children.length > 0;
         if (!continued) box!.remove();
         newPage();
-        start(continued);
+        start(true);
         tbody!.appendChild(row);
       }
       if (!fits()) throw new Error("أحد أوصاف الحركات أطول من صفحة؛ اختصره قبل إصدار الكشف.");
     }
-    appendBlock('<div class="section-total"><span>عدد الحركات: <b>' + rows.length + '</b></span><span>' + (title === "حركات القبض" ? "مجموع القبوض" : "مجموع المستحقات") + ': <b dir="ltr">' + money(total) + '</b></span></div>');
+    appendBlock('<div class="section-total"><span>عدد الحركات: <b>' + rows.length + '</b></span><span>' + (title === "حركات القبض" ? "مجموع القبوض" : "مجموع المستحقات") + ': <b dir="ltr">' + money(total) + '</b></span></div>', title);
   };
   try {
     await document.fonts.ready;
-    newPage();
+    newPage(true);
     appendBlock('<div class="statement-summary">' + [
       ["إجمالي المستحقات", report.dueTotal],
       ["إجمالي التنزيلات", report.receiptTotal],
@@ -76,6 +85,7 @@ export async function downloadCustomerStatement(input: Input) {
     ].map(([label, value]) => '<div><span>' + label + '</span><strong dir="ltr">' + money(Number(value)) + '</strong></div>').join("") + '</div>');
     section("الحركات المستحقة", ["التاريخ", "الرقم", "اسم السائق ورقم السيارة", "اسم الشركة والوصف", "المبلغ USD"], [13, 18, 22, 29, 18],
       report.dues.map(row => '<td dir="ltr">' + date(row.date) + '</td><td dir="ltr">' + escapeHtml(row.number) + '</td><td><b>' + escapeHtml(row.driver) + '</b><br/><span dir="ltr">' + escapeHtml(row.vehicle) + '</span></td><td><b>' + escapeHtml(row.company) + '</b><br/>' + escapeHtml(row.description) + '</td><td class="money" dir="ltr">' + money(row.amount) + '</td>'), report.dueTotal);
+    newPage(true);
     section("حركات القبض", ["التاريخ", "اسم المرسل وكيفية الإرسال", "المبلغ المستلم USD"], [18, 58, 24],
       report.receipts.map(row => '<td dir="ltr">' + date(row.date) + '</td><td><b>' + escapeHtml(row.sender) + '</b><br/>طريقة الإرسال: ' + escapeHtml(row.method) + (row.note ? '<br/>' + escapeHtml(row.note) : '') + '</td><td class="money" dir="ltr">' + money(row.amount) + '</td>'), report.receiptTotal);
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
