@@ -1,8 +1,8 @@
 import { isDebtIncrease, ledgerAmount } from "@/lib/customer-ledger";
 import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Calculator, CreditCard, Download, FileText, ReceiptText, RefreshCcw, Search, TrendingUp, UserRound, WalletCards } from "lucide-react";
+import { Calculator, CreditCard, Download, FileText, ReceiptText, RefreshCcw, Search, TrendingUp, WalletCards } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/accounts")({
@@ -263,6 +263,8 @@ function AccountsPage() {
     const query = search.trim().toLocaleLowerCase();
     return !query || [row.number, row.service, row.note, traderNames.get(row.traderId ?? "") ?? ""].some((field) => field.toLocaleLowerCase().includes(query));
   }), [history, historyTraderId, search, traderNames]);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const visibleHistory = showAllHistory || search.trim() ? filteredHistory : filteredHistory.slice(0, 15);
   const historyTotals = useMemo(() => filteredHistory.reduce((sum, row) => ({ invoiced: sum.invoiced + row.total, paid: sum.paid + row.paid, cost: sum.cost + row.cost, profit: sum.profit + row.profit }), { invoiced: 0, paid: 0, cost: 0, profit: 0 }), [filteredHistory]);
 
   function exportHistory() {
@@ -284,13 +286,13 @@ function AccountsPage() {
         .operation-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}.operation-stat{border:1px solid var(--border);border-radius:16px;padding:13px;background:var(--muted)}.operation-stat span{display:flex;align-items:center;gap:6px;color:var(--muted-foreground);font-size:.76rem}.operation-stat strong{display:block;margin-top:8px;font-size:1.15rem;direction:ltr;text-align:right}.operation-stat.gold strong{color:var(--gh-gold-dark)}.operation-stat.green strong{color:var(--gh-success)}.operation-stat.red strong{color:var(--gh-danger)}.cost-box{margin-top:10px;padding:12px;border-radius:14px;border:1px dashed var(--border);font-size:.82rem;line-height:1.9}.cost-box b{direction:ltr;display:inline-block}
         .account-message{margin-top:12px;padding:11px 13px;border-radius:12px}.account-error{border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.08);color:#ef4444}.account-success{border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.08);color:#16a34a}
         .ledger{margin-top:16px}.ledger-head,.ledger-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}.ledger-head p{margin:0 0 14px;color:var(--muted-foreground)}.ledger-tools{justify-content:flex-start;margin-bottom:14px}.ledger-tools input,.ledger-tools select{min-height:42px;padding:8px 11px;border:1px solid var(--border);border-radius:11px}.ledger-tools input{flex:1;min-width:170px}.ledger-tools button{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:8px 12px;border:1px solid var(--border);border-radius:11px;background:var(--secondary);color:var(--foreground);cursor:pointer}.ledger-tools button:disabled{opacity:.5;cursor:not-allowed}.ledger-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:0 0 16px}.ledger-kpis div{border:1px solid var(--border);border-radius:13px;background:var(--muted);padding:12px}.ledger-kpis span{display:block;font-size:.76rem;color:var(--muted-foreground)}.ledger-kpis strong{display:block;margin-top:5px;font-size:1.05rem;overflow-wrap:anywhere}.ledger-table-wrap{overflow:auto}.ledger-table{width:100%;min-width:830px;border-collapse:collapse}.ledger-table th,.ledger-table td{padding:11px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}.ledger-table td:nth-child(3){white-space:normal;min-width:140px}.ledger-table th{background:var(--secondary)!important;color:var(--foreground)!important}.ledger-empty{text-align:center;padding:28px;color:var(--muted-foreground)}
-        .manual-accounts{margin-top:16px}.manual-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:14px}.manual-form{display:grid;gap:10px}.account-list{display:grid;gap:10px}.account-item{padding:13px;border:1px solid var(--gh-line,#d9dfeb);border-radius:15px;background:var(--gh-panel2,#f8fafc)}.account-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.account-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.account-actions button{padding:8px 11px;border-radius:10px;cursor:pointer}
+        .history-more{display:block;margin:16px auto 0;border:1px solid var(--border);border-radius:12px;padding:10px 22px;background:var(--secondary);color:var(--foreground);cursor:pointer}.manual-accounts{margin-top:24px}.manual-toggle{cursor:pointer;color:var(--muted-foreground);font-size:.84rem;padding:12px 4px}.manual-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:14px}.manual-form{display:grid;gap:10px}.account-list{display:grid;gap:10px}.account-item{padding:13px;border:1px solid var(--gh-line,#d9dfeb);border-radius:15px;background:var(--gh-panel2,#f8fafc)}.account-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.account-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.account-actions button{padding:8px 11px;border-radius:10px;cursor:pointer}
         @media(max-width:820px){.operation-layout,.manual-grid{grid-template-columns:1fr}.operation-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.ledger-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.accounting-page{padding-inline:2px}.operation-form{grid-template-columns:1fr}.operation-field.full{grid-column:auto}.operation-submit{grid-column:auto}.accounting-card{padding:13px 10px;border-radius:17px}.operation-summary{gap:6px}.operation-stat{padding:11px 8px}.operation-stat strong{font-size:1rem}}
       `}</style>
 
       <section className="accounting-hero">
         <h1>الحسابات والمعاملات</h1>
-        <p>سجّل العملية مرة واحدة، والنظام يحسب الفاتورة والمدفوع والمتبقي والتكلفة وصافي الربح ويحفظ الحركات على حساب العميل.</p>
+        <p>سجّل فاتورة للعميل وتابع المستحقات والتحصيلات في مكان واحد.</p>
       </section>
 
       <div className="operation-layout">
@@ -304,7 +306,7 @@ function AccountsPage() {
             <div className="operation-field"><label>المبلغ المدفوع</label><input type="number" min="0" step="0.01" value={operation.paidAmount} onChange={(e)=>setOperationField("paidAmount",e.target.value)} placeholder="0"/></div>
             <div className="operation-field"><label>تكلفة الوحدة عليك</label><input type="number" min="0" step="0.01" value={operation.unitCost} onChange={(e)=>setOperationField("unitCost",e.target.value)} placeholder="0"/></div>
             <div className="operation-field full"><label>طريقة الدفع</label><select value={operation.paymentMethod} onChange={(e)=>setOperationField("paymentMethod",e.target.value)}><option>نقداً</option><option>تحويل بنكي</option><option>حوالة</option><option>آجل</option><option>أخرى</option></select></div>
-            <div className="operation-field full"><label>ملاحظات</label><textarea value={operation.note} onChange={(e)=>setOperationField("note",e.target.value)} placeholder="أي تفاصيل إضافية للعملية"/></div>
+            <details className="operation-field full"><summary style={{cursor:"pointer",padding:"10px 0"}}>ملاحظات إضافية (اختياري)</summary><textarea aria-label="ملاحظات" value={operation.note} onChange={(e)=>setOperationField("note",e.target.value)} placeholder="تفاصيل إضافية"/></details>
             <button className="operation-submit" type="submit" disabled={savingOperation}>{savingOperation?"جارٍ حفظ الفاتورة والحركة...":"حفظ العملية في حساب العميل"}</button>
           </form>
           {error?<div className="account-message account-error">{error}</div>:null}
@@ -320,14 +322,16 @@ function AccountsPage() {
       </div>
 
       <section className="accounting-card ledger" aria-label="سجل المعاملات المحاسبية">
-        <div className="ledger-head"><div><h2><FileText size={20}/> سجل المعاملات</h2><p>آخر 500 حركة، تشمل المستحقات والقبوض اللاحقة من العملاء. الأرقام أدناه تخص النتائج المعروضة بعد البحث فقط، وبالدينار العراقي.</p></div></div>
+        <div className="ledger-head"><div><h2><FileText size={20}/> سجل المعاملات</h2><p>آخر الحركات المالية. الأرقام تخص نتائج البحث، بالدينار العراقي.</p></div></div>
         <div className="ledger-tools"><Search size={18} aria-hidden="true"/><input aria-label="بحث في المعاملات" value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="ابحث برقم العملية أو العميل أو الخدمة"/><select aria-label="تصفية حسب العميل" value={historyTraderId} onChange={(e)=>setHistoryTraderId(e.target.value)}><option value="">كل العملاء</option>{traders.map((trader)=><option key={trader.id} value={trader.id}>{trader.name}</option>)}</select><button type="button" onClick={()=>void loadPage()} disabled={loading}><RefreshCcw size={16}/> تحديث</button><button type="button" onClick={exportHistory} disabled={!filteredHistory.length}><Download size={16}/> تصدير CSV</button></div>
         {historyError?<div className="account-message account-error" role="alert">{historyError}</div>:null}
         <div className="ledger-kpis"><div><span>إجمالي المستحقات</span><strong>{money(historyTotals.invoiced)} IQD</strong></div><div><span>المقبوض</span><strong>{money(historyTotals.paid)} IQD</strong></div><div><span>المتبقي</span><strong>{money(historyTotals.invoiced-historyTotals.paid)} IQD</strong></div><div><span>الربح المتوقع للفواتير المحاسبية</span><strong>{money(historyTotals.profit)} IQD</strong></div></div>
-        {loading?<div className="ledger-empty">جارٍ تحميل السجل...</div>:filteredHistory.length===0?<div className="ledger-empty">لا توجد معاملات مطابقة.</div>:<div className="ledger-table-wrap"><table className="ledger-table"><thead><tr><th>الرقم / التاريخ</th><th>العميل</th><th>الخدمة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الربح المتوقع</th></tr></thead><tbody>{filteredHistory.map((row)=><tr key={row.id}><td><strong>{row.number}</strong><br/><small>{new Date(row.date).toLocaleString("en-GB")}</small></td><td>{traderNames.get(row.traderId??"")??"عميل محذوف"}</td><td>{row.service}</td><td>{money(row.total)}</td><td>{money(row.paid)}</td><td>{money(row.total-row.paid)}</td><td>{money(row.profit)}</td></tr>)}</tbody></table></div>}
+        {loading?<div className="ledger-empty">جارٍ تحميل السجل...</div>:filteredHistory.length===0?<div className="ledger-empty">لا توجد معاملات مطابقة.</div>:<div className="ledger-table-wrap"><table className="ledger-table"><thead><tr><th>الرقم / التاريخ</th><th>العميل</th><th>الخدمة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الربح المتوقع</th></tr></thead><tbody>{visibleHistory.map((row)=><tr key={row.id}><td><strong>{row.number}</strong><br/><small>{new Date(row.date).toLocaleString("en-GB")}</small></td><td>{traderNames.get(row.traderId??"")??"عميل محذوف"}</td><td>{row.service}</td><td>{money(row.total)}</td><td>{money(row.paid)}</td><td>{money(row.total-row.paid)}</td><td>{money(row.profit)}</td></tr>)}</tbody></table></div>}
       </section>
 
-      <section className="manual-accounts">
+      {!loading && !search.trim() && filteredHistory.length > 15 ? <button type="button" className="history-more" onClick={()=>setShowAllHistory(v=>!v)}>{showAllHistory?"عرض آخر 15 حركة":`عرض جميع الحركات (${filteredHistory.length})`}</button>:null}
+
+      <details className="manual-accounts"><summary className="manual-toggle">الحسابات المستقلة (خيارات إضافية)</summary>
         <div className="manual-grid">
           <div className="accounting-card">
             <h2>إضافة حساب مالي مستقل</h2>
@@ -346,7 +350,7 @@ function AccountsPage() {
             {loading?<div>جارٍ التحميل...</div>:accounts.length===0?<div>لا توجد حسابات حتى الآن.</div>:<div className="account-list">{accounts.map((account)=><div className="account-item" key={account.id}><div className="account-head"><div><strong>{account.name}</strong><div>{account.currency} • {account.status}</div></div><strong>{money(account.balance)}</strong></div>{editingId===account.id?<div className="manual-form" style={{marginTop:10}}><input type="number" step="0.01" value={editBalance} onChange={(e)=>setEditBalance(e.target.value)}/><select value={editStatus} onChange={(e)=>setEditStatus(e.target.value)}><option value="active">نشط</option><option value="pending">قيد الانتظار</option><option value="closed">مغلق</option></select><textarea value={editDescription} onChange={(e)=>setEditDescription(e.target.value)}/><div className="account-actions"><button onClick={()=>void handleSaveEdit(account.id)}>حفظ</button><button onClick={()=>setEditingId(null)}>إلغاء</button></div></div>:<><div style={{marginTop:7}}>{account.description||"بدون ملاحظات"}</div><div className="account-actions"><button onClick={()=>handleEdit(account)}>تعديل</button><button onClick={()=>void handleDelete(account.id)}>حذف</button></div></>}</div>)}</div>}
           </div>
         </div>
-      </section>
+      </details>
     </div>
   );
 }
