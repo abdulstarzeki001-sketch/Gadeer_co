@@ -501,3 +501,248 @@ html[data-ghadeer-theme="pearl"] .royal-customer-row strong{color:#f6ddaa}
 html[data-ghadeer-theme="pearl"] .royal-customer-avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#3b3021;color:#f6ddaa}
 @media(max-width:1000px){html[data-ghadeer-theme="pearl"] .royal-financial-row{grid-template-columns:1fr}}
 @media(max-width:600px){html[data-ghadeer-theme="pearl"] .royal-collection-card{grid-template-columns:1fr 1fr}html[data-ghadeer-theme="pearl"] .royal-balance-card{padding:18px}html[data-ghadeer-theme="pearl"] .royal-balance-bottom{gap:7px}html[data-ghadeer-theme="pearl"] .royal-balance-bottom strong{font-size:12px}}
+
+
+/* SECOND THEME: reference-matched royal black and gold; original midnight remains unchanged. */
+html[data-ghadeer-theme="pearl"]{--background:#090b0c;--foreground:#f7ebd6;--card:#141515;--border:#776044;--primary:#eac17d}
+html[data-ghadeer-theme="pearl"] body{background:#090b0c!important;color:#f7ebd6}
+html[data-ghadeer-theme="pearl"] :is(.app-header,.bottom-navigation){background:#101112!important;border-color:#957344!important}
+html[data-ghadeer-theme="pearl"] .app-shell{color:#f7ebd6}
+html[data-ghadeer-theme="pearl"] .app-header .brand img{background:#1b1711!important}
+html[data-ghadeer-theme="pearl"] .gh-theme-option[aria-pressed="true"]{background:#eac17d;color:#0b0c0d;border-color:#eac17d}
+html[data-ghadeer-theme="pearl"] .app-main :is(.panel,.dialog,.modal,.modal-box,.modal-content,.item,.row,.accounting-card,.dashboard-card){background:#151617!important;border-color:#7d6340!important;color:#f7ebd6!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){background:#101213!important;color:#f7ebd6!important;border-color:#7d6340!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(button,.btn,.operation-submit,.collection-submit,.add-btn):not(.royal-refresh){border-color:#bd9558!important}
+html[data-ghadeer-theme="pearl"] .app-main table{background:#121414!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(thead tr,thead th){background:#25221c!important;color:#f5d8a4!important}
+html[data-ghadeer-theme="pearl"] .app-main tbody td{background:#131617!important;color:#f3e6d1!important;border-color:#5b4b35!important}
+html[data-ghadeer-theme="pearl"] .app-main tbody tr:nth-child(even) td{background:#1d1d1b!important}
+.royal-dashboard{padding:0 0 20px;min-width:0}
+.royal-toolbar{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+.royal-search{display:flex;align-items:center;gap:12px;border:1px solid #63533B;border-radius:15px;padding:0 16px;flex:1;background:#0B0D0F;color:#B8B6AF}
+html[data-ghadeer-theme="pearl"] .royal-search input{border:0!important;background:transparent!important;box-shadow:none!important;outline:none;min-height:48px;width:100%;padding:8px 0}
+html[data-ghadeer-theme="pearl"] .royal-refresh{display:flex;align-items:center;gap:8px;background:#191C1E!important;color:#F6DDAA!important;border:1px solid #63533B;border-radius:12px;padding:12px;cursor:pointer}
+.royal-refresh:disabled{opacity:.5}
+.royal-banner{min-height:205px;position:relative;border:1px solid #B28B4E;border-radius:21px;overflow:hidden;background:linear-gradient(90deg,#08090BAA,transparent 80%),url('/royal-transport-hero.webp') center 57%/cover;display:flex;align-items:flex-end;justify-content:space-between;padding:28px;direction:ltr;margin-bottom:22px;box-shadow:0 12px 45px #0009}
+.royal-banner>div{direction:rtl;text-align:right}
+.royal-banner h1{font-size:clamp(1.7rem,3vw,2.7rem);margin:4px 0 8px!important}
+html[data-ghadeer-theme="pearl"] .royal-banner h1{color:#F6DDAA!important;text-shadow:0 3px 20px #000}
+html[data-ghadeer-theme="pearl"] .royal-banner p{color:#F7F3E9!important;margin:0;text-shadow:0 2px 8px #000}
+.royal-eyebrow{font-size:11px;letter-spacing:3px;color:#E7BD76}
+.royal-date{display:flex;align-items:center;gap:12px;background:#08090BDD;border:1px solid #B28B4E;border-radius:15px;padding:13px 17px;color:#F6DDAA;font-size:13px}
+.royal-date small{display:block;margin-top:5px;color:#B8B6AF}
+.royal-kpis,.royal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:22px}
+.royal-card{background:linear-gradient(140deg,#1E1C16 0%,#111416 28%,#080A0C 100%);border:1px solid #786244;border-radius:20px;box-shadow:inset 1px 0 0 #F6DDAA55,0 7px 26px #0007;min-width:0;position:relative}
+.royal-kpi{display:flex;gap:15px;padding:22px 18px;align-items:flex-start;overflow:hidden;min-height:155px}
+.royal-kpi>div{min-width:0;flex:1}.royal-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:54px;border:1px solid #C49A53;border-radius:14px;color:#E7BD76;background:linear-gradient(150deg,#312719,#090B0C);box-shadow:-3px 0 13px #E7BD7622}
+.royal-label{font-size:13px;color:#B8B6AF}
+html[data-ghadeer-theme="pearl"] .royal-kpi strong{display:block;font-size:clamp(1.25rem,1.8vw,2rem);margin:10px 0 7px;color:#F6DDAA!important;overflow-wrap:anywhere}
+.royal-kpi small{font-size:10px;color:#B8B6AF}
+.royal-kpi-rule{position:absolute;bottom:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,#E7BD76,transparent)}
+.royal-action{display:flex;align-items:center;gap:16px;padding:22px 17px;text-decoration:none;color:#E7BD76;transition:transform .2s,box-shadow .2s}
+.royal-action>div{flex:1;min-width:0}.royal-action strong{display:block;font-size:16px}.royal-action small{display:block;color:#B8B6AF;font-size:10px;margin-top:5px}
+.royal-arrow{border:1px solid #63533B;border-radius:50%;width:33px;height:33px;display:grid;place-items:center;flex-shrink:0}
+.royal-action:hover{transform:translateY(-2px);box-shadow:inset 2px 0 0 #F6DDAA,0 0 22px #E7BD7633}
+.royal-action:focus-visible,.royal-sidebar a:focus-visible{outline:2px solid #F6DDAA;outline-offset:4px}
+.royal-details{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px}
+.royal-movements,.royal-chart{padding:22px;box-shadow:inset 2px 0 0 #E7BD76,0 0 20px #E7BD761A}
+.royal-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.royal-section-head h2{font-size:19px;margin:0}.royal-section-head a{display:flex;align-items:center;color:#E7BD76;text-decoration:none;font-size:12px}
+.royal-table-wrap{overflow-x:auto}
+html[data-ghadeer-theme="pearl"] .royal-movements table{width:100%;min-width:470px;border-collapse:collapse;background:transparent!important;box-shadow:none!important}
+html[data-ghadeer-theme="pearl"] .royal-movements :is(th,td){padding:12px 8px;text-align:right;font-size:12px;border:0!important;border-bottom:1px solid #3B3428!important}
+html[data-ghadeer-theme="pearl"] .royal-movements th{background:#202426!important;color:#D7D4CB!important;font-weight:500}
+html[data-ghadeer-theme="pearl"] .royal-movements tbody td{background:#0D1011!important}
+html[data-ghadeer-theme="pearl"] .royal-movements tbody tr:nth-child(even) td{background:#121516!important}
+.royal-movements td small{display:block;max-width:180px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10px;color:#B8B6AF;margin-top:6px}
+.royal-status{display:inline-flex;border:1px solid #63533B;border-radius:7px;padding:3px 8px;font-size:10px}
+.royal-status.paid{color:#79CE9C;background:#112319;border-color:#274735}.royal-status.due{color:#F6DDAA;background:#2A2215}
+.royal-chart-subtitle{font-size:11px;color:#B8B6AF;margin:0 0 18px}.royal-legend{display:flex;gap:20px;font-size:11px;color:#B8B6AF}
+.royal-legend span{display:flex;align-items:center;gap:6px}.royal-legend i{width:9px;height:9px;background:#E7BD76;border-radius:50%}.royal-legend span+span i{background:#81978D}
+.royal-bars{height:240px;display:flex;direction:ltr;gap:12px;padding-top:20px;align-items:flex-end;background:repeating-linear-gradient(to top,transparent 0,transparent 47px,#FFFFFF10 48px)}
+.royal-month{flex:1;min-width:0;text-align:center}.royal-bar-pair{height:185px;display:flex;gap:4px;align-items:flex-end;justify-content:center}.royal-bar-pair span{width:19px;background:linear-gradient(#F6DDAA,#B28B4E);border-radius:3px 3px 0 0}.royal-bar-pair span+span{background:linear-gradient(#B7C2B8,#495952)}.royal-month small{font-size:10px;white-space:nowrap;color:#B8B6AF;display:block;margin-top:14px}
+.royal-chart-data{margin-top:20px;font-size:11px;color:#B8B6AF}.royal-chart-data summary{cursor:pointer}.royal-chart-data table{width:100%;margin-top:10px}.royal-chart-data td,.royal-chart-data th{padding:5px}
+.royal-chart-empty{height:240px;display:grid;place-items:center;color:#B8B6AF}.royal-notice{padding:15px;border:1px solid #63533B;margin-bottom:20px;border-radius:12px;color:#F6DDAA}.royal-notice a{color:#E7BD76}
+@media(min-width:1150px){
+ html[data-ghadeer-theme="pearl"] .app-shell{padding-left:250px}
+ html[data-ghadeer-theme="pearl"] .app-header{position:fixed;inset:0 0 auto 0;z-index:100;direction:ltr}
+ html[data-ghadeer-theme="pearl"] .app-header .brand{min-width:225px}
+ html[data-ghadeer-theme="pearl"] .app-header .brand-name{direction:rtl}
+ html[data-ghadeer-theme="pearl"] .app-header .gh-theme-picker{margin-left:auto;margin-right:12px;direction:rtl}
+ html[data-ghadeer-theme="pearl"] .desktop-nav{display:none}
+ html[data-ghadeer-theme="pearl"] .app-main{padding-top:110px}
+ .royal-sidebar{display:flex;flex-direction:column;position:fixed;left:0;top:84px;bottom:0;width:250px;border-right:1px solid #B28B4E;background:#08090B;z-index:90;overflow-y:auto}
+ .royal-sidebar nav{padding:20px 14px;display:grid;gap:8px}.royal-sidebar nav a{display:flex;direction:ltr;align-items:center;gap:18px;padding:15px 20px;min-height:55px;text-decoration:none;color:#C7C6C1;border:1px solid transparent;border-radius:13px}
+ .royal-sidebar nav a span{flex:1;text-align:right;direction:rtl}.royal-sidebar nav a:hover{background:#1C1A15;color:#F6DDAA}
+ .royal-sidebar nav a.royal-side-active{color:#FFF1D5;border-color:#E7BD76;background:linear-gradient(100deg,#41301C,#171511 65%,#8C682E);box-shadow:inset 3px 0 0 #FFF1D5,0 0 16px #E7BD7640}
+ .royal-sidebar-art{min-height:300px;flex:1;position:relative;background:linear-gradient(180deg,#08090B,transparent 28%,#08090B 98%),url('/royal-transport-hero.webp') 76% center/auto 100%;display:flex;align-items:flex-end;justify-content:center;padding:30px 15px}
+ .royal-sidebar-art div{text-align:center;display:grid;gap:7px;text-shadow:0 2px 10px #000}.royal-sidebar-art strong{font-family:Georgia,serif;font-size:28px;letter-spacing:2px;color:#E7BD76}.royal-sidebar-art span{font-size:10px;letter-spacing:6px;color:#F6DDAA}.royal-sidebar-art small{font-size:11px;color:#B8B6AF;margin-top:12px}
+}
+@media(max-width:1400px){.royal-kpis,.royal-actions{gap:12px}.royal-kpi{gap:10px;padding:18px 12px}.royal-icon{flex-basis:40px;width:40px;height:46px}.royal-action{gap:10px;padding:18px 12px}.royal-action>svg{width:24px}.royal-action strong{font-size:14px}}
+@media(max-width:1000px){.royal-details{grid-template-columns:1fr}.royal-kpis,.royal-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.royal-kpi strong{font-size:24px!important}.royal-banner{min-height:220px}}
+@media(max-width:600px){.royal-toolbar{gap:8px;flex-wrap:wrap}.royal-search{flex-basis:100%}.royal-refresh{margin-inline-start:auto}.royal-banner{padding:20px;min-height:250px;align-items:flex-end;background-position:65% center}.royal-banner>div:first-child{max-width:70%}.royal-date{position:absolute;top:12px;right:12px;padding:8px;font-size:11px}.royal-date small{display:none}.royal-eyebrow{font-size:8px;letter-spacing:2px}.royal-kpi{flex-direction:column;min-height:180px}.royal-kpi strong{font-size:20px!important}.royal-kpi small{font-size:9px}.royal-movements,.royal-chart{padding:16px 12px}.royal-action{flex-wrap:wrap}.royal-action>div{flex-basis:60%}.royal-arrow{display:none}.royal-section-head h2{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.royal-action{transition:none;transform:none!important}}
+
+.royal-kpis,.royal-actions,.royal-details{direction:ltr}.royal-kpi,.royal-action,.royal-details>section{direction:rtl}
+
+
+/* SECOND THEME — Royal black and gold reference. Third theme remains unchanged. */
+html[data-ghadeer-theme="pearl"]{
+ color-scheme:dark;
+ --background:#08090b;--foreground:#f7f3e9;--card:#111416;--card-foreground:#f7f3e9;
+ --popover:#151819;--popover-foreground:#f7f3e9;--primary:#e7bd76;--primary-foreground:#17120a;
+ --secondary:#1b1c1b;--secondary-foreground:#f7f3e9;--muted:#191c1e;--muted-foreground:#b8b6af;
+ --accent:#312719;--accent-foreground:#f4d9a6;--border:#63533b;--input:#63533b;--ring:#e7bd76;
+ --gh-navy:#101315;--gh-navy-2:#23221d;--gh-navy-deep:#060708;
+ --gh-gold:#e7bd76;--gh-gold-light:#f6ddaa;--gh-gold-dark:#c49a53;
+ --gh-cream:#08090b;--gh-cream-2:#191c1e;--gh-ink:#f7f3e9;
+ --gh-muted:#b8b6af;--gh-line:#63533b;--gh-soft:#191c1e;
+ --gh-panel:#111416;--gh-panel2:#191c1e;--gh-text:#f7f3e9;
+ --gh-success:#79ce9c;--gh-danger:#ee7c80;--gh-warn:#e7bd76;
+}
+html[data-ghadeer-theme="pearl"] body{background:#08090b!important;background-image:radial-gradient(ellipse at 70% 0%,#322315 0%,transparent 38%)!important;color:#f7f3e9}
+html[data-ghadeer-theme="pearl"] :is(.app-header,.bottom-navigation){background:#0d0e0f!important;border-color:#786244!important;box-shadow:0 4px 26px #0009!important}
+html[data-ghadeer-theme="pearl"] .app-header::after{background:#c49a53!important}
+html[data-ghadeer-theme="pearl"] .app-header .brand img{background:#161615!important}
+html[data-ghadeer-theme="pearl"] :is(.brand-name span,.brand-name small,.top-navigation a,.top-navigation button){color:#f7f3e9!important}
+html[data-ghadeer-theme="pearl"] :is(.top-navigation a:hover,.top-navigation a[aria-current="page"]){background:#342819!important;color:#f6ddaa!important}
+html[data-ghadeer-theme="pearl"] .gh-theme-option{background:#191b1b!important;color:#f7f3e9!important;border-color:#786244!important}
+html[data-ghadeer-theme="pearl"] .gh-theme-option[aria-pressed="true"]{background:#e7bd76!important;color:#08090b!important;border-color:#e7bd76!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(.panel,.dialog,.modal,.modal-box,.modal-content,.item,.row,.accounting-card,.receipt-type-card){background:#151819!important;border-color:#63533b!important;color:#f7f3e9!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea){background:#101314!important;color:#f7f3e9!important;border-color:#63533b!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(button,.btn,.operation-submit,.collection-submit,.add-btn){border-color:#a7834f!important}
+html[data-ghadeer-theme="pearl"] .app-main :is(p,small,label,strong,h1,h2,h3,h4){color:inherit}
+html[data-ghadeer-theme="pearl"] .royal-dashboard .royal-card{background:linear-gradient(140deg,#1e1c16,#111416 45%,#080a0c)!important;border:1px solid #786244!important;color:#f7f3e9!important}
+html[data-ghadeer-theme="pearl"] .royal-dashboard .royal-banner{background:linear-gradient(90deg,#08090baa,transparent 80%),url('/royal-transport-hero.webp') center 57%/cover!important}
+.royal-dashboard{padding:0 0 20px;min-width:0}
+.royal-toolbar{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+.royal-search{display:flex;align-items:center;gap:12px;border:1px solid #63533B;border-radius:15px;padding:0 16px;flex:1;background:#0B0D0F;color:#B8B6AF}
+html[data-ghadeer-theme="pearl"] .royal-search input{border:0!important;background:transparent!important;box-shadow:none!important;outline:none;min-height:48px;width:100%;padding:8px 0}
+html[data-ghadeer-theme="pearl"] .royal-refresh{display:flex;align-items:center;gap:8px;background:#191C1E!important;color:#F6DDAA!important;border:1px solid #63533B;border-radius:12px;padding:12px;cursor:pointer}
+.royal-refresh:disabled{opacity:.5}
+.royal-banner{min-height:205px;position:relative;border:1px solid #B28B4E;border-radius:21px;overflow:hidden;background:linear-gradient(90deg,#08090BAA,transparent 80%),url('/royal-transport-hero.webp') center 57%/cover;display:flex;align-items:flex-end;justify-content:space-between;padding:28px;direction:ltr;margin-bottom:22px;box-shadow:0 12px 45px #0009}
+.royal-banner>div{direction:rtl;text-align:right}
+.royal-banner h1{font-size:clamp(1.7rem,3vw,2.7rem);margin:4px 0 8px!important}
+html[data-ghadeer-theme="pearl"] .royal-banner h1{color:#F6DDAA!important;text-shadow:0 3px 20px #000}
+html[data-ghadeer-theme="pearl"] .royal-banner p{color:#F7F3E9!important;margin:0;text-shadow:0 2px 8px #000}
+.royal-eyebrow{font-size:11px;letter-spacing:3px;color:#E7BD76}
+.royal-date{display:flex;align-items:center;gap:12px;background:#08090BDD;border:1px solid #B28B4E;border-radius:15px;padding:13px 17px;color:#F6DDAA;font-size:13px}
+.royal-date small{display:block;margin-top:5px;color:#B8B6AF}
+.royal-kpis,.royal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:22px}
+.royal-card{background:linear-gradient(140deg,#1E1C16 0%,#111416 28%,#080A0C 100%);border:1px solid #786244;border-radius:20px;box-shadow:inset 1px 0 0 #F6DDAA55,0 7px 26px #0007;min-width:0;position:relative}
+.royal-kpi{display:flex;gap:15px;padding:22px 18px;align-items:flex-start;overflow:hidden;min-height:155px}
+.royal-kpi>div{min-width:0;flex:1}.royal-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:54px;border:1px solid #C49A53;border-radius:14px;color:#E7BD76;background:linear-gradient(150deg,#312719,#090B0C);box-shadow:-3px 0 13px #E7BD7622}
+.royal-label{font-size:13px;color:#B8B6AF}
+html[data-ghadeer-theme="pearl"] .royal-kpi strong{display:block;font-size:clamp(1.25rem,1.8vw,2rem);margin:10px 0 7px;color:#F6DDAA!important;overflow-wrap:anywhere}
+.royal-kpi small{font-size:10px;color:#B8B6AF}
+.royal-kpi-rule{position:absolute;bottom:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,#E7BD76,transparent)}
+.royal-action{display:flex;align-items:center;gap:16px;padding:22px 17px;text-decoration:none;color:#E7BD76;transition:transform .2s,box-shadow .2s}
+.royal-action>div{flex:1;min-width:0}.royal-action strong{display:block;font-size:16px}.royal-action small{display:block;color:#B8B6AF;font-size:10px;margin-top:5px}
+.royal-arrow{border:1px solid #63533B;border-radius:50%;width:33px;height:33px;display:grid;place-items:center;flex-shrink:0}
+.royal-action:hover{transform:translateY(-2px);box-shadow:inset 2px 0 0 #F6DDAA,0 0 22px #E7BD7633}
+.royal-action:focus-visible,.royal-sidebar a:focus-visible{outline:2px solid #F6DDAA;outline-offset:4px}
+.royal-details{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px}
+.royal-movements,.royal-chart{padding:22px;box-shadow:inset 2px 0 0 #E7BD76,0 0 20px #E7BD761A}
+.royal-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.royal-section-head h2{font-size:19px;margin:0}.royal-section-head a{display:flex;align-items:center;color:#E7BD76;text-decoration:none;font-size:12px}
+.royal-table-wrap{overflow-x:auto}
+html[data-ghadeer-theme="pearl"] .royal-movements table{width:100%;min-width:470px;border-collapse:collapse;background:transparent!important;box-shadow:none!important}
+html[data-ghadeer-theme="pearl"] .royal-movements :is(th,td){padding:12px 8px;text-align:right;font-size:12px;border:0!important;border-bottom:1px solid #3B3428!important}
+html[data-ghadeer-theme="pearl"] .royal-movements th{background:#202426!important;color:#D7D4CB!important;font-weight:500}
+html[data-ghadeer-theme="pearl"] .royal-movements tbody td{background:#0D1011!important}
+html[data-ghadeer-theme="pearl"] .royal-movements tbody tr:nth-child(even) td{background:#121516!important}
+.royal-movements td small{display:block;max-width:180px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10px;color:#B8B6AF;margin-top:6px}
+.royal-status{display:inline-flex;border:1px solid #63533B;border-radius:7px;padding:3px 8px;font-size:10px}
+.royal-status.paid{color:#79CE9C;background:#112319;border-color:#274735}.royal-status.due{color:#F6DDAA;background:#2A2215}
+.royal-chart-subtitle{font-size:11px;color:#B8B6AF;margin:0 0 18px}.royal-legend{display:flex;gap:20px;font-size:11px;color:#B8B6AF}
+.royal-legend span{display:flex;align-items:center;gap:6px}.royal-legend i{width:9px;height:9px;background:#E7BD76;border-radius:50%}.royal-legend span+span i{background:#81978D}
+.royal-bars{height:240px;display:flex;direction:ltr;gap:12px;padding-top:20px;align-items:flex-end;background:repeating-linear-gradient(to top,transparent 0,transparent 47px,#FFFFFF10 48px)}
+.royal-month{flex:1;min-width:0;text-align:center}.royal-bar-pair{height:185px;display:flex;gap:4px;align-items:flex-end;justify-content:center}.royal-bar-pair span{width:19px;background:linear-gradient(#F6DDAA,#B28B4E);border-radius:3px 3px 0 0}.royal-bar-pair span+span{background:linear-gradient(#B7C2B8,#495952)}.royal-month small{font-size:10px;white-space:nowrap;color:#B8B6AF;display:block;margin-top:14px}
+.royal-chart-data{margin-top:20px;font-size:11px;color:#B8B6AF}.royal-chart-data summary{cursor:pointer}.royal-chart-data table{width:100%;margin-top:10px}.royal-chart-data td,.royal-chart-data th{padding:5px}
+.royal-chart-empty{height:240px;display:grid;place-items:center;color:#B8B6AF}.royal-notice{padding:15px;border:1px solid #63533B;margin-bottom:20px;border-radius:12px;color:#F6DDAA}.royal-notice a{color:#E7BD76}
+@media(min-width:1150px){
+ html[data-ghadeer-theme="pearl"] .app-shell{padding-left:250px}
+ html[data-ghadeer-theme="pearl"] .app-header{position:fixed;inset:0 0 auto 0;z-index:100;direction:ltr}
+ html[data-ghadeer-theme="pearl"] .app-header .brand{min-width:225px}
+ html[data-ghadeer-theme="pearl"] .app-header .brand-name{direction:rtl}
+ html[data-ghadeer-theme="pearl"] .app-header .gh-theme-picker{margin-left:auto;margin-right:12px;direction:rtl}
+ html[data-ghadeer-theme="pearl"] .desktop-nav{display:none}
+ html[data-ghadeer-theme="pearl"] .app-main{padding-top:110px}
+ .royal-sidebar{display:flex;flex-direction:column;position:fixed;left:0;top:84px;bottom:0;width:250px;border-right:1px solid #B28B4E;background:#08090B;z-index:90;overflow-y:auto}
+ .royal-sidebar nav{padding:20px 14px;display:grid;gap:8px}.royal-sidebar nav a{display:flex;direction:ltr;align-items:center;gap:18px;padding:15px 20px;min-height:55px;text-decoration:none;color:#C7C6C1;border:1px solid transparent;border-radius:13px}
+ .royal-sidebar nav a span{flex:1;text-align:right;direction:rtl}.royal-sidebar nav a:hover{background:#1C1A15;color:#F6DDAA}
+ .royal-sidebar nav a.royal-side-active{color:#FFF1D5;border-color:#E7BD76;background:linear-gradient(100deg,#41301C,#171511 65%,#8C682E);box-shadow:inset 3px 0 0 #FFF1D5,0 0 16px #E7BD7640}
+ .royal-sidebar-art{min-height:300px;flex:1;position:relative;background:linear-gradient(180deg,#08090B,transparent 28%,#08090B 98%),url('/royal-transport-hero.webp') 76% center/auto 100%;display:flex;align-items:flex-end;justify-content:center;padding:30px 15px}
+ .royal-sidebar-art div{text-align:center;display:grid;gap:7px;text-shadow:0 2px 10px #000}.royal-sidebar-art strong{font-family:Georgia,serif;font-size:28px;letter-spacing:2px;color:#E7BD76}.royal-sidebar-art span{font-size:10px;letter-spacing:6px;color:#F6DDAA}.royal-sidebar-art small{font-size:11px;color:#B8B6AF;margin-top:12px}
+}
+@media(max-width:1400px){.royal-kpis,.royal-actions{gap:12px}.royal-kpi{gap:10px;padding:18px 12px}.royal-icon{flex-basis:40px;width:40px;height:46px}.royal-action{gap:10px;padding:18px 12px}.royal-action>svg{width:24px}.royal-action strong{font-size:14px}}
+@media(max-width:1000px){.royal-details{grid-template-columns:1fr}.royal-kpis,.royal-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.royal-kpi strong{font-size:24px!important}.royal-banner{min-height:220px}}
+@media(max-width:600px){.royal-toolbar{gap:8px;flex-wrap:wrap}.royal-search{flex-basis:100%}.royal-refresh{margin-inline-start:auto}.royal-banner{padding:20px;min-height:250px;align-items:flex-end;background-position:65% center}.royal-banner>div:first-child{max-width:70%}.royal-date{position:absolute;top:12px;right:12px;padding:8px;font-size:11px}.royal-date small{display:none}.royal-eyebrow{font-size:8px;letter-spacing:2px}.royal-kpi{flex-direction:column;min-height:180px}.royal-kpi strong{font-size:20px!important}.royal-kpi small{font-size:9px}.royal-movements,.royal-chart{padding:16px 12px}.royal-action{flex-wrap:wrap}.royal-action>div{flex-basis:60%}.royal-arrow{display:none}.royal-section-head h2{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.royal-action{transition:none;transform:none!important}}
+
+.royal-kpis,.royal-actions,.royal-details{direction:ltr}.royal-kpi,.royal-action,.royal-details>section{direction:rtl}
+
+html[data-ghadeer-theme="pearl"] .royal-financial-row{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,.9fr);gap:18px;direction:ltr;margin-bottom:20px}
+html[data-ghadeer-theme="pearl"] .royal-financial-row>section{direction:rtl}
+html[data-ghadeer-theme="pearl"] .royal-balance-card{padding:26px;min-height:280px;background:linear-gradient(90deg,#0a0c0ee8,#2c2116b5),url('/royal-transport-hero.webp') center/cover!important}
+html[data-ghadeer-theme="pearl"] .royal-balance-value{display:block;font:normal clamp(36px,4vw,60px) Georgia,serif;color:#f6ddaa!important;text-align:right;margin:14px 0}
+html[data-ghadeer-theme="pearl"] .royal-balance-caption{display:flex;align-items:center;gap:8px;font-size:12px;color:#c9bda8}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid #786244;padding-top:18px;margin-top:24px}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom>div{display:grid;gap:6px;min-width:0}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom svg{color:#e7bd76}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom span{font-size:12px;color:#b8b6af}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom strong{font-size:clamp(12px,1.5vw,19px);color:#f6ddaa;overflow-wrap:anywhere}
+html[data-ghadeer-theme="pearl"] .royal-collection-card{padding:22px;display:grid;grid-template-columns:minmax(130px,1fr) minmax(110px,1fr);gap:12px;align-items:center}
+html[data-ghadeer-theme="pearl"] .royal-collection-card h2{grid-column:1/-1;font-size:17px}
+html[data-ghadeer-theme="pearl"] .royal-donut{width:min(100%,190px);aspect-ratio:1;border-radius:50%;padding:17px;background:conic-gradient(#f6ddaa 0 var(--royal-progress),#483a27 var(--royal-progress) 100%);display:grid;place-items:center}
+html[data-ghadeer-theme="pearl"] .royal-donut>div{width:100%;height:100%;border-radius:50%;background:#121415;display:flex;flex-direction:column;align-items:center;justify-content:center}
+html[data-ghadeer-theme="pearl"] .royal-donut strong{font:normal 30px Georgia,serif;color:#f6ddaa}
+html[data-ghadeer-theme="pearl"] .royal-donut small{color:#b8b6af}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend{display:grid;gap:12px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend>div{border-bottom:1px solid #63533b;padding-bottom:8px;display:grid;gap:4px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend span{color:#b8b6af;font-size:12px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend strong{color:#f6ddaa;font-size:15px}
+html[data-ghadeer-theme="pearl"] .royal-top-customers{padding:20px;margin-bottom:20px}
+html[data-ghadeer-theme="pearl"] .royal-customer-row{display:flex;align-items:center;gap:12px;border-top:1px solid #63533b;padding:11px 0;font-size:13px}
+html[data-ghadeer-theme="pearl"] .royal-customer-row>span:nth-child(2){flex:1}
+html[data-ghadeer-theme="pearl"] .royal-customer-row strong{color:#f6ddaa}
+html[data-ghadeer-theme="pearl"] .royal-customer-avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#3b3021;color:#f6ddaa}
+@media(max-width:1000px){html[data-ghadeer-theme="pearl"] .royal-financial-row{grid-template-columns:1fr}}
+@media(max-width:600px){html[data-ghadeer-theme="pearl"] .royal-collection-card{grid-template-columns:1fr 1fr}html[data-ghadeer-theme="pearl"] .royal-balance-card{padding:18px}html[data-ghadeer-theme="pearl"] .royal-balance-bottom{gap:7px}html[data-ghadeer-theme="pearl"] .royal-balance-bottom strong{font-size:12px}}
+
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-banner{min-height:255px;background:linear-gradient(90deg,#08090bd9,#090a0b33 65%),url('/royal-transport-hero.webp') center 53%/cover;border-color:#ae8750}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-banner h1{font:normal clamp(40px,5vw,72px)/1 Georgia,serif;letter-spacing:5px;color:#f6d9a9!important}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-banner p{font-size:13px;color:#e6d4b8!important}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-kpis{margin-bottom:16px}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-kpi{min-height:100px;padding:16px;align-items:center}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-kpi strong{font-size:clamp(19px,2vw,30px)!important;color:#f2d19b!important}
+html[data-ghadeer-theme="pearl"] .royal-financial-row{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(290px,.9fr);gap:16px;direction:ltr;margin-bottom:16px}
+html[data-ghadeer-theme="pearl"] .royal-financial-row>section{direction:rtl}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-balance-card{min-height:260px;padding:28px;background:linear-gradient(100deg,#090b0ce8,#10100dc2),url('/royal-transport-hero.webp') center 85%/cover;border-color:#c49a5c}
+html[data-ghadeer-theme="pearl"] .royal-balance-value{display:block;font:normal clamp(36px,4vw,62px)/1.5 Georgia,serif;color:#f6d7a4;text-align:right}
+html[data-ghadeer-theme="pearl"] .royal-balance-caption{display:flex;gap:8px;align-items:center;color:#c5b59d;font-size:12px}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border-top:1px solid #aa895b77;padding-top:17px;margin-top:22px}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom>div{display:grid;gap:5px}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom svg{color:#eac17d}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom span{font-size:11px;color:#c5b59d}
+html[data-ghadeer-theme="pearl"] .royal-balance-bottom strong{font-size:clamp(13px,1.6vw,21px);color:#f4d39c}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-collection-card{display:grid;grid-template-columns:minmax(130px,1fr) minmax(125px,1fr);gap:12px;align-items:center;padding:20px}
+html[data-ghadeer-theme="pearl"] .royal-collection-card h2{grid-column:1/-1;margin:0;font-size:17px}
+html[data-ghadeer-theme="pearl"] .royal-donut{width:min(100%,185px);aspect-ratio:1;border-radius:50%;padding:16px;background:conic-gradient(#f4d39b 0 var(--royal-progress),#4b3b27 var(--royal-progress) 100%);display:grid;place-items:center}
+html[data-ghadeer-theme="pearl"] .royal-donut>div{background:#141514;width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;justify-content:center;align-items:center}
+html[data-ghadeer-theme="pearl"] .royal-donut strong{font:normal 32px Georgia,serif;color:#f6d7a4}
+html[data-ghadeer-theme="pearl"] .royal-donut small{color:#e8c68e;font-size:11px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend{display:grid;gap:12px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend>div{display:grid;gap:4px;border-bottom:1px solid #77604470;padding-bottom:8px}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend span{font-size:11px;color:#c8b69d}
+html[data-ghadeer-theme="pearl"] .royal-collection-legend strong{color:#f2d19b;font-size:15px}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-top-customers{padding:18px 22px;margin-bottom:16px}
+html[data-ghadeer-theme="pearl"] .royal-customer-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #77604466;font-size:12px}
+html[data-ghadeer-theme="pearl"] .royal-customer-row:last-child{border:0}
+html[data-ghadeer-theme="pearl"] .royal-customer-row strong{margin-right:auto;color:#f1ce94}
+html[data-ghadeer-theme="pearl"] .royal-customer-avatar{display:grid;place-items:center;flex:0 0 32px;height:32px;border:1px solid #8b7049;border-radius:50%;background:#30291e;color:#f2d19b}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-action{min-height:118px;background:linear-gradient(145deg,#29231a,#111416 55%);border-color:#907147}
+html[data-ghadeer-theme="pearl"] .royal-reference .royal-chart{background:linear-gradient(145deg,#171713,#0b0e0e)}
+@media(min-width:1150px){html[data-ghadeer-theme="pearl"] .app-shell{padding-left:250px}html[data-ghadeer-theme="pearl"] .app-header{position:fixed;inset:0 0 auto;z-index:100;direction:ltr}html[data-ghadeer-theme="pearl"] .desktop-nav{display:none}html[data-ghadeer-theme="pearl"] .app-main{padding-top:110px}}
+@media(max-width:850px){html[data-ghadeer-theme="pearl"] .royal-financial-row{grid-template-columns:1fr}}
+@media(max-width:600px){html[data-ghadeer-theme="pearl"] .royal-reference .royal-banner{min-height:215px}html[data-ghadeer-theme="pearl"] .royal-reference .royal-kpi{min-height:105px;flex-direction:row}html[data-ghadeer-theme="pearl"] .royal-reference .royal-collection-card{grid-template-columns:1fr 1fr}html[data-ghadeer-theme="pearl"] .royal-balance-bottom{gap:5px}html[data-ghadeer-theme="pearl"] .royal-balance-bottom strong{font-size:12px}}
