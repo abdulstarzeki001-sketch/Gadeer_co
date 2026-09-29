@@ -88,7 +88,7 @@ export async function downloadCustomerStatement(input: Input) {
       card("الرصيد المتبقي",money(report.balance),"navy","▣") +
       '</div>');
     tableSection("الحركات المستحقة (بالدولار)",["التاريخ","الرقم","اسم السائق ورقم السيارة","اسم الشركة والوصف","المبلغ USD"],[13,18,22,29,18],
-      report.dues.map(row=>'<td dir="ltr">'+displayDate(row.date)+'</td><td dir="ltr">'+escapeHtml(row.number)+'</td><td><b>'+escapeHtml(row.driver)+'</b><br/><span dir="ltr">'+escapeHtml(row.vehicle)+'</span></td><td><b>'+escapeHtml(row.company)+'</b><br/>'+escapeHtml(row.description)+'</td><td class="money" dir="ltr">'+money(row.amount)+'</td>'),money(report.dueTotal),"USD");
+      report.dues.map(row=>'<td dir="ltr">'+displayDate(row.date)+'</td><td dir="ltr">'+escapeHtml(row.number)+'</td><td><b>'+escapeHtml(row.driver)+'</b><br/><span dir="ltr">'+escapeHtml(row.vehicle)+'</span></td><td><b>'+escapeHtml(row.company)+'</b><br/>'+escapeHtml(row.description)+'</td><td class="money" dir="ltr">'+(row.amountPending ? "بانتظار التسعير" : money(row.amount))+'</td>'),money(report.dueTotal),"USD");
 
     newPage(true);
     tableSection("حركات القبض (بالدينار العراقي)",["التاريخ","اسم المرسل / الملاحظات","المبلغ المستلم","العملة"],[21,49,23,7],
