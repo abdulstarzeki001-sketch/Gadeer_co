@@ -24,6 +24,12 @@ export function collectionDescription(value: string | null): string {
     ? [detailText(details.senderName), detailText(details.paymentMethod), detailText(details.note)].filter(Boolean).join(" — ") || "—"
     : value || "—";
 }
+/** Collections are stored in IQD; legacy dues and other receipts remain USD. */
+export const IQD_PER_USD = 1530;
+export function isIqdCollection(type: string): boolean { return type.trim() === "تحصيل من عميل"; }
+export function amountInUsd(type: string, amount: number): number {
+  return isIqdCollection(type) ? amount / IQD_PER_USD : amount;
+}
 export function buildCustomerStatement(items: readonly StatementTransaction[], documents: readonly StatementDocument[] = []) {
   const docs = new Map(documents.map(item => [item.id, item]));
   const sorted = [...items].sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
@@ -31,6 +37,7 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
   const receipts = [];
   let dueCents = 0;
   let receiptCents = 0;
+  let receiptIqd = 0;
   for (const item of sorted) {
     const value = Number(item.amount);
     if (!Number.isFinite(value)) throw new Error("توجد حركة بمبلغ غير صالح؛ صحّحها قبل إصدار الكشف.");
@@ -49,14 +56,16 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
         description: item.cargo_typedetails || doc?.cargo_typedetails || detailText(details.cargoType) || detailText(details.service) || (Object.keys(details).length ? detailText(details.note) : item.description) || "—",
       });
     } else {
-      receiptCents += cents;
+      const iqd = isIqdCollection(item.type);
+      receiptCents += Math.round(amountInUsd(item.type, cents / 100) * 100);
+      if (iqd) receiptIqd += cents / 100;
       receipts.push({
-        ...common, sender: detailText(details.senderName) || "—",
+        ...common, currency: isIqdCollection(item.type) ? "IQD" : "USD", sender: detailText(details.senderName) || "—",
         method: detailText(details.paymentMethod) || "—",
         note: Object.keys(details).length ? detailText(details.note) : item.description || "",
       });
     }
   }
   if (![dueCents, receiptCents, dueCents - receiptCents].every(Number.isSafeInteger)) throw new Error("إجمالي الحركات يتجاوز الحد الآمن للحساب.");
-  return { dues, receipts, dueTotal: dueCents / 100, receiptTotal: receiptCents / 100, balance: (dueCents - receiptCents) / 100 };
+  return { dues, receipts, dueTotal: dueCents / 100, receiptTotal: receiptCents / 100, receiptIqdTotal: receiptIqd, balance: (dueCents - receiptCents) / 100 };
 }
