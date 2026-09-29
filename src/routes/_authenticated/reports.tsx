@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadCustomerStatement } from "@/lib/customer-statement-pdf";
-import { collectionDescription, amountInUsd, isIqdCollection, type StatementDocument } from "@/lib/customer-statement";
+import { collectionDescription, amountInUsd, isIqdCollection, readDetails, type StatementDocument } from "@/lib/customer-statement";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -315,7 +315,7 @@ function ReportsPage() {
                                   <td>{transaction.cargo_typedetails ?? collectionDescription(transaction.description)}</td>
                                   <td className={incoming ? "positive" : "negative"}>
                                     {incoming ? "+" : "-"}
-                                    {formatAmount(transaction.amount)} {isIqdCollection(transaction.type) ? "IQD" : "USD"}
+                                    {incoming && Number(transaction.amount) === 0 && readDetails(transaction.description).note === "المبلغ غير محدد — بانتظار تحديد قيمة المستحق" ? "بانتظار التسعير" : `${formatAmount(transaction.amount)} ${isIqdCollection(transaction.type) ? "IQD" : "USD"}`}
                                   </td>
                                 </tr>
                               );
