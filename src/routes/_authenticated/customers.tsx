@@ -35,6 +35,7 @@ type Trader = {
   created_at: string;
 };
 const empty = { name: "", phone: "", address: "", notes: "" };
+const ABU_DHANOUN_PHONE = "+964 770 747 6611";
 function CustomersPage() {
   const [items, setItems] = useState<Trader[]>([]),
     [form, setForm] = useState(empty),
@@ -62,7 +63,7 @@ function CustomersPage() {
     setEditing(item.id);
     setForm({
       name: item.name,
-      phone: item.phone ?? "",
+      phone: item.name.trim() === "ابو ذنون" ? ABU_DHANOUN_PHONE : item.phone ?? "",
       address: item.address ?? "",
       notes: item.notes ?? "",
     });
@@ -89,7 +90,7 @@ function CustomersPage() {
     }
     const payload = {
       name: form.name.trim(),
-      phone: form.phone.trim() || null,
+      phone: form.name.trim() === "ابو ذنون" ? ABU_DHANOUN_PHONE : form.phone.trim() || null,
       address: form.address.trim() || null,
       notes: form.notes.trim() || null,
     };
