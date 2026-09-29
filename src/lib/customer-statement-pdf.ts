@@ -5,6 +5,7 @@ import { buildCustomerStatement, type StatementTransaction, type StatementDocume
 
 type Input = { customer: string; items: StatementTransaction[]; documents: StatementDocument[]; from?: string; to?: string };
 const money = (value: number) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " USD";
+const dinars = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value) + " IQD";
 const date = (value: string) => {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? "—" : new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Baghdad", year: "numeric", month: "2-digit", day: "2-digit" }).format(parsed);
@@ -27,7 +28,7 @@ export async function downloadCustomerStatement(input: Input) {
     page = document.createElement("div");
     page.className = "gh-statement";
     page.dir = "rtl";
-    page.innerHTML = (showHeader ? header + '<div class="period">' + period + ' · العملة: الدولار الأمريكي USD</div>' : '') + '<div class="statement-content"></div><footer></footer>';
+    page.innerHTML = (showHeader ? header + '<div class="period">' + period + ' · المستحقات بالدولار، القبوض بالدينار (1 USD = 1,530 IQD)</div>' : '') + '<div class="statement-content"></div><footer></footer>';
     root.appendChild(page);
     content = page.querySelector<HTMLDivElement>(".statement-content")!;
     pages.push(page);
@@ -73,21 +74,22 @@ export async function downloadCustomerStatement(input: Input) {
       }
       if (!fits()) throw new Error("أحد أوصاف الحركات أطول من صفحة؛ اختصره قبل إصدار الكشف.");
     }
-    appendBlock('<div class="section-total"><span>عدد الحركات: <b>' + rows.length + '</b></span><span>' + (title === "حركات القبض" ? "مجموع القبوض" : "مجموع المستحقات") + ': <b dir="ltr">' + money(total) + '</b></span></div>', title);
+    appendBlock('<div class="section-total"><span>عدد الحركات: <b>' + rows.length + '</b></span><span>' + (title === "حركات القبض" ? "مجموع القبوض" : "مجموع المستحقات") + ': <b dir="ltr">' + (title === "حركات القبض" ? dinars(total) : money(total)) + '</b></span></div>', title);
   };
   try {
     await document.fonts.ready;
     newPage(true);
     appendBlock('<div class="statement-summary">' + [
       ["إجمالي المستحقات", report.dueTotal],
-      ["إجمالي التنزيلات", report.receiptTotal],
+      ["التنزيلات بالدولار", report.receiptTotal],
       ["الرصيد", report.balance],
     ].map(([label, value]) => '<div><span>' + label + '</span><strong dir="ltr">' + money(Number(value)) + '</strong></div>').join("") + '</div>');
     section("الحركات المستحقة", ["التاريخ", "الرقم", "اسم السائق ورقم السيارة", "اسم الشركة والوصف", "المبلغ USD"], [13, 18, 22, 29, 18],
       report.dues.map(row => '<td dir="ltr">' + date(row.date) + '</td><td dir="ltr">' + escapeHtml(row.number) + '</td><td><b>' + escapeHtml(row.driver) + '</b><br/><span dir="ltr">' + escapeHtml(row.vehicle) + '</span></td><td><b>' + escapeHtml(row.company) + '</b><br/>' + escapeHtml(row.description) + '</td><td class="money" dir="ltr">' + money(row.amount) + '</td>'), report.dueTotal);
     newPage(true);
-    section("حركات القبض", ["التاريخ", "اسم المرسل وكيفية الإرسال", "المبلغ المستلم USD"], [18, 58, 24],
-      report.receipts.map(row => '<td dir="ltr">' + date(row.date) + '</td><td><b>' + escapeHtml(row.sender) + '</b><br/>طريقة الإرسال: ' + escapeHtml(row.method) + (row.note ? '<br/>' + escapeHtml(row.note) : '') + '</td><td class="money" dir="ltr">' + money(row.amount) + '</td>'), report.receiptTotal);
+    appendBlock('<div class="section-total"><span>إجمالي القبوض بالدينار: <b dir="ltr">' + dinars(report.receiptIqdTotal) + '</b></span><span>المعادِل بالدولار: <b dir="ltr">' + money(report.receiptIqdTotal / 1530) + '</b></span></div>');
+    section("حركات القبض", ["التاريخ", "اسم المرسل وكيفية الإرسال", "المبلغ المستلم"], [18, 58, 24],
+      report.receipts.map(row => '<td dir="ltr">' + date(row.date) + '</td><td><b>' + escapeHtml(row.sender) + '</b><br/>طريقة الإرسال: ' + escapeHtml(row.method) + (row.note ? '<br/>' + escapeHtml(row.note) : '') + '</td><td class="money" dir="ltr">' + (row.currency === "IQD" ? dinars(row.amount) : money(row.amount)) + '</td>'), report.receiptIqdTotal);
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     for (let index = 0; index < pages.length; index++) {
       const sheet = pages[index];
