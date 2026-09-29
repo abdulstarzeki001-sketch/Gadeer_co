@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas-pro";
 import { escapeHtml } from "./print-pdf";
-import { buildCustomerStatement, type StatementTransaction, type StatementDocument } from "./customer-statement";
+import { buildCustomerStatement, IQD_PER_USD, type StatementTransaction, type StatementDocument } from "./customer-statement";
 
 type Input = { customer: string; items: StatementTransaction[]; documents: StatementDocument[]; from?: string; to?: string };
 const money = (value: number) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " USD";
-const dinars = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value) + " IQD";
+const dinars = (value: number) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value) + " IQD";
 const date = (value: string) => {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? "—" : new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Baghdad", year: "numeric", month: "2-digit", day: "2-digit" }).format(parsed);
@@ -28,7 +28,7 @@ export async function downloadCustomerStatement(input: Input) {
     page = document.createElement("div");
     page.className = "gh-statement";
     page.dir = "rtl";
-    page.innerHTML = (showHeader ? header + '<div class="period">' + period + ' · المستحقات بالدولار، القبوض بالدينار (1 USD = 1,530 IQD)</div>' : '') + '<div class="statement-content"></div><footer></footer>';
+    page.innerHTML = (showHeader ? header + '<div class="period">' + period + ' · المستحقات بالدولار، القبوض بالدينار (1 USD = ' + new Intl.NumberFormat('en-US').format(IQD_PER_USD) + ' IQD)</div>' : '') + '<div class="statement-content"></div><footer></footer>';
     root.appendChild(page);
     content = page.querySelector<HTMLDivElement>(".statement-content")!;
     pages.push(page);
@@ -87,9 +87,9 @@ export async function downloadCustomerStatement(input: Input) {
     section("الحركات المستحقة", ["التاريخ", "الرقم", "اسم السائق ورقم السيارة", "اسم الشركة والوصف", "المبلغ USD"], [13, 18, 22, 29, 18],
       report.dues.map(row => '<td dir="ltr">' + date(row.date) + '</td><td dir="ltr">' + escapeHtml(row.number) + '</td><td><b>' + escapeHtml(row.driver) + '</b><br/><span dir="ltr">' + escapeHtml(row.vehicle) + '</span></td><td><b>' + escapeHtml(row.company) + '</b><br/>' + escapeHtml(row.description) + '</td><td class="money" dir="ltr">' + money(row.amount) + '</td>'), report.dueTotal);
     newPage(true);
-    appendBlock('<div class="section-total"><span>إجمالي القبوض بالدينار: <b dir="ltr">' + dinars(report.receiptIqdTotal) + '</b></span><span>المعادِل بالدولار: <b dir="ltr">' + money(report.receiptIqdTotal / 1530) + '</b></span></div>');
     section("حركات القبض", ["التاريخ", "اسم المرسل وكيفية الإرسال", "المبلغ المستلم"], [18, 58, 24],
       report.receipts.map(row => '<td dir="ltr">' + date(row.date) + '</td><td><b>' + escapeHtml(row.sender) + '</b><br/>طريقة الإرسال: ' + escapeHtml(row.method) + (row.note ? '<br/>' + escapeHtml(row.note) : '') + '</td><td class="money" dir="ltr">' + (row.currency === "IQD" ? dinars(row.amount) : money(row.amount)) + '</td>'), report.receiptIqdTotal);
+    appendBlock('<div class="conversion-summary"><h3>تسوية القبوض والمستحقات</h3><div><span>مجموع القبوض بالدينار</span><b dir="ltr">' + dinars(report.receiptIqdTotal) + '</b></div><div><span>التحويل إلى الدولار (مجموع الدينار ÷ ' + new Intl.NumberFormat("en-US").format(IQD_PER_USD) + ')</span><b dir="ltr">' + money(report.receiptIqdTotal / IQD_PER_USD) + '</b></div><div><span>إجمالي المستحقات بالدولار</span><b dir="ltr">' + money(report.dueTotal) + '</b></div><div><span>إجمالي المخصوم بالدولار (بما فيه القبوض القديمة بالدولار)</span><b dir="ltr">' + money(report.receiptTotal) + '</b></div><div class="final"><span>المتبقي من المستحقات بالدولار</span><b dir="ltr">' + money(report.balance) + '</b></div></div>', "تسوية القبوض والمستحقات");
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     for (let index = 0; index < pages.length; index++) {
       const sheet = pages[index];
@@ -122,6 +122,7 @@ const styles = `
 .gh-statement td{background:var(--white);color:var(--text);padding:8px 7px;border:1px solid var(--border);font-size:12px;vertical-align:top;overflow-wrap:anywhere;white-space:pre-wrap;text-align:right}
 .gh-statement tr:nth-child(even) td{background:var(--ivory)}.gh-statement .money{font-weight:bold;font-size:12px;white-space:normal}
 .gh-statement .section-total{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--ivory);border:1px solid var(--border);margin:8px 0 18px}
+.gh-statement .conversion-summary{margin:14px 0;border:1px solid var(--gold);padding:10px 12px;background:#fff}.gh-statement .conversion-summary h3{margin-top:0}.gh-statement .conversion-summary>div{display:flex;justify-content:space-between;gap:15px;padding:7px 3px;border-bottom:1px solid var(--border)}.gh-statement .conversion-summary .final{font-weight:bold;color:var(--navy);border-bottom:0;background:#f7f3e9;padding:10px 7px}
 .gh-statement footer{position:absolute;bottom:15px;right:26px;left:26px;border-top:1px solid var(--border);padding-top:6px;text-align:center;font-size:11px;color:var(--text)}
 /* Isolate printed tables from the site's global dark table rules. */
 .gh-statement table,.gh-statement thead tr,.gh-statement thead th,.gh-statement tbody td,.gh-statement tbody tr:nth-child(even) td,.gh-statement tbody tr:hover td{background:#FFFFFF!important;color:#17263A!important;box-shadow:none!important;border-color:#E4E0DA!important}
