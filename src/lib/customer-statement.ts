@@ -45,6 +45,8 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
     if (!Number.isSafeInteger(cents)) throw new Error("مبلغ الحركة يتجاوز الحد الآمن للحساب.");
     const details = readDetails(item.description);
     const doc = item.document_id ? docs.get(item.document_id) : undefined;
+    const displayDescription = item.cargo_typedetails || doc?.cargo_typedetails || detailText(details.cargoType) || detailText(details.service) || (Object.keys(details).length ? detailText(details.note) : item.description) || "—";
+    const amountPending = details.note === "المبلغ غير محدد — بانتظار تحديد قيمة المستحق" && cents === 0;
     const common = { id: item.id, date: item.created_at, amount: cents / 100 };
     if (isDebtIncrease(item.type)) {
       dueCents += cents;
@@ -53,7 +55,8 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
         driver: item.driver_name || doc?.driver_name || detailText(details.driverName) || "—",
         vehicle: doc?.vehicle_number || detailText(details.vehicleNumber) || "—",
         company: doc?.company_name_project || doc?.company_name || detailText(details.companyName) || "—",
-        description: item.cargo_typedetails || doc?.cargo_typedetails || detailText(details.cargoType) || detailText(details.service) || (Object.keys(details).length ? detailText(details.note) : item.description) || "—",
+        description: displayDescription,
+        amountPending,
       });
     } else {
       const iqd = isIqdCollection(item.type);
