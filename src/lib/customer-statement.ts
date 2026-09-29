@@ -36,8 +36,8 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
   const dues = [];
   const receipts = [];
   let dueCents = 0;
-  let receiptCents = 0;
-  let receiptIqd = 0;
+  let legacyReceiptCents = 0;
+  let receiptIqdCents = 0;
   for (const item of sorted) {
     const value = Number(item.amount);
     if (!Number.isFinite(value)) throw new Error("توجد حركة بمبلغ غير صالح؛ صحّحها قبل إصدار الكشف.");
@@ -57,8 +57,8 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
       });
     } else {
       const iqd = isIqdCollection(item.type);
-      receiptCents += Math.round(amountInUsd(item.type, cents / 100) * 100);
-      if (iqd) receiptIqd += cents / 100;
+      if (iqd) receiptIqdCents += cents;
+      else legacyReceiptCents += cents;
       receipts.push({
         ...common, currency: isIqdCollection(item.type) ? "IQD" : "USD", sender: detailText(details.senderName) || "—",
         method: detailText(details.paymentMethod) || "—",
@@ -66,6 +66,10 @@ export function buildCustomerStatement(items: readonly StatementTransaction[], d
       });
     }
   }
-  if (![dueCents, receiptCents, dueCents - receiptCents].every(Number.isSafeInteger)) throw new Error("إجمالي الحركات يتجاوز الحد الآمن للحساب.");
-  return { dues, receipts, dueTotal: dueCents / 100, receiptTotal: receiptCents / 100, receiptIqdTotal: receiptIqd, balance: (dueCents - receiptCents) / 100 };
+  // Convert the IQD grand total once, rather than rounding each receipt in USD.
+  const receiptIqdTotal = receiptIqdCents / 100;
+  const receiptTotal = Math.round((legacyReceiptCents / 100 + receiptIqdTotal / IQD_PER_USD) * 100) / 100;
+  const balance = Math.round((dueCents / 100 - receiptTotal) * 100) / 100;
+  if (![dueCents, legacyReceiptCents, receiptIqdCents].every(Number.isSafeInteger)) throw new Error("إجمالي الحركات يتجاوز الحد الآمن للحساب.");
+  return { dues, receipts, dueTotal: dueCents / 100, receiptTotal, receiptIqdTotal, balance };
 }
