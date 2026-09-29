@@ -1,8 +1,8 @@
 import { isDebtIncrease, ledgerAmount } from "@/lib/customer-ledger";
 import { requireActiveCustomer, activeCustomers, activeTransactions } from "@/lib/customer-trash";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Calculator, CreditCard, Download, FileText, ReceiptText, RefreshCcw, Search, TrendingUp, WalletCards } from "lucide-react";
+import { Calculator, CreditCard, Download, FileText, ReceiptText, RefreshCcw, Search, TrendingUp, UserRound, WalletCards } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/accounts")({
