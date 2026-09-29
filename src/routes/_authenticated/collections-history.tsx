@@ -1,7 +1,7 @@
 import { collectionDescription } from "@/lib/customer-statement";
 import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { ArrowRight, CalendarDays, RefreshCcw, Search, UserRound, WalletCards } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -74,7 +74,7 @@ function CollectionsHistoryPage() {
     setError(null);
   }
 
-  async function saveEdit(event: React.FormEvent<HTMLFormElement>) {
+  async function saveEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editing || busyId) return;
     const amount = Number(editAmount);
