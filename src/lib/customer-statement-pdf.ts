@@ -21,11 +21,11 @@ export async function downloadCustomerStatement(input: Input) {
   const pages: HTMLDivElement[] = [];
   const stamp = displayDate(new Date().toISOString());
   const logo = new URL(import.meta.env.BASE_URL + "ghadeer-logo.png", window.location.origin).href;
-  const commonHeader = '<header class="statement-head"><div class="brand"><img src="' + escapeHtml(logo) + '" alt="GHADEER"/><div><h1>شركة الغدير</h1><h2>كشف حساب العميل — ' + escapeHtml(input.customer) + '</h2></div></div><div class="issued"><span>▦ &nbsp; التاريخ</span><strong dir="ltr">' + stamp + '</strong></div></header>';
-  const period = input.from || input.to ? 'الفترة: ' + escapeHtml(input.from || "البداية") + ' — ' + escapeHtml(input.to || "حتى الآن") : "جميع الحركات";
+  const commonHeader = '<header class="statement-head"><div class="brand"><img src="' + escapeHtml(logo) + '" alt="GHADEER"/><div><h1>شركة الغدير</h1></div></div><div class="issued"><span>▦ &nbsp; التاريخ</span><strong dir="ltr">' + stamp + '</strong></div></header>';
+  const period = 'كشف حساب العميل — ' + escapeHtml(input.customer) + ' · ' + (input.from || input.to ? 'الفترة: ' + escapeHtml(input.from || "البداية") + ' — ' + escapeHtml(input.to || "حتى الآن") : "جميع الحركات");
   let page: HTMLDivElement;
   let content: HTMLDivElement;
-  // Show the branded header only on the first page of each transaction section.
+  // The branded company/date header appears only on the first dues page, first receipts page, and settlement page. Continuations have only their table title.
   const newPage = (showHeader = false) => {
     page = document.createElement("div");
     page.className = "gh-statement";
@@ -55,7 +55,7 @@ export async function downloadCustomerStatement(input: Input) {
     const start = (cont = false) => {
       wrapper = document.createElement("div");
       wrapper.className = "table-section";
-      wrapper.innerHTML = banner(title + (cont ? " — تابع" : ""), "▤") + '<table><colgroup>' + widths.map(w=>'<col style="width:' + w + '%">').join("") + '</colgroup><thead><tr>' + columns.map(c=>'<th>' + escapeHtml(c) + '</th>').join("") + '</tr></thead><tbody></tbody></table>';
+      wrapper.innerHTML = banner(cont ? (unit === "IQD" ? "تابع القبوضات" : "تابع المستحقات") : title, "▤") + '<table><colgroup>' + widths.map(w=>'<col style="width:' + w + '%">').join("") + '</colgroup><thead><tr>' + columns.map(c=>'<th>' + escapeHtml(c) + '</th>').join("") + '</tr></thead><tbody></tbody></table>';
       content.appendChild(wrapper);
       tbody = wrapper.querySelector("tbody")!;
     };
