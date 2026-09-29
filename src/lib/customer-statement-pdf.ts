@@ -25,11 +25,13 @@ export async function downloadCustomerStatement(input: Input) {
   const period = input.from || input.to ? 'الفترة: ' + escapeHtml(input.from || "البداية") + ' — ' + escapeHtml(input.to || "حتى الآن") : "جميع الحركات";
   let page: HTMLDivElement;
   let content: HTMLDivElement;
-  const newPage = () => {
+  // Show the branded header only on the first page of each transaction section.
+  const newPage = (showHeader = false) => {
     page = document.createElement("div");
     page.className = "gh-statement";
     page.dir = "rtl";
-    page.innerHTML = commonHeader + '<div class="period">' + period + ' · المستحقات بالدولار — القبوض بالدينار · 1 USD = ' + new Intl.NumberFormat("en-US").format(IQD_PER_USD) + ' IQD</div><main class="statement-content"></main><footer><span class="footer-rule"></span><span>شركة الغدير</span><span class="page-number"></span><span class="footer-rule"></span></footer>';
+    page.classList.toggle("with-header", showHeader);
+    page.innerHTML = (showHeader ? commonHeader + '<div class="period">' + period + ' · المستحقات بالدولار — القبوض بالدينار · 1 USD = ' + new Intl.NumberFormat("en-US").format(IQD_PER_USD) + ' IQD</div>' : "") + '<main class="statement-content"></main><footer><span class="footer-rule"></span><span>شركة الغدير</span><span class="page-number"></span><span class="footer-rule"></span></footer>';
     root.appendChild(page);
     content = page.querySelector<HTMLDivElement>(".statement-content")!;
     pages.push(page);
@@ -79,7 +81,7 @@ export async function downloadCustomerStatement(input: Input) {
     '<div class="settlement-row ' + cls + '"><span class="settlement-label">' + title + '</span><strong dir="ltr">' + amount + '</strong><span class="settlement-icon">' + icon + '</span></div>';
   try {
     await document.fonts.ready;
-    newPage();
+    newPage(true);
     appendBlock('<div class="statement-summary">' +
       card("إجمالي المستحقات",money(report.dueTotal),"gold","▤") +
       card("التنزيلات بالدولار",money(report.receiptTotal),"teal","≋") +
@@ -88,10 +90,12 @@ export async function downloadCustomerStatement(input: Input) {
     tableSection("الحركات المستحقة (بالدولار)",["التاريخ","الرقم","اسم السائق ورقم السيارة","اسم الشركة والوصف","المبلغ USD"],[13,18,22,29,18],
       report.dues.map(row=>'<td dir="ltr">'+displayDate(row.date)+'</td><td dir="ltr">'+escapeHtml(row.number)+'</td><td><b>'+escapeHtml(row.driver)+'</b><br/><span dir="ltr">'+escapeHtml(row.vehicle)+'</span></td><td><b>'+escapeHtml(row.company)+'</b><br/>'+escapeHtml(row.description)+'</td><td class="money" dir="ltr">'+money(row.amount)+'</td>'),money(report.dueTotal),"USD");
 
-    newPage();
+    newPage(true);
     tableSection("حركات القبض (بالدينار العراقي)",["التاريخ","اسم المرسل / الملاحظات","المبلغ المستلم","العملة"],[21,49,23,7],
       report.receipts.map(row=>'<td dir="ltr">'+displayDate(row.date)+'</td><td><b>'+escapeHtml(row.sender)+'</b><br/><span class="detail">طريقة الإرسال: '+escapeHtml(row.method)+(row.note?'<br/>'+escapeHtml(row.note):"")+'</span></td><td class="money" dir="ltr">'+(row.currency==="IQD"?dinars(row.amount):money(row.amount))+'</td><td dir="ltr">'+escapeHtml(row.currency)+'</td>'),dinars(report.receiptIqdTotal),"IQD");
 
+    // Always start settlement on its own page, with the branded header.
+    newPage(true);
     appendBlock('<div class="settlement">' + banner("تسوية القبوض والمستحقات","⚙") +
       settlementRow("مجموع القبوض بالدينار العراقي",dinars(report.receiptIqdTotal),"≋") +
       settlementRow("التحويل إلى الدولار (مجموع الدينار ÷ "+new Intl.NumberFormat("en-US").format(IQD_PER_USD)+")",money(report.receiptIqdTotal/IQD_PER_USD),"⇄") +
