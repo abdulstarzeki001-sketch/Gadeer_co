@@ -1,4 +1,4 @@
-import { isDebtIncrease as isIncoming, customerBalance } from "@/lib/customer-ledger";
+import { isDebtIncrease as isIncoming } from "@/lib/customer-ledger";
 import { activeCustomers, activeTransactions } from "@/lib/customer-trash";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadCustomerStatement } from "@/lib/customer-statement-pdf";
-import { collectionDescription, type StatementDocument } from "@/lib/customer-statement";
+import { collectionDescription, amountInUsd, isIqdCollection, type StatementDocument } from "@/lib/customer-statement";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -56,6 +56,7 @@ type Transaction = {
 type ReportStats = {
   incoming: number;
   outgoing: number;
+  receiptIqd: number;
   balance: number;
   count: number;
   incomingCount: number;
@@ -244,7 +245,7 @@ function ReportsPage() {
 
                     <div className="customer-actions">
                       <button type="button" className="pill" disabled={exporting || loading || Boolean(error)} onClick={() => void exportCurrentCustomerPdf()}>
-                        <FileText size={16} /> {exporting ? "جارٍ إنشاء الكشف..." : "تنزيل كشف PDF بالدولار"}
+                        <FileText size={16} /> {exporting ? "جارٍ إنشاء الكشف..." : "تنزيل كشف PDF (قبوض IQD / رصيد USD)"}
                       </button>
                     </div>
                   </div>
@@ -260,7 +261,7 @@ function ReportsPage() {
 
                 <section className="report-stats">
                   <Stat cls="green" label="إجمالي المستحقات" icon={<ArrowDownLeft size={18} />} value={formatAmount(stats.incoming)} note={`${formatInteger(stats.incomingCount)} حركة`} />
-                  <Stat cls="red" label="إجمالي التنزيلات" icon={<ArrowUpRight size={18} />} value={formatAmount(stats.outgoing)} note={`${formatInteger(stats.outgoingCount)} حركة`} />
+                  <Stat cls="red" label="التنزيلات بالدولار" icon={<ArrowUpRight size={18} />} value={`${formatAmount(stats.outgoing)} USD`} note={`${formatAmount(stats.receiptIqd)} IQD · ${formatInteger(stats.outgoingCount)} حركة`} />
                   <Stat cls="blue" label="الرصيد الحالي" icon={<WalletCards size={18} />} value={formatAmount(stats.balance)} note={hasDateFilter ? "حسب النطاق المختار" : "إجمالي كامل"} />
                   <Stat cls="gold" label="المتوسط" icon={<TrendingUp size={18} />} value={formatAmount(stats.average)} note={`من ${stats.documents ?? 0} مستند`} />
                 </section>
@@ -269,7 +270,7 @@ function ReportsPage() {
                   <h3>ملخص الحساب الكلي</h3>
                   <div className="overview-grid">
                     <Overview label="إجمالي المستحقات" value={formatAmount(allTimeStats.incoming)} />
-                    <Overview label="إجمالي التنزيلات" value={formatAmount(allTimeStats.outgoing)} />
+                    <Overview label="التنزيلات بالدولار" value={`${formatAmount(allTimeStats.outgoing)} USD (${formatAmount(allTimeStats.receiptIqd)} IQD)`} />
                     <Overview label="الرصيد النهائي" value={formatAmount(allTimeStats.balance)} />
                     <Overview label="أول حركة" value={allTimeStats.firstDate ? formatDate(allTimeStats.firstDate) : "—"} />
                   </div>
@@ -314,7 +315,7 @@ function ReportsPage() {
                                   <td>{transaction.cargo_typedetails ?? collectionDescription(transaction.description)}</td>
                                   <td className={incoming ? "positive" : "negative"}>
                                     {incoming ? "+" : "-"}
-                                    {formatAmount(transaction.amount)}
+                                    {formatAmount(transaction.amount)} {isIqdCollection(transaction.type) ? "IQD" : "USD"}
                                   </td>
                                 </tr>
                               );
@@ -336,6 +337,7 @@ function ReportsPage() {
 function buildStats(items: Transaction[]): ReportStats {
   let incoming = 0;
   let outgoing = 0;
+  let receiptIqd = 0;
   let incomingCount = 0;
   let outgoingCount = 0;
   const documents = new Set<string>();
@@ -347,19 +349,20 @@ function buildStats(items: Transaction[]): ReportStats {
       incoming += amountValue;
       incomingCount += 1;
     } else {
-      outgoing += amountValue;
+      outgoing += amountInUsd(item.type, amountValue);
+      if (isIqdCollection(item.type)) receiptIqd += amountValue;
       outgoingCount += 1;
     }
 
     if (item.document_number) documents.add(item.document_number);
   }
 
-  const balance = customerBalance(items);
+  const balance = Math.round((incoming - outgoing) * 100) / 100;
   const average = items.length ? balance / items.length : 0;
   const firstDate = items.length ? items[items.length - 1]?.created_at ?? null : null;
   const lastDate = items.length ? items[0]?.created_at ?? null : null;
 
-  return { incoming, outgoing, balance, count: items.length, incomingCount, outgoingCount, documents: documents.size, average, firstDate, lastDate };
+  return { incoming, outgoing, receiptIqd, balance, count: items.length, incomingCount, outgoingCount, documents: documents.size, average, firstDate, lastDate };
 }
 
 function Stat({ cls = "", label, icon, value, note }: { cls?: string; label: string; icon: ReactNode; value: string; note?: string }) {
