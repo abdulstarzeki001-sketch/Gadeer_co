@@ -30,6 +30,13 @@ function CollectionsHistoryPage() {
   const [dateTo, setDateTo] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Collection | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editSender, setEditSender] = useState("");
+  const [editMethod, setEditMethod] = useState("نقداً");
+  const [editNote, setEditNote] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => { void loadData(); }, []);
 
@@ -50,6 +57,60 @@ function CollectionsHistoryPage() {
       setCollections((collectionData ?? []) as Collection[]);
     }
     setLoading(false);
+  }
+
+  function beginEdit(collection: Collection) {
+    let details: Record<string, unknown> = {};
+    try {
+      const parsed: unknown = JSON.parse(collection.description ?? "");
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) details = parsed as Record<string, unknown>;
+    } catch { /* Keep legacy plain-text receipts editable. */ }
+    setEditing(collection);
+    setEditAmount(String(collection.amount));
+    setEditSender(typeof details.senderName === "string" ? details.senderName : "");
+    setEditMethod(typeof details.paymentMethod === "string" ? details.paymentMethod : "نقداً");
+    setEditNote(typeof details.note === "string" ? details.note : collectionDescription(collection.description));
+    setNotice(null);
+    setError(null);
+  }
+
+  async function saveEdit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editing || busyId) return;
+    const amount = Number(editAmount);
+    if (!Number.isFinite(amount) || amount <= 0 || !Number.isSafeInteger(Math.round(amount * 100))) {
+      setError("أدخل مبلغ قبض صحيحاً."); return;
+    }
+    if (!editSender.trim()) { setError("أدخل اسم المرسل."); return; }
+    setBusyId(editing.id);
+    setError(null);
+    // Restrict the mutation to collection receipts: never modify an invoice by mistake.
+    const { data, error: updateError } = await supabase.from("transactions")
+      .update({ amount, description: JSON.stringify({
+        collection_receipt: true, senderName: editSender.trim(),
+        paymentMethod: editMethod, note: editNote.trim(),
+      }) })
+      .eq("id", editing.id).eq("type", "تحصيل من عميل").select("id");
+    setBusyId(null);
+    if (updateError) { setError(updateError.message); return; }
+    if (!data?.length) { setError("لم يتم تعديل القبض. تحقق من صلاحياتك أو حدّث الصفحة."); return; }
+    setEditing(null);
+    await loadData();
+    setNotice("تم تعديل القبض وتحديث الرصيد المعروض.");
+  }
+
+  async function deleteCollection(collection: Collection) {
+    if (busyId || !window.confirm(`حذف قبض بقيمة ${formatAmount(collection.amount)} من حساب العميل؟ سيُعاد احتساب رصيده بعد الحذف. لا يمكن التراجع عن هذا الإجراء.`)) return;
+    setBusyId(collection.id);
+    setError(null);
+    const { data, error: deleteError } = await supabase.from("transactions")
+      .delete().eq("id", collection.id).eq("type", "تحصيل من عميل").select("id");
+    setBusyId(null);
+    if (deleteError) { setError(deleteError.message); return; }
+    if (!data?.length) { setError("لم يتم حذف القبض. تحقق من صلاحياتك أو حدّث الصفحة."); return; }
+    if (editing?.id === collection.id) setEditing(null);
+    await loadData();
+    setNotice("تم حذف القبض وتحديث السجل.");
   }
 
   const traderMap = useMemo(() => new Map(traders.map((trader) => [trader.id, trader])), [traders]);
@@ -76,12 +137,25 @@ function CollectionsHistoryPage() {
       .history-head,.history-panel,.history-stat{border:1px solid var(--line);background:var(--surface)!important;box-shadow:var(--shadow)}.history-head{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:22px;border-radius:22px}.history-head h1{margin:0 0 6px;color:var(--text)!important}.history-head p{margin:0;color:var(--muted)!important}.history-head a{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2)!important;color:var(--text)!important;text-decoration:none}
       .history-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.history-stat{padding:17px;border-radius:17px}.history-stat span{display:block;color:var(--muted)!important;font-size:.82rem}.history-stat strong{display:block;margin-top:8px;color:var(--text)!important;font-size:1.35rem}.history-stat.gold strong{color:var(--accent)!important}
       .history-panel{padding:18px;border-radius:20px}.history-filters{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr auto;gap:10px;align-items:end}.history-field label{display:block;margin-bottom:6px;color:var(--text)!important;font-size:.8rem;font-weight:800}.history-field input,.history-field select{width:100%;margin:0!important;padding:10px 12px!important;border:1px solid var(--line)!important;border-radius:12px!important;background:var(--surface2)!important;color:var(--text)!important}.history-search{position:relative}.history-search svg{position:absolute;right:12px;bottom:12px;color:var(--muted)}.history-search input{padding-right:38px!important}.history-refresh{min-height:43px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;border:1px solid var(--line)!important;border-radius:12px!important;background:var(--surface2)!important;color:var(--text)!important;cursor:pointer}
+      .history-notice{margin:12px 0;padding:12px;border:1px solid #16a34a;border-radius:12px;color:#16a34a}
+      .history-editor{margin:16px 0}.history-editor h2{font-size:1.1rem;margin:0 0 14px;color:var(--text)}.history-edit-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.history-edit-form label{display:grid;gap:6px;font-weight:700;color:var(--text)}.history-edit-form input,.history-edit-form select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface2);color:var(--text)}.history-edit-buttons,.history-actions{display:flex;gap:8px;flex-wrap:wrap}.history-edit-buttons{grid-column:1/-1}.history-edit-buttons button,.history-actions button{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--text);cursor:pointer}.history-edit-buttons button[type=submit]{background:#137a61;color:white}.history-actions button.danger{color:#dc2626;border-color:#dc2626}.history-actions button:disabled,.history-edit-buttons button:disabled{opacity:.5;cursor:not-allowed}
       .history-table-wrap{overflow:auto;margin-top:16px}.history-table{width:100%;min-width:760px;border-collapse:collapse;background:transparent!important}.history-table th{padding:12px 14px;text-align:right;color:var(--accent)!important;background:var(--surface2)!important;border-bottom:1px solid var(--line)!important}.history-table td{padding:13px 14px;color:var(--text)!important;border-bottom:1px solid var(--line)!important}.history-client{display:flex;align-items:center;gap:9px}.history-client-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--surface2)!important;color:var(--accent)}.history-amount{font-weight:900;color:#16a34a!important;direction:ltr}.history-empty{padding:42px;text-align:center;color:var(--muted)!important}.history-error{margin-top:14px;padding:12px 14px;border-radius:13px;color:#dc2626!important;border:1px solid rgba(220,38,38,.22);background:rgba(220,38,38,.08)}
-      @media(max-width:850px){.history-filters{grid-template-columns:1fr 1fr}.history-search{grid-column:1/-1}.history-refresh{grid-column:1/-1}.history-head{align-items:flex-start}}@media(max-width:500px){.history-stats{grid-template-columns:1fr}.history-filters{grid-template-columns:1fr}.history-search,.history-refresh{grid-column:auto}.history-head{flex-direction:column}.history-head a{width:100%;justify-content:center}}
+      @media(max-width:850px){.history-edit-form{grid-template-columns:1fr}.history-filters{grid-template-columns:1fr 1fr}.history-search{grid-column:1/-1}.history-refresh{grid-column:1/-1}.history-head{align-items:flex-start}}@media(max-width:500px){.history-stats{grid-template-columns:1fr}.history-filters{grid-template-columns:1fr}.history-search,.history-refresh{grid-column:auto}.history-head{flex-direction:column}.history-head a{width:100%;justify-content:center}}
     `}</style>
     <div className="history-page">
       <section className="history-head"><div><h1>سجل قبوض العملاء</h1><p>كل دفعة تم قبضها من عميل تظهر هنا مع التاريخ والمبلغ والملاحظة.</p></div><Link to="/collections"><ArrowRight size={17}/> قبض جديد</Link></section>
-      {error ? <div className="history-error">{error}</div> : null}
+      {error ? <div className="history-error" role="alert">{error}</div> : null}
+      {notice ? <div className="history-notice" role="status">{notice}</div> : null}
+      {editing ? <section className="history-panel history-editor" aria-label="تعديل القبض">
+        <h2>تعديل القبض</h2>
+        <form onSubmit={saveEdit} className="history-edit-form">
+          <label>المبلغ (د.ع)<input type="number" min="0.01" step="0.01" required value={editAmount} onChange={e=>setEditAmount(e.target.value)}/></label>
+          <label>اسم المرسل<input required value={editSender} onChange={e=>setEditSender(e.target.value)}/></label>
+          <label>طريقة الدفع<select value={editMethod} onChange={e=>setEditMethod(e.target.value)}><option>نقداً</option><option>تحويل بنكي</option><option>حوالة</option><option>أخرى</option></select></label>
+          <label>ملاحظات<input value={editNote} onChange={e=>setEditNote(e.target.value)}/></label>
+          <div className="history-edit-buttons"><button type="submit" disabled={busyId !== null}>حفظ التعديل</button><button type="button" disabled={busyId !== null} onClick={()=>setEditing(null)}>إلغاء</button></div>
+        </form>
+      </section> : null}
       <section className="history-stats"><div className="history-stat gold"><span>إجمالي القبوض المعروضة</span><strong>{formatAmount(total)}</strong></div><div className="history-stat"><span>عدد عمليات القبض</span><strong>{filtered.length.toLocaleString("ar-IQ")}</strong></div></section>
       <section className="history-panel">
         <div className="history-filters">
@@ -91,7 +165,7 @@ function CollectionsHistoryPage() {
           <div className="history-field"><label>إلى تاريخ</label><input type="date" value={dateTo} onChange={(e)=>setDateTo(e.target.value)}/></div>
           <button type="button" className="history-refresh" onClick={()=>void loadData()}><RefreshCcw size={16}/> تحديث</button>
         </div>
-        {loading ? <div className="history-empty">جارٍ تحميل سجل القبوض...</div> : filtered.length === 0 ? <div className="history-empty">لا توجد عمليات قبض مطابقة.</div> : <div className="history-table-wrap"><table className="history-table"><thead><tr><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الملاحظة</th><th>رقم الوثيقة</th></tr></thead><tbody>{filtered.map((collection)=>{const trader=collection.trader_id?traderMap.get(collection.trader_id):null;return <tr key={collection.id}><td><div className="history-client"><span className="history-client-icon"><UserRound size={17}/></span><span>{trader?.name||"عميل غير معروف"}</span></div></td><td><CalendarDays size={14} style={{display:"inline",marginInlineEnd:5}}/>{formatDateTime(collection.created_at)}</td><td className="history-amount">{formatAmount(collection.amount)}</td><td>{collectionDescription(collection.description)}</td><td>{collection.document_number||"—"}</td></tr>})}</tbody></table></div>}
+        {loading ? <div className="history-empty">جارٍ تحميل سجل القبوض...</div> : filtered.length === 0 ? <div className="history-empty">لا توجد عمليات قبض مطابقة.</div> : <div className="history-table-wrap"><table className="history-table"><thead><tr><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الملاحظة</th><th>رقم الوثيقة</th><th>الإجراءات</th></tr></thead><tbody>{filtered.map((collection)=>{const trader=collection.trader_id?traderMap.get(collection.trader_id):null;return <tr key={collection.id}><td><div className="history-client"><span className="history-client-icon"><UserRound size={17}/></span><span>{trader?.name||"عميل غير معروف"}</span></div></td><td><CalendarDays size={14} style={{display:"inline",marginInlineEnd:5}}/>{formatDateTime(collection.created_at)}</td><td className="history-amount">{formatAmount(collection.amount)}</td><td>{collectionDescription(collection.description)}</td><td>{collection.document_number||"—"}</td><td><div className="history-actions"><button type="button" disabled={busyId !== null} onClick={()=>beginEdit(collection)}>تعديل</button><button type="button" className="danger" disabled={busyId !== null} onClick={()=>void deleteCollection(collection)}>حذف</button></div></td></tr>})}</tbody></table></div>}
         <div style={{marginTop:14}}><Link to="/reports" style={{display:"inline-flex",alignItems:"center",gap:7,textDecoration:"none",color:"var(--text)"}}><WalletCards size={17}/> فتح تقارير حسابات العملاء</Link></div>
       </section>
     </div>
